@@ -1,6 +1,8 @@
 # Changelog
 
-## v0.3.0
+## v0.3.1
+First release containing everything below (a v0.3.0 tag was created but never published).
+
 ### Fixed
 - **Install:** `pip install telmus` produced a CLI that crashed on every command when pip picked `mcp` 2.x. `mcp` is now an optional extra (`pip install "telmus[mcp]"`, pinned `<2`); the CLI no longer imports it unless you run `telmus serve`.
 - **Beneish M-score** was not Beneish's model (DSRI was a gross-margin ratio, LVGI used interest expense, TATA had the wrong sign and denominator) and returned nothing on current yfinance data. Rewritten per the paper, with hand-computed tests. **Reported M-scores change.**
