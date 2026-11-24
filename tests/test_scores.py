@@ -258,3 +258,40 @@ def test_margin_trend_unknown_when_a_year_is_missing_not_zero() -> None:
 
     inc = frame({"Total Revenue": [100, 100, 100], "Operating Income": [20, 20, None]})
     assert GrowthEngine()._margin_trend(inc) is None
+
+
+# ------------------------------------------------------------ end-to-end (offline)
+def test_scanner_end_to_end_with_mocked_provider() -> None:
+    from unittest.mock import patch
+
+    from telmus.core.scanner import TelmusScanner
+
+    fin = company()
+    fin["info"] = {"symbol": "ACME", "longName": "Acme Corp", "exchange": "NYQ", "marketCap": 3000.0}
+    with patch("telmus.core.scanner.load_financials", return_value=fin):
+        result = TelmusScanner().scan("ACME")
+    assert (result.ticker, result.company) == ("ACME", "Acme Corp")
+    assert result.health.piotroski_f == 8
+    assert result.health.altman_z == pytest.approx(4.645273, abs=1e-5)
+    assert result.beneish_m == pytest.approx(-2.2835, abs=1e-3)
+    assert result.valuation.pb_ratio == pytest.approx(3000 / 600)
+    assert result.valuation.vs_sector is None
+    assert result.highest_concern == "low"
+    payload = result.to_dict()  # serialisable, with explanatory notes list
+    assert payload["notes"] == []
+    with patch("telmus.core.scanner.load_financials", return_value=fin):
+        cmp = TelmusScanner().compare("ACME", "ACME")
+    assert cmp.result_a.ticker == cmp.result_b.ticker == "ACME"
+
+
+def test_scan_result_carries_notes_for_every_na() -> None:
+    from unittest.mock import patch
+
+    from telmus.core.scanner import TelmusScanner
+
+    sparse = {"info": {"symbol": "X"}, "income_stmt": frame({"Total Revenue": [1, 1, 1]})}
+    with patch("telmus.core.scanner.load_financials", return_value=sparse):
+        result = TelmusScanner().scan("X")
+    assert result.health.piotroski_f is None and result.beneish_m is None
+    assert any("Piotroski" in n for n in result.notes)
+    assert any("Beneish" in n for n in result.notes)
