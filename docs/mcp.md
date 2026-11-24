@@ -4,68 +4,31 @@ telmus can run as an MCP server so AI assistants and agents can call financial a
 
 ## Why use telmus as an MCP server
 
-- Get deterministic financial metrics from real data, not guesses.
+- Get deterministic, documented financial metrics instead of model-generated numbers.
 - Let AI agents fetch company analysis automatically during conversations.
 - Keep your local environment in control while giving assistants structured access to tools.
-- Use the same API for both command-line workflows and agent-based integrations.
+- Same engine as the CLI and the Python SDK.
 
-## Start the server
+## Install and start
 
 ```bash
+pip install "telmus[mcp]"
 telmus serve
 ```
 
-When the server starts, you should see:
-
-```text
-telmus MCP server listening on port 8080
-Available tools: scan, scan_ticker, compare, screen, info
-```
+`telmus serve` speaks MCP over **stdio**: it opens no network port and prints nothing on its own. You normally don't run it by hand; your MCP client launches it (see the client examples below). Without the extra installed, the command exits with a message telling you to install it.
 
 ## Available MCP tools
 
-### `scan(ticker)`
+| Tool | Inputs | Returns |
+|---|---|---|
+| `scan` | `ticker` | `{"result": ScanResult}` (same JSON as `scan(...).to_dict()`) |
+| `scan_ticker` | `ticker`, optional `exchange` (`NSE`, `BSE`, `LSE`, `NYSE`, `NASDAQ`, `US`) | same; `INFY` + `NSE` scans `INFY.NS`; a ticker that already has a suffix is left alone; unknown exchange is an error |
+| `compare` | `ticker_a`, `ticker_b` | `{"result": CompareResult}` |
+| `screen` | optional `sector` (`IT` or `Banking`, default `IT`), `min_piotroski` (default 0), `max_de` (default 10) | `{"matches": [ScanResult...], "skipped": {ticker: reason}}`; unknown sector is an error |
+| `info` | none | `{version, data_source, coverage, description}` |
 
-- **Inputs**: `ticker` (string)
-- **Purpose**: Run a full financial scan for a single company.
-- **Returns**: `valuation`, `health`, `growth`, `flags`, `analyst_brief`
-
-Use this when you want a complete snapshot of one stock.
-
-### `scan_ticker(ticker, exchange)`
-
-- **Inputs**: `ticker` (string), `exchange` (string)
-- **Purpose**: Resolve exchange-specific symbols and scan accurately.
-- **Returns**: same structured scan result as `scan`
-
-Use this when your assistant needs to distinguish between listings that share a ticker symbol.
-
-### `compare(ticker_a, ticker_b)`
-
-- **Inputs**: `ticker_a` (string), `ticker_b` (string)
-- **Purpose**: Compare two companies side by side.
-- **Returns**: valuation, health, growth, and analyst summary for both tickers.
-
-Use this for peer analysis or watchlist comparisons.
-
-### `screen(sector, min_piotroski, max_de)`
-
-- **Inputs**:
-  - `sector` (string)
-  - `min_piotroski` (integer)
-  - `max_de` (float)
-- **Purpose**: Filter stocks by sector, earnings quality, and leverage.
-- **Returns**: a list of matching tickers with their financial metrics.
-
-Use this for building a shortlist of fundamentally stronger companies.
-
-### `info()`
-
-- **Inputs**: none
-- **Purpose**: Retrieve server status and metadata.
-- **Returns**: version, tool list, data source details, and uptime.
-
-Use this to verify the server is running and to check available tools.
+Missing metrics are `null` with an explanation in each result's `notes`. `screen` only covers the small built-in example lists described in the [CLI](cli.md#screen) page.
 
 ## Client setup examples
 
@@ -135,16 +98,9 @@ Ask the assistant to:
 - `Find IT stocks with Piotroski above 6 and debt-to-equity below 1.5`
 - `Give me a shortlist of low-leverage, high-quality companies in the technology sector`
 
-## Best practices
-
-- Start with `info()` to confirm the server is running.
-- Use `scan()` for detailed company analysis.
-- Use `compare()` for direct peer comparisons.
-- Use `screen()` to filter a universe before deeper research.
-- Use `scan_ticker()` when the assistant needs an exchange-specific symbol.
-
 ## Troubleshooting
 
-- If the server does not start, verify that `telmus` is installed and the `serve` command is available.
-- If the assistant cannot connect, confirm that the MCP client is configured to launch `telmus serve` and that the local port is open.
-- If a ticker cannot be resolved, use `scan_ticker()` with the exchange hint.
+- `telmus serve` prints "needs the optional mcp extra": run `pip install "telmus[mcp]"`.
+- The client cannot start the server: make sure `telmus` is on the PATH of the app that launches it (on Windows/macOS GUI apps this can differ from your terminal; use the full path to `telmus` in `command`).
+- A ticker is not found: add the exchange suffix (`INFY.NS`) or pass `exchange` to `scan_ticker`.
+- Data is from Yahoo Finance (unofficial). Output is screening statistics, not investment advice.

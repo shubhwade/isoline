@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.4.0
+### Fixed (reports, docs, screening: found in a second, deeper audit)
+- **HTML report** showed missing data as `0` (P/E 0.0, "HEALTH: WEAK", "GROWTH: DECLINING", "VALUATION: FAIR", "Beneish 0.00 = low manipulation risk") and unavailable Piotroski signals as failures. It now shows `n/a`, "N/A" badges and neutral signal markers. The header said v0.2.6 and the footer printed a literal `{telmus_version}`; both now show the real version.
+- **Excel report** header said v0.1.0, used the old Altman thresholds (2.99/1.81) and showed "ok" for n/a rows; now correct, with the n/a reasons listed on the Summary sheet.
+- **Power BI** radar scored a missing leverage as a perfect 10 and other gaps as 0; gaps are now blank.
+- **screen**: an unknown sector silently screened IT; now exit code 2 with the valid sectors. Tickers that fail are reported as skipped with the reason instead of vanishing. The MCP `screen` tool scanned bare symbols (US listings) instead of NSE tickers; it now shares the CLI's universe.
+- **MCP** `scan_ticker` ignored its `exchange` argument; it now applies it (`INFY` + `NSE` = `INFY.NS`).
+- **CLI**: `telmus check` printed "n/a" for a legitimate score of 0; percentages now display as percentages; n/a rows show an n/a status, not "ok".
+- Summary text no longer says "Suitable for DCF or comparable company analysis" (that read as a recommendation) and has correct capitalisation; "AI Analyst Brief" renamed "Summary (rule-based)" because it is not AI.
+- Website showed real companies (INFY, AAPL, RELIANCE, MSFT) with numbers from the pre-fix formulas; replaced with clearly labelled synthetic samples. Removed the unverifiable "50,000+ tickers" claim and the wrong "Python 3.9+".
+
+### Changed
+- `from telmus import scan, compare, TelmusScanner, ScanResult` now works as documented (lazy import). `telmus.sdk` exports the error classes.
+- Docs rewritten from the actual behaviour: SDK, CLI, MCP (stdio, not a port), Quickstart, homepage. They previously described methods and options that did not exist and showed invented example numbers.
+
 ## v0.3.3
 ### Added
 - **Quality metrics** (`ScanResult.quality`, CLI "Quality" table, HTML report section): DuPont ROE decomposition, ROIC, free-cash-flow margin and FCF/net income, accruals ratio, DSO/DIO/DPO, cash conversion cycle, share-count change. Formulas in `docs/methodology.md`; missing inputs give n/a with a note.

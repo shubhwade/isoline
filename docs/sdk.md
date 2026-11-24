@@ -1,172 +1,92 @@
-# Python SDK Reference
-
-Use the telmus Python SDK to embed financial analysis directly into notebooks, scripting workflows, and automated data pipelines.
-
-## Install
+# Python SDK
 
 ```bash
 pip install telmus
 ```
 
-## Import examples
-
 ```python
-from telmus import TelmusScanner, scan, compare
-from telmus.models import ScanResult, HealthResult, ValuationResult, GrowthResult, FlagsResult
+from telmus import scan, compare, TelmusScanner, ScanResult, CompareResult
 ```
 
-## When to use the SDK
+`import telmus` is lightweight; the SDK loads on first use. Everything here is tested offline in `tests/test_sdk.py`. Names not listed on this page are internal and may change.
 
-- You want programmatic access to valuations, health scores, growth metrics, and red-flag indicators.
-- You are building a data pipeline, Jupyter notebook, or analytics dashboard.
-- You need structured objects that can be inspected, transformed, and exported.
+## Functions
 
-## TelmusScanner class
+| Call | Returns |
+|---|---|
+| `scan(ticker)` | `ScanResult` |
+| `compare(ticker_a, ticker_b)` | `CompareResult` (`.ticker_a`, `.ticker_b`, `.result_a`, `.result_b`) |
+| `telmus.sdk.compare_to_dataframe(compare_result)` | `pandas.DataFrame` indexed by metric, one column per ticker |
+| `TelmusScanner().scan(t)` / `.compare(a, b)` | same as above; use when you want one reusable scanner |
 
-`TelmusScanner` is the primary programmatic interface for telmus.
+Tickers use Yahoo Finance format: `AAPL`, `INFY.NS` (NSE), `500209.BO` (BSE).
 
-### Methods
+## ScanResult
 
-- `scan(ticker: str) -> ScanResult`
-  - Scan a single ticker and return a full structured result.
-- `compare(ticker_a: str, ticker_b: str) -> tuple[ScanResult, ScanResult]`
-  - Compare two tickers side by side.
-- `screen(sector: str | None = None, min_piotroski: int | None = None, max_de: float | None = None) -> list[ScanResult]`
-  - Filter the universe by sector, Piotroski score, and leverage.
-- `check(ticker: str) -> HealthResult`
-  - Run a compact health check for one ticker.
-- `serve(port: int = 8080, host: str = "127.0.0.1") -> None`
-  - Start the MCP server.
-- `info() -> dict`
-  - Retrieve server metadata and tool availability.
+| Field | Type | Notes |
+|---|---|---|
+| `ticker`, `company`, `exchange` | str | |
+| `valuation` | `ValuationResult` | `pe_ratio`, `pb_ratio`, `ev_ebitda`, `vs_sector` (always `None`: no peer data), `flag` |
+| `health` | `HealthResult` | `piotroski_f` (int or `None`), `piotroski_signals` (dict of the signals that were computable), `altman_z`, `debt_to_equity`, `current_ratio`, `interest_coverage`, `flag`, `notes` |
+| `growth` | `GrowthResult` | `revenue_cagr_3y`, `pat_cagr_3y` (fractions, 0.10 = 10%), `margin_trend` (`"improving"`/`"stable"`/`"declining"`), `fcf_yield`, `flag` |
+| `quality` | `QualityResult` | DuPont (`net_margin`, `asset_turnover`, `equity_multiplier`, `roe`), `roic`, `fcf`, `fcf_margin`, `fcf_to_net_income`, `accruals_ratio`, `dso_days`, `dio_days`, `dpo_days`, `cash_conversion_cycle_days`, `share_count_change`, `notes` |
+| `beneish_m` | float or `None` | flagged as a possible manipulator above -2.22 |
+| `red_flags` | list of `RedFlag(type, value, severity)` | |
+| `highest_concern` | str | `"low"`, `"medium"` or `"high"` |
+| `analyst_brief` | str | rule-based text summary, not advice |
+| `notes` | list[str] | one line for every metric that is `None`, saying why |
+| `scan_duration_ms`, `schema_version` | int | |
 
-## ScanResult dataclass
+**Missing data is `None`, never `0`.** Check `result.notes` to see why a value is missing (for example, banks have no meaningful Altman Z″ or Beneish M).
 
-`ScanResult` contains the full result of a scan.
+Methods: `result.to_dict()` and `result.to_json()` (stable shape, `schema_version` 1).
 
-### Fields
+## Errors
 
-- `ticker: str` the stock symbol.
-- `valuation: ValuationResult` valuation multiples and comparison metrics.
-- `health: HealthResult` balance sheet and earnings health metrics.
-- `growth: GrowthResult` revenue and margin momentum metrics.
-- `flags: FlagsResult` risk flags and fraud indicators.
-- `analyst_brief: str` deterministic summary text.
-- `generated_at: str` timestamp when the scan was produced.
+All inherit `TelmusError` (a `ValueError`) and carry a `.hint`:
+`InvalidTickerError`, `NoDataError`, `ProviderUnavailableError`, `RateLimitError`.
 
-## Result models
+```python
+from telmus import scan
+from telmus.sdk import TelmusError
 
-### ValuationResult
+try:
+    r = scan("INFY.NS")
+except TelmusError as exc:
+    print(exc, "->", exc.hint)
+```
 
-- `pe_ratio: float` price-to-earnings ratio.
-- `pb_ratio: float` price-to-book ratio.
-- `ev_ebitda: float` enterprise value to EBITDA.
-- `sector: str` the company sector.
-- `peer_rank: str` valuation ranking relative to peers.
-
-### HealthResult
-
-- `piotroski_f: int` Piotroski F-score, 0 to 9.
-- `altman_z: float` Altman Z-score.
-- `debt_to_equity: float` debt-to-equity ratio.
-- `current_ratio: float` current assets divided by current liabilities.
-- `interest_coverage: float` EBIT divided by interest expense.
-
-### GrowthResult
-
-- `revenue_cagr_3y: float` three-year revenue CAGR.
-- `pat_cagr_3y: float` three-year PAT CAGR.
-- `margin_trend: str` `improving`, `stable`, or `declining`.
-- `fcf_yield: float` free cash flow yield.
-
-### FlagsResult
-
-- `beneish_m: float` Beneish M-score.
-- `high_de_flag: bool` high leverage warning.
-- `negative_fcf_flag: bool` negative free cash flow warning.
-- `value_warning: str | None` value concern note.
-
-## Quick examples
-
-### Basic scan
+## Examples
 
 ```python
 from telmus import scan
 
-result = scan("INFY")
-print(result.analyst_brief)
+r = scan("AAPL")
+print(r.health.piotroski_f, r.health.altman_z, r.quality.roic)
+for note in r.notes:
+    print("n/a because:", note)
 ```
-
-### Compare two tickers
-
-```python
-from telmus import compare
-
-result_a, result_b = compare("INFY", "TCS")
-print(result_a.valuation.pe_ratio, result_b.valuation.pe_ratio)
-```
-
-### Loop over a list of tickers
-
-```python
-from telmus import scan
-
-tickers = ["INFY", "TCS", "WIPRO"]
-for symbol in tickers:
-    result = scan(symbol)
-    print(symbol, result.health.piotroski_f, result.analyst_brief)
-```
-
-### Access specific fields
-
-```python
-from telmus import scan
-
-result = scan("INFY")
-print("Altman Z:", result.health.altman_z)
-print("Revenue CAGR 3y:", result.growth.revenue_cagr_3y)
-print("Beneish M:", result.flags.beneish_m)
-```
-
-### Convert to pandas DataFrame
 
 ```python
 import pandas as pd
 from telmus import scan
 
-result = scan("INFY")
-rows = [{
-    "ticker": result.ticker,
-    "pe_ratio": result.valuation.pe_ratio,
-    "altman_z": result.health.altman_z,
-    "revenue_cagr_3y": result.growth.revenue_cagr_3y,
-    "beneish_m": result.flags.beneish_m,
-}]
-df = pd.DataFrame(rows)
-print(df)
+rows = []
+for t in ["INFY.NS", "TCS.NS", "WIPRO.NS"]:
+    try:
+        r = scan(t)
+    except Exception as exc:          # one bad ticker should not stop the loop
+        print("skipped", t, exc)
+        continue
+    rows.append({"ticker": t, "F": r.health.piotroski_f, "Z": r.health.altman_z,
+                 "ROIC": r.quality.roic, "CCC days": r.quality.cash_conversion_cycle_days})
+print(pd.DataFrame(rows))
 ```
-
-### Export to JSON file
 
 ```python
 import json
 from telmus import scan
-
-result = scan("INFY")
-with open("infy_report.json", "w", encoding="utf-8") as f:
-    json.dump(result.__dict__, f, indent=2)
+open("aapl.json", "w", encoding="utf-8").write(scan("AAPL").to_json())
 ```
 
-## Best practices
-
-- Use `scan()` when you need a complete company profile.
-- Use `compare()` to evaluate alternatives side by side.
-- Use `screen()` to build a shortlist before deeper analysis.
-- Use `check()` for fast health validation when you only need risk indicators.
-- Use `serve()` to expose the SDK as an MCP tool for AI integrations.
-
-## Integration notes
-
-- The SDK is ideal for notebooks and data pipelines.
-- Use structured results to build dashboards, alerts, or export pipelines.
-- Always treat `analyst_brief` as a deterministic summary, not investment advice.
+Data comes from Yahoo Finance via `yfinance` (unofficial, may be delayed or incomplete). Output is screening statistics, not investment advice.

@@ -3,9 +3,9 @@
 Last updated: 2026-11-25. Repository head: see `git log`.
 
 ## Stage
-Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.3.3`, adding quality metrics to CLI/HTML; release `v0.3.3` needs the owner to create the GitHub release.
+Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.4.0`: quality metrics plus the second-audit fixes (see CHANGELOG). Release `v0.4.0` needs the owner to create the tag/release.
 
-## Implemented and tested (offline, 75 tests, Python 3.11/3.12 locally)
+## Implemented and tested (offline, 92 tests, Python 3.11/3.12 locally)
 - Install fix: `mcp` is an optional extra; clean-venv wheel install verified.
 - Piotroski F, Altman Z'', Beneish M with hand-computed tests; n/a instead of fabricated zeros.
 - Quality engine: DuPont ROE, ROIC, FCF, accruals, DSO/DIO/DPO, cash conversion cycle, dilution.
@@ -16,6 +16,7 @@ Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-
 - Windows and macOS CI results (cannot read Actions logs from here).
 - Everything against live Yahoo data (sandbox has no access). Real-world label drift may surface more n/a values.
 - Quality metrics are shown in the CLI and HTML report; not yet in the Excel workbook.
+- HTML compare/screen pages and the Excel compare/screen sheets were only smoke-tested with sparse data (no crash, no literal placeholders); their per-metric zero defaults in chart arrays are not individually audited.
 
 ## Planned (not started)
 Provider abstraction (SEC EDGAR / user-supplied data), DCF with explicit assumptions, screening, portfolio analytics, rebuilt website, web app, release-please automation. See ROADMAP.md.
@@ -27,7 +28,7 @@ Provider abstraction (SEC EDGAR / user-supplied data), DCF with explicit assumpt
 - Not an investment-advice product: SEBI Research Analyst Regulations require registration for buy/sell/hold recommendations, so output is analytics plus a disclaimer.
 
 ## Outstanding (owner actions)
-1. Create GitHub release `v0.3.3` (Trusted Publishing already works if 0.3.2 went out that way; otherwise add a Trusted Publisher (owner `shubhwade`, repo `telmus`, workflow `publish.yml`, environment `pypi`), ). Alternative: local `python -m build && twine upload dist/*` with a **new project-scoped token** that never goes into chat or git.
+1. Create GitHub release `v0.4.0` (Trusted Publishing already works if 0.3.2 went out that way; otherwise add a Trusted Publisher (owner `shubhwade`, repo `telmus`, workflow `publish.yml`, environment `pypi`), ). Alternative: local `python -m build && twine upload dist/*` with a **new project-scoped token** that never goes into chat or git.
 2. Optional: GitHub environment `pypi` with required reviewers.
 3. Stale tag `v0.3.0` (on old commit a166424) and unpublished `v0.3.1` remain; harmless, left untouched.
 

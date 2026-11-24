@@ -32,3 +32,11 @@ class ProviderUnavailableError(TelmusError):
 
 class RateLimitError(ProviderUnavailableError):
     hint = "Yahoo Finance is rate-limiting requests. Wait a few minutes and retry."
+
+
+class UnknownSectorError(TelmusError):
+    exit_code = 2
+
+    def __init__(self, sector: str, available: list[str]) -> None:
+        super().__init__(f"Unknown sector '{sector}'.")
+        self.hint = "Available sectors: " + ", ".join(available)

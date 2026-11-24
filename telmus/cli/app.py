@@ -14,6 +14,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from telmus import __version__
+from telmus.core.errors import TelmusError
 from telmus.core.result import ScanResult
 from telmus.core.scanner import TelmusScanner
 
@@ -103,9 +104,19 @@ def _fail(exc: BaseException) -> typing.NoReturn:
     raise typer.Exit(code=getattr(exc, "exit_code", 1))
 
 
+class Pct(float):
+    """A fraction that should be displayed as a percentage (0.123 -> 12.3%)."""
+
+
+def _pct(value: float | None) -> Pct | None:
+    return None if value is None else Pct(value)
+
+
 def _format_metric(value: typing.Any | None) -> str:
     if value is None:
         return "n/a"
+    if isinstance(value, Pct):
+        return f"{value * 100:.1f}%"
     if isinstance(value, float):
         return f"{value:.2f}"
     return str(value)
@@ -135,6 +146,9 @@ def _render_section(
     table.add_column("Status")
     for metric, value, flag in metrics:
         text = _format_metric(value)
+        if value is None:
+            table.add_row(name, metric, text, "[dim]n/a[/dim]")
+            continue
         color = _severity_color(flag)
         table.add_row(name, metric, text, f"[{color}]{flag or 'ok'}[/{color}]")
     return table
@@ -182,7 +196,7 @@ def _render_bar_chart(
         else:
             bar_str = f"[{color}]{bar_str}[/{color}]"
 
-        table.add_row(metric, f"{value:,.2f}", bar_str)
+        table.add_row(metric, _format_metric(value), bar_str)
 
     return table
 
@@ -240,10 +254,10 @@ def _print_scan(result: ScanResult) -> None:
         ("Interest coverage", result.health.interest_coverage, result.health.flag),
     ]
     growth_metrics = [
-        ("Revenue CAGR 3y", result.growth.revenue_cagr_3y, result.growth.flag),
-        ("PAT CAGR 3y", result.growth.pat_cagr_3y, result.growth.flag),
+        ("Revenue CAGR 3y", _pct(result.growth.revenue_cagr_3y), result.growth.flag),
+        ("PAT CAGR 3y", _pct(result.growth.pat_cagr_3y), result.growth.flag),
         ("Margin trend", result.growth.margin_trend, result.growth.flag),
-        ("FCF yield", result.growth.fcf_yield, result.growth.flag),
+        ("FCF yield", _pct(result.growth.fcf_yield), result.growth.flag),
     ]
 
     console.print(_render_section("Valuation", valuation_metrics))
@@ -255,17 +269,17 @@ def _print_scan(result: ScanResult) -> None:
     if result.quality is not None:
         q = result.quality
         quality_metrics = [
-            ("ROE (DuPont)", q.roe, None),
-            ("Net margin", q.net_margin, None),
+            ("ROE (DuPont)", _pct(q.roe), None),
+            ("Net margin", _pct(q.net_margin), None),
             ("Asset turnover", q.asset_turnover, None),
             ("Equity multiplier", q.equity_multiplier, None),
-            ("ROIC", q.roic, None),
-            ("FCF margin", q.fcf_margin, None),
-            ("Accruals ratio", q.accruals_ratio, None),
+            ("ROIC", _pct(q.roic), None),
+            ("FCF margin", _pct(q.fcf_margin), None),
+            ("Accruals ratio", _pct(q.accruals_ratio), None),
             ("Cash conversion (days)", q.cash_conversion_cycle_days, None),
         ]
         console.print(_render_section("Quality", quality_metrics))
-    console.print(Panel(escape(result.analyst_brief), title="Analyst brief", expand=False))
+    console.print(Panel(escape(result.analyst_brief), title="Summary (rule-based)", expand=False))
     for note in result.notes:
         console.print(f"[dim]Note: {escape(note)}[/dim]")
     console.print(
@@ -736,35 +750,16 @@ def screen(
         None, "--export", help="Save screening results to file (.xlsx, .csv, or .json)."
     ),
 ) -> None:
-    """Run a simple sector screener."""
-    universe = {
-        "IT": ["INFY.NS", "TCS.NS", "WIPRO.NS", "HCLTECH.NS", "TECHM.NS"],
-        "Banking": [
-            "HDFCBANK.NS",
-            "ICICIBANK.NS",
-            "KOTAKBANK.NS",
-            "SBIN.NS",
-            "AXISBANK.NS",
-        ],
-    }
-    tickers = universe.get(sector, universe["IT"])
-    results: list[ScanResult] = []
-    scanner = TelmusScanner()
-    for ticker in tickers:
-        try:
-            result = scanner.scan(ticker)
-            if (
-                result.health.piotroski_f is None
-                or result.health.debt_to_equity is None
-            ):
-                continue
-            if (
-                result.health.piotroski_f >= min_piotroski
-                and result.health.debt_to_equity <= max_de
-            ):
-                results.append(result)
-        except Exception:
-            continue
+    """Screen a small example sector universe (IT, Banking) by Piotroski F and debt/equity."""
+    from telmus.core.screening import screen_sector
+
+    try:
+        outcome = screen_sector(sector, min_piotroski, max_de)
+    except TelmusError as exc:
+        _fail(exc)
+    results = outcome.matches
+    for tkr, reason in outcome.skipped.items():
+        console.print(f"[dim]Skipped {escape(tkr)}: {escape(reason)}[/dim]")
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("Ticker")
     table.add_column("Piotroski F")
@@ -907,7 +902,7 @@ def info() -> None:
     console.print(f"Version: [green]{package_version}[/green]")
     console.print(f"Python: [green]{sys.version.split()[0]}[/green]")
     console.print("Data source: [green]yfinance[/green]")
-    console.print("Coverage: [green]valuation, health, growth, flags[/green]")
+    console.print("Coverage: [green]valuation, health, growth, quality, red flags[/green]")
 
 
 @app.command()
@@ -917,10 +912,10 @@ def check(ticker: str) -> None:
     try:
         scanner = TelmusScanner()
         result = scanner.scan(ticker)
-        console.print(
-            f"Piotroski F-score: [bold]{result.health.piotroski_f or 'n/a'}[/bold]"
-        )
-        console.print(f"Altman Z-score: [bold]{result.health.altman_z or 'n/a'}[/bold]")
+        console.print(f"Piotroski F-score: [bold]{_format_metric(result.health.piotroski_f)}[/bold]")
+        console.print(f"Altman Z-score: [bold]{_format_metric(result.health.altman_z)}[/bold]")
+        for note in result.notes:
+            console.print(f"[dim]Note: {escape(note)}[/dim]")
     except Exception as exc:
         _fail(exc)
 

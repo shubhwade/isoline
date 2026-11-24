@@ -85,4 +85,4 @@ ignore = ["E501", "B008"]
 python_version = "3.10"
 ignore_missing_imports = true
 warn_unused_ignores = true
-files = ["telmus/core"]
+files = ["telmus/core", "telmus/sdk", "telmus/__init__.py"]

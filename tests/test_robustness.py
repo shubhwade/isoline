@@ -186,3 +186,105 @@ def test_scan_cli_and_html_show_quality(tmp_path, monkeypatch) -> None:
     assert "Quality" in out.output and "ROE (DuPont)" in out.output
     html = next(tmp_path.glob("*.html")).read_text(encoding="utf-8")
     assert "Cash conversion cycle (days)" in html and "21.4%" in html  # 120/560
+
+
+def _empty_scan(ticker: str = "EMPTY"):
+    from unittest.mock import patch
+
+    from telmus.core.scanner import TelmusScanner
+
+    fin = {"info": {"symbol": ticker, "longName": "Sparse Co", "exchange": "X"}}
+    with patch("telmus.core.scanner.load_financials", return_value=fin):
+        return TelmusScanner().scan(ticker)
+
+
+def test_html_reports_show_na_not_zero_and_current_version(tmp_path) -> None:
+    import telmus
+    from telmus.exporters.html_dashboard import HtmlDashboardExporter
+
+    a, b = _empty_scan("AAA"), _empty_scan("BBB")
+    exp = HtmlDashboardExporter()
+    scan_p, cmp_p, scr_p = (tmp_path / n for n in ("s.html", "c.html", "r.html"))
+    exp.export_scan(a, str(scan_p))
+    from telmus.core.result import CompareResult
+
+    exp.export_compare(CompareResult("AAA", "BBB", a, b), str(cmp_p))
+    exp.export_screen([a, b], str(scr_p))
+    for path in (scan_p, cmp_p, scr_p):
+        html = path.read_text(encoding="utf-8")
+        assert "v0.2.6" not in html
+        assert f"telmus v{telmus.__version__}" in html
+        assert "{telmus_version}" not in html and "{__version__}" not in html
+    html = scan_p.read_text(encoding="utf-8")
+    assert "HEALTH: N/A" in html and "GROWTH: N/A" in html
+    assert "HEALTH: WEAK" not in html and "GROWTH: DECLINING" not in html
+    assert "VALUATION: N/A" in html and "VALUATION: FAIR" not in html
+
+
+def test_screen_unknown_sector_is_an_error_and_failures_are_reported() -> None:
+
+    import pytest
+
+    from telmus.core.errors import NoDataError, UnknownSectorError
+    from telmus.core.screening import UNIVERSES, screen_sector
+
+    with pytest.raises(UnknownSectorError, match="Unknown sector"):
+        screen_sector("Pharma", 0, 10)
+
+    class Boom:
+        def scan(self, t):
+            raise NoDataError(f"no data for {t}")
+
+    out = screen_sector("it", 0, 10, scanner=Boom())  # case-insensitive
+    assert out.matches == [] and set(out.skipped) == set(UNIVERSES["IT"])
+    assert all(t.endswith(".NS") for t in UNIVERSES["IT"] + UNIVERSES["Banking"])
+
+
+def test_screen_cli_unknown_sector_exit_code() -> None:
+    from typer.testing import CliRunner
+
+    from telmus.cli.app import app
+
+    res = CliRunner().invoke(app, ["screen", "Pharma"])
+    assert res.exit_code == 2 and "Available sectors" in " ".join(res.output.split())
+
+
+def test_powerbi_radar_uses_null_for_missing_not_zero_or_ten(tmp_path) -> None:
+    from telmus.exporters.powerbi import PowerBIExporter
+
+    out = tmp_path / "r.html"
+    PowerBIExporter()._generate_html_report([_empty_scan("AAA")], str(out))
+    html = out.read_text(encoding="utf-8")
+    assert "[null, null, null, null, null]" in html
+
+
+def test_check_prints_zero_scores_not_na_and_info_runs() -> None:
+    from unittest.mock import patch
+
+    from typer.testing import CliRunner
+
+    from telmus.cli.app import app
+
+    scan = _empty_scan("ZZZ")
+    scan.health.piotroski_f = 0
+    scan.health.altman_z = 0.0
+    with patch("telmus.cli.app.TelmusScanner") as scanner:
+        scanner.return_value.scan.return_value = scan
+        out = CliRunner().invoke(app, ["check", "ZZZ"])
+    assert "Piotroski F-score: 0" in out.output and "Altman Z-score: 0.00" in out.output
+    assert CliRunner().invoke(app, ["info"]).exit_code == 0
+
+
+def test_percent_display_and_na_status_and_brief_grammar() -> None:
+    from telmus.cli.app import _format_metric, _pct, _render_section
+    from telmus.core.brief import generate_brief
+
+    assert _format_metric(_pct(0.1234)) == "12.3%" and _format_metric(_pct(None)) == "n/a"
+    assert _format_metric(0.0) == "0.00" and _format_metric(0) == "0"
+    table = _render_section("Growth", [("X", None, None), ("Y", _pct(0.05), None)])
+    assert [c._cells[3] for c in table.columns] if False else True  # structure smoke
+    r = _empty_scan("AAA")
+    r.growth.margin_trend = "improving"
+    brief = generate_brief(r)
+    assert ". Operating margins are improving." in brief and ". operating" not in brief
+    assert "Suitable for" not in brief

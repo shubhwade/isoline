@@ -1,126 +1,62 @@
-# CLI Reference
+# CLI reference
 
-The `telmus` command-line interface provides instant financial statement analysis. Every main command automatically generates styled Excel workbooks and interactive HTML dashboards.
-
----
-
-## == SCAN COMMAND ==
-
-```bash
-telmus scan TICKER
+```text
+telmus [--version] [--debug] COMMAND [ARGS]
 ```
 
-**What it does**
-Performs a comprehensive financial scan for a single ticker and generates detailed reports.
+`--debug` (or `TELMUS_DEBUG=1`) shows full tracebacks. Exit codes: `0` ok, `1` no data / other error, `2` bad input (ticker, sector), `3` network or provider unavailable.
 
-**Examples**
-- `telmus scan INFY.NS` (Indian NSE stock)
-- `telmus scan AAPL` (US stock)
-- `telmus scan RELIANCE.NS` (Indian NSE stock)
+Tickers use Yahoo Finance format: `AAPL`, `INFY.NS` (NSE), `500209.BO` (BSE), `VOD.L` (London).
 
-**Auto-generates instantly after every scan:**
-- **`TICKER_analysis.xlsx`**: Excel workbook with 6 sheets, starting with the interactive **Dashboard** tab at index 0 followed by Valuation, Health, Growth, and Red Flags details.
-- **`TICKER_dashboard.html`**: A fully self-contained dark-theme HTML report with Chart.js charts that opens automatically in your web browser.
-
----
-
-## == COMPARE COMMAND ==
+## scan
 
 ```bash
-telmus compare TICKER_A TICKER_B
+telmus scan AAPL
+telmus scan INFY.NS --export infy.xlsx        # .xlsx, .csv or .json
+telmus scan AAPL --json                        # raw JSON to the terminal
+telmus scan AAPL --no-report --no-open         # terminal only, write nothing
 ```
 
-**What it does**
-Compares two tickers side-by-side across their financial metrics.
+Prints Valuation, Health, Growth and Quality tables, a rule-based summary and a note for every metric that is n/a. By default it also writes `<TICKER>_analysis.xlsx` and `<TICKER>_dashboard.html` to the current folder and opens the HTML in your browser; `--no-report` / `--no-open` turn that off.
 
-**Examples**
-- `telmus compare INFY.NS TCS.NS`
-- `telmus compare AAPL MSFT`
-
-**Auto-generates:**
-- **`TICKERAvsTICKERB_comparison.xlsx`**: Side-by-side comparative Excel workbook.
-- **`TICKERAvsTICKERB_dashboard.html`**: Grouped bar charts (Teal for Ticker A, Orange for Ticker B) and a winner-highlighted metrics table. Opens automatically in your browser.
-
----
-
-## == SCREEN COMMAND ==
+## compare
 
 ```bash
-telmus screen [--sector TEXT] [--min-piotroski INT] [--max-de FLOAT]
+telmus compare AAPL MSFT [--export out.xlsx|.csv|.json] [--no-report] [--no-open]
 ```
 
-**What it does**
-Screens the stock universe using specific filters.
-
-**Examples**
-- `telmus screen --sector IT`
-- `telmus screen --sector IT --min-piotroski 5`
-- `telmus screen --sector IT --max-de 1.5`
-- `telmus screen --sector Banking`
-
-**Auto-generates:**
-- **`screen_results.xlsx`**: Tabular Excel sheet summarizing all screening results and averages.
-- **`screen_dashboard.html`**: Visual comparison dashboard with interactive multi-company bar charts and a sortable results table. Opens automatically in your browser.
-
----
-
-## == CHECK COMMAND ==
+## screen
 
 ```bash
-telmus check TICKER
+telmus screen IT --min-piotroski 6 --max-de 1.0
+telmus screen Banking --export banks.csv
 ```
 
-**What it does**
-Performs a lightweight, ultra-fast financial safety check on a ticker.
+Screens a **small built-in example list** (sectors `IT` and `Banking`, five NSE tickers each), not the whole market. Tickers whose data cannot be fetched or scored are listed as skipped with the reason. Banks are usually skipped because Piotroski and debt/equity are not meaningful for them. An unknown sector exits with code 2 and lists the valid ones.
 
-**Examples**
-- `telmus check INFY.NS`
-
-**Notes**
-- Fast health check only — **no report files are generated**. Prints summary output directly to the terminal.
-
----
-
-## == POWERBI COMMAND ==
+## check
 
 ```bash
-telmus powerbi --tickers INFY.NS TCS.NS WIPRO.NS --export portfolio.csv
+telmus check AAPL
 ```
+Prints just the Piotroski F-score and Altman Z″ (and notes), no files.
 
-**What it does**
-Generates custom portfolios formatted for Power BI.
-
-**Auto-generates:**
-- **`portfolio.csv`**: A CSV file structured for Power BI data models.
-- **`portfolio_report.html`**: A self-contained dark-theme HTML dashboard showcasing the combined portfolio metrics.
-
----
-
-## == SERVE COMMAND ==
+## powerbi
 
 ```bash
+telmus powerbi INFY.NS TCS.NS --export portfolio.csv
+telmus powerbi --tickers INFY.NS TCS.NS --export flags.csv --flags
+```
+Writes the CSV plus a `*_report.html` portfolio report. Radar scores for missing metrics are left blank (null), not zero.
+
+## serve
+
+```bash
+pip install "telmus[mcp]"
 telmus serve
 ```
+Starts the MCP server over stdio. See [MCP](mcp.md).
 
-**What it does**
-Starts the telmus MCP (Model Context Protocol) server. Useful for connecting telmus as a tool directly to AI assistants like Claude Desktop, Cursor, or Windsurf.
+## info
 
----
-
-## == INFO COMMAND ==
-
-```bash
-telmus info
-```
-
-**What it does**
-Displays system information, including package version, active data sources, and coverage metadata.
-
----
-
-## Ticker Suffix Conventions
-
-To fetch data correctly from the underlying APIs:
-1. **Indian Stocks (NSE)**: Always use the `.NS` suffix (e.g., `INFY.NS`, `TCS.NS`, `RELIANCE.NS`).
-2. **Indian Stocks (BSE)**: Use the `.BO` suffix (e.g., `500209.BO`).
-3. **US Stocks**: Use no suffix (e.g., `AAPL`, `MSFT`, `GOOGL`).
+Prints version, Python version, data source and coverage.

@@ -48,17 +48,18 @@ telmus --help
 Tickers use Yahoo Finance symbols. Outside the US add the exchange suffix: `INFY.NS` (NSE),
 `RELIANCE.BO` (BSE), `VOD.L` (London), `SAP.DE` (Xetra).
 
-Sample output (illustrative figures, real formatting):
+Sample output (a **synthetic** company with deliberately incomplete data, real formatting):
 
 ```text
-─────────────────────────── Infosys Limited — INFY — NSE ───────────────────────────
+───────────────────── Acme Corp (synthetic) — ACME — DEMO ─────────────────────
 ┏━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━┓
 ┃ Engine ┃ Metric            ┃ Value ┃ Status ┃
 ┡━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━┩
-│ Health │ Piotroski F-score │ 7     │ ok     │
-│ Health │ Altman Z-score    │ 4.00  │ ok     │
+│ Health │ Piotroski F-score │ 8     │ ok     │
+│ Health │ Altman Z-score    │ 4.65  │ ok     │
 │ Health │ Current ratio     │ 2.00  │ ok     │
 └────────┴───────────────────┴───────┴────────┘
+Note: ROIC not reported: effective tax rate unavailable (no rate is assumed).
 Screening statistics from public data (Yahoo Finance); not investment advice.
 ```
 
@@ -69,7 +70,8 @@ Screening statistics from public data (Yahoo Finance); not investment advice.
 | Health | Piotroski F-score (9 signals), Altman Z″-score, liabilities/equity, current ratio, interest coverage |
 | Earnings quality | Beneish M-score (8 variables), negative-equity and free-cash-flow flags |
 | Valuation | P/E, P/B, EV/EBITDA |
-| Growth | 3-year revenue and profit CAGR, margin trend, FCF yield |
+| Growth | 3-year revenue and profit CAGR, operating-margin trend, FCF yield |
+| Quality | DuPont ROE, ROIC, FCF margin, accruals ratio, cash conversion cycle, share dilution |
 
 Formulas, sources and limits are in [docs/methodology.md](docs/methodology.md).
 

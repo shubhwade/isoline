@@ -4,51 +4,43 @@ template: home.html
 
 # telmus
 
-Financial statement analysis for AI IDEs and coding agents.
+Financial statement analysis from your terminal, Python, or an AI coding assistant (MCP).
 
-## Why telmus?
+## What it computes
 
-| Engine | What it catches |
+| Engine | What it covers |
 |---|---|
-| Valuation | Overpriced or undervalued relative to sector peers |
-| Health | Balance sheet stress, leverage, and credit risk |
-| Flags | Earnings manipulation risk and cash flow trouble |
+| Valuation | P/E, P/B, EV/EBITDA |
+| Health | Piotroski F-score, Altman Z″, debt/equity, current ratio, interest coverage |
+| Growth | 3-year revenue and profit CAGR, operating-margin trend, FCF yield |
+| Quality | DuPont ROE, ROIC, FCF margin, accruals, cash conversion cycle, share dilution |
+| Red flags | Beneish M-score, negative equity, negative free cash flow, leverage, liquidity |
+
+Every formula is documented in [Methodology](methodology.md) and checked by hand-computed tests. **When the data needed for a metric is missing, telmus shows `n/a` and says why. It never substitutes zero.**
 
 ## Features
 
-- **One Command = Instant Dashboard**: Every scan, compare, or screen command instantly auto-generates styled Excel workbooks and interactive HTML dashboards.
-- **50,000+ Tickers Supported Globally**: Seamlessly analyze US, Indian, European, and Asian equities.
-- **No API Key Needed**: Pulls data directly from public financial statements automatically.
-- **MCP Server Ready**: Built-in Model Context Protocol server for direct integration with AI assistants like Claude Desktop, Cursor, and Windsurf.
+- **Reports:** each scan can write an Excel workbook and an HTML dashboard (`--no-report` to skip).
+- **Data:** Yahoo Finance via `yfinance`. No API key needed. It is an unofficial source: coverage varies by company and exchange, and values can be delayed or wrong.
+- **Python SDK** and **MCP server** (optional extra) on the same engine.
+- **Local:** runs on your machine; telmus sends no telemetry.
 
-## The analyst_brief - The Key Innovation
+## The summary
 
-The `analyst_brief` is a deterministic summary generated from financial metrics and red flags. Designed for AI IDEs to consume without relying on generative models.
+Each scan includes a short, rule-based text summary built from the numbers (no generative model), for example:
 
-```json
-{
-  "analyst_brief": "Strong fundamentals (Piotroski F-score of 7). Financially safe (Altman Z-score of 4.20). Revenue growth is 11.2% over three years and operating margins are stable. No significant red flags detected. Suitable for DCF or comparable company analysis."
-}
-```
+> Strong fundamentals (Piotroski F-score of 8). Financially safe (Altman Z-score of 4.65). Operating margins are improving. No red flags were triggered by the checks that could be run.
+
+It describes the data; it is not a recommendation.
 
 ## Quick start
 
-1. Install: `pip install telmus`
-2. Run `telmus scan INFY`
-3. Read the summary, ratios, and red flags
-
-## MCP Server
-
-Use telmus as an MCP tool for Claude, Cursor, or any MCP-aware IDE.
-
-```json
-{
-  "mcpServers": {
-    "telmus": {
-      "command": "telmus",
-      "args": ["serve"],
-      "description": "Financial statement analysis - real ratios for any ticker"
-    }
-  }
-}
+```bash
+pip install telmus
+telmus scan AAPL
+telmus scan INFY.NS
 ```
+
+See the [Quickstart](quickstart.md), [CLI](cli.md), [SDK](sdk.md) and [MCP](mcp.md) pages.
+
+*Telmus provides screening statistics from public data. It is not investment advice and is not a SEBI-registered research analyst or investment adviser.*

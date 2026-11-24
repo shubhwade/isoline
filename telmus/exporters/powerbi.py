@@ -183,25 +183,29 @@ class PowerBIExporter:
             de_val = res.health.debt_to_equity
 
             # Health (max 9)
-            h_score = round((f_val / 9.0) * 10.0, 2) if f_val is not None else 0.0
+            h_score = round((f_val / 9.0) * 10.0, 2) if f_val is not None else None
             # Safety
             s_score = (
                 round(min(max(z_val, 0.0) / 3.0, 1.0) * 10.0, 2)
                 if z_val is not None
-                else 0.0
+                else None
             )
             # Valuation
             if pe_val is not None and pe_val > 0:
                 v_score = round(max(0.0, min(10.0, (40.0 - pe_val) / 3.0)), 2)
+            elif pe_val is not None:
+                v_score = 0.0  # negative earnings
             else:
-                v_score = 0.0
+                v_score = None
             # Growth
-            g_score = round(max(0.0, min(10.0, (rev_cagr or 0.0) * 50.0)), 2)
+            g_score = (
+                round(max(0.0, min(10.0, rev_cagr * 50.0)), 2) if rev_cagr is not None else None
+            )
             # Leverage
             if de_val is not None:
                 l_score = round(max(0.0, min(10.0, 10.0 - (de_val * 5.0))), 2)
             else:
-                l_score = 10.0
+                l_score = None  # unknown leverage is not a perfect score
 
             color_pair = vibrant_colors[idx % len(vibrant_colors)]
             radar_datasets.append(

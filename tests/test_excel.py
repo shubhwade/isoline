@@ -119,4 +119,4 @@ def test_excel_export_graceful_on_missing_data() -> None:
 
         # Verify empty red flags cell has the correct message
         ws_flags = wb["Red Flags"]
-        assert ws_flags["A2"].value == "No red flags detected"
+        assert ws_flags["A2"].value.startswith("No red flags triggered")

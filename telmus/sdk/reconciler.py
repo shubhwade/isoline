@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import pandas as pd
 
-from telmus.core.result import CompareResult
+from telmus.core.result import CompareResult, ScanResult
 from telmus.core.scanner import TelmusScanner
 
 
-def scan(ticker: str):
+def scan(ticker: str) -> ScanResult:
     return TelmusScanner().scan(ticker)
 
 

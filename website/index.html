@@ -425,7 +425,7 @@
     <nav class="navbar" id="navbar">
         <div class="nav-logo-container">
             <a href="#" class="nav-logo">telmus</a>
-            <span class="nav-version">v0.3.3</span>
+            <span class="nav-version">v0.4.0</span>
         </div>
         <button class="mobile-menu-btn" onclick="toggleMenu()">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -452,7 +452,7 @@
     <section class="hero" id="hero">
         <div class="hero-layout">
             <div class="hero-left">
-                <div class="hero-top-line">$ pip install telmus   —   v0.3.3   —   MIT License</div>
+                <div class="hero-top-line">$ pip install telmus   —   v0.4.0   —   MIT License</div>
                 <h1>
                     <span class="hero-line hero-line-1">Financial analysis.</span>
                     <span class="hero-line hero-line-2">One command.</span>
@@ -493,9 +493,9 @@
     <!-- STATS CHIPS -->
     <div class="stats-divider">
         <div class="stats-chips">
-            <div class="stat-chip">50,000+ tickers</div>
+            <div class="stat-chip">US, India &amp; more via Yahoo</div>
             <div class="stat-chip">No API key</div>
-            <div class="stat-chip">4 scoring models</div>
+            <div class="stat-chip">Piotroski, Altman, Beneish + quality</div>
             <div class="stat-chip">Excel + HTML output</div>
         </div>
     </div>
@@ -550,7 +550,7 @@
                 <div class="step-num">1</div>
                 <div class="step-content">
                     <h3>Install</h3>
-                    <p>One command. Python 3.9+ required. No API key needed.</p>
+                    <p>One command. Python 3.10+ required. No API key needed.</p>
                     <div class="step-code"><span class="c-cmd">pip</span> install telmus</div>
                 </div>
             </div>
@@ -558,7 +558,7 @@
                 <div class="step-num">2</div>
                 <div class="step-content">
                     <h3>Scan any stock</h3>
-                    <p>Works with 50,000+ global tickers. Add .NS for Indian NSE stocks.</p>
+                    <p>Uses Yahoo Finance symbols: AAPL for US stocks, add .NS for NSE or .BO for BSE.</p>
                     <div class="step-code"><span class="c-cmd">telmus</span> scan <span class="c-arg">AAPL</span>
 <span class="c-cmd">telmus</span> scan <span class="c-arg">INFY.NS</span>
 <span class="c-cmd">telmus</span> scan <span class="c-arg">RELIANCE.NS</span></div>
@@ -568,7 +568,7 @@
                 <div class="step-num">3</div>
                 <div class="step-content">
                     <h3>Get instant analysis</h3>
-                    <p>Piotroski F, Altman Z, Beneish M, valuation ratios, growth metrics, analyst brief — all in seconds.</p>
+                    <p>Piotroski F, Altman Z, Beneish M, valuation ratios, growth metrics, rule-based summary, all in seconds.</p>
                     <div class="step-code"><span class="c-comment"># Terminal shows full analysis table</span></div>
                 </div>
             </div>
@@ -833,7 +833,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2025 telmus &middot; MIT License &middot; Not financial advice &middot; Data via Yahoo Finance
+            &copy; 2026 telmus &middot; MIT License &middot; Not financial advice &middot; Data via Yahoo Finance
         </div>
     </footer>
 
@@ -860,29 +860,29 @@
         });
 
         // Terminal Typing Animation
-        const terminalText = `<span class="term-prompt">$</span> <span class="term-arg">telmus scan INFY.NS</span>
+        const terminalText = `<span class="term-prompt">$</span> <span class="term-arg">telmus scan ACME</span>
 
-<span class="term-sep">───────────</span> Infosys Limited — INFY.NS — NSI <span class="term-sep">───────────</span>
-Scan duration: <span class="term-val">2989 ms</span>
+<span class="term-sep">───────────</span> Acme Corp (synthetic sample, not a real company) <span class="term-sep">───────────</span>
 
 <span class="term-header">Engine    Metric              Value    Status</span>
-<span class="term-label">Valuation</span> P/E ratio           <span class="term-val">13.21</span>    <span class="term-ok">✓ ok</span>
-<span class="term-label">Valuation</span> P/B ratio           <span class="term-val">4.37</span>     <span class="term-ok">✓ ok</span>  
-<span class="term-label">Health</span>    Piotroski F-score   <span class="term-val">6/9</span>      <span class="term-warn">⚠ adequate</span>
-<span class="term-label">Health</span>    Altman Z-score      <span class="term-val">13.48</span>    <span class="term-ok">✓ safe</span>
-<span class="term-label">Growth</span>    Revenue CAGR 3y     <span class="term-val">3.44%</span>    <span class="term-ok">✓ ok</span>
-<span class="term-label">Growth</span>    Margin trend        <span class="term-val">stable</span>   <span class="term-ok">✓ ok</span>
+<span class="term-label">Valuation</span> P/E ratio           <span class="term-val">25.00</span>    <span class="term-ok">✓ ok</span>
+<span class="term-label">Valuation</span> EV/EBITDA           <span class="term-val">n/a</span>      <span class="term-warn">n/a</span>
+<span class="term-label">Health</span>    Piotroski F-score   <span class="term-val">8</span>        <span class="term-ok">✓ ok</span>
+<span class="term-label">Health</span>    Altman Z-score      <span class="term-val">4.65</span>     <span class="term-ok">✓ ok</span>
+<span class="term-label">Growth</span>    Margin trend        <span class="term-val">improving</span> <span class="term-ok">✓ ok</span>
+<span class="term-label">Quality</span>   ROE (DuPont)        <span class="term-val">21.4%</span>    <span class="term-ok">✓ ok</span>
+<span class="term-label">Quality</span>   ROIC                <span class="term-val">n/a</span>      <span class="term-warn">n/a</span>
 
-<span class="term-brief">✦ Analyst Brief: Adequate fundamentals. Financially safe.
-  Revenue growing 3.44% CAGR. No red flags detected.</span>
+<span class="term-brief">Summary: Strong fundamentals. Financially safe.
+  No red flags were triggered by the checks that could be run.</span>
+<span class="term-brief">Note: ROIC not reported: effective tax rate unavailable.</span>
 
-<span class="term-saved">Saved: INFY_analysis.xlsx + INFY_dashboard.html</span>
-<span class="term-open">Opening dashboard in browser...</span>`;
+<span class="term-saved">Saved: ACME_analysis.xlsx + ACME_dashboard.html</span>`;
         
         const terminalEl = document.getElementById('terminal-text');
         
         setTimeout(() => {
-            terminalEl.innerHTML = '<span class="term-prompt">$</span> <span class="term-arg">telmus scan INFY.NS</span>\n<span style="color: #71717a;">...</span>';
+            terminalEl.innerHTML = '<span class="term-prompt">$</span> <span class="term-arg">telmus scan ACME</span>\n<span style="color: #71717a;">...</span>';
             
             setTimeout(() => {
                 terminalEl.innerHTML = '';
@@ -1044,9 +1044,9 @@ Scan duration: <span class="term-val">2989 ms</span>
 
         const stockData = [
             {
-                ticker: "INFY.NS",
-                name: "Infosys Limited",
-                exchange: "NSE",
+                ticker: "SAMPLE-A",
+                name: "Illustrative sample, not real data",
+                exchange: "DEMO",
                 badge: "SAFE",
                 badgeClass: "sc-badge-safe",
                 piotroski: { val: "6/9", pct: 66, cls: "amber" },
@@ -1061,9 +1061,9 @@ Scan duration: <span class="term-val">2989 ms</span>
                 brief: "Adequate fundamentals. Financially safe. Revenue growing 3.44% CAGR. No red flags detected."
             },
             {
-                ticker: "AAPL",
-                name: "Apple Inc.",
-                exchange: "NASDAQ",
+                ticker: "SAMPLE-B",
+                name: "Illustrative sample, not real data",
+                exchange: "DEMO",
                 badge: "SAFE",
                 badgeClass: "sc-badge-safe",
                 piotroski: { val: "7/9", pct: 78, cls: "green" },
@@ -1078,9 +1078,9 @@ Scan duration: <span class="term-val">2989 ms</span>
                 brief: "Strong fundamentals. High valuation justified by margins. Financially very safe. Consistent growth."
             },
             {
-                ticker: "RELIANCE.NS",
-                name: "Reliance Industries",
-                exchange: "NSE",
+                ticker: "SAMPLE-C",
+                name: "Illustrative sample, not real data",
+                exchange: "DEMO",
                 badge: "ADEQUATE",
                 badgeClass: "sc-badge-warn",
                 piotroski: { val: "5/9", pct: 55, cls: "amber" },
@@ -1095,9 +1095,9 @@ Scan duration: <span class="term-val">2989 ms</span>
                 brief: "Adequate health score. High revenue growth. Leverage elevated but manageable. Monitor debt levels."
             },
             {
-                ticker: "MSFT",
-                name: "Microsoft Corp.",
-                exchange: "NASDAQ",
+                ticker: "SAMPLE-D",
+                name: "Illustrative sample, not real data",
+                exchange: "DEMO",
                 badge: "SAFE",
                 badgeClass: "sc-badge-safe",
                 piotroski: { val: "8/9", pct: 89, cls: "green" },

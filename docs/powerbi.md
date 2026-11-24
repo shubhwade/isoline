@@ -19,13 +19,13 @@ Use `telmus` to export fundamental stock data. `telmus` outputs null values as e
 ### Standard Portfolio Export
 Run this command to export general valuation, health, and growth metrics:
 ```bash
-telmus powerbi --tickers INFY TCS WIPRO HDFCBANK RELIANCE.NS --export portfolio.csv
+telmus powerbi --tickers INFY.NS TCS.NS WIPRO.NS HDFCBANK.NS RELIANCE.NS --export portfolio.csv
 ```
 
 ### Red Flags Export (Granular tracking)
 Run this command to export flag-level details for each ticker (one row per flag per ticker):
 ```bash
-telmus powerbi --tickers INFY TCS WIPRO --flags --export flags.csv
+telmus powerbi --tickers INFY.NS TCS.NS WIPRO.NS --flags --export flags.csv
 ```
 
 ---
@@ -110,7 +110,7 @@ Instead of overwriting the CSV, write a script that runs `telmus` and appends ro
 ```powershell
 # PowerShell script (e.g., update_portfolio.ps1)
 # Fetch standard metrics for this week and append to master database
-telmus powerbi --tickers INFY TCS WIPRO --export temp_week.csv
+telmus powerbi --tickers INFY.NS TCS.NS WIPRO.NS --export temp_week.csv
 
 # If master.csv doesn't exist, create it with headers, otherwise skip headers and append
 if (-Not (Test-Path master.csv)) {

@@ -4,7 +4,7 @@ from telmus.core.result import ScanResult
 
 
 def generate_brief(result: ScanResult) -> str:
-    """Generate a deterministic analyst brief from scan results."""
+    """Generate a deterministic, rule-based summary from scan results (no recommendations)."""
     health_phrases: list[str] = []
     if result.health.piotroski_f is not None:
         if result.health.piotroski_f >= 7:
@@ -33,7 +33,7 @@ def generate_brief(result: ScanResult) -> str:
                 f"distress risk (Altman Z-score of {result.health.altman_z:.2f})"
             )
     health_sentence = (
-        ". ".join(health_phrases) + "."
+        ". ".join(p[0].upper() + p[1:] for p in health_phrases) + "."
         if health_phrases
         else "Health metrics are inconclusive."
     )
@@ -46,7 +46,7 @@ def generate_brief(result: ScanResult) -> str:
     if result.growth.margin_trend is not None:
         growth_phrases.append(f"operating margins are {result.growth.margin_trend}")
     growth_sentence = (
-        " and ".join(growth_phrases) + "."
+        (" and ".join(growth_phrases))[0].upper() + (" and ".join(growth_phrases))[1:] + "."
         if growth_phrases
         else "Growth metrics are inconclusive."
     )
@@ -57,9 +57,9 @@ def generate_brief(result: ScanResult) -> str:
             for flag in result.red_flags
         )
         final_sentence = (
-            f"Red flags detected: {flags_text}. Requires further due diligence."
+            f"Red flags detected: {flags_text}. Warrants further review."
         )
     else:
-        final_sentence = "No significant red flags detected. Suitable for DCF or comparable company analysis."
+        final_sentence = "No red flags were triggered by the checks that could be run."
 
     return f"{health_sentence} {growth_sentence} {final_sentence}"

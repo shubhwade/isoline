@@ -1,160 +1,74 @@
 # Quickstart
 
-This quickstart guide walks you through installing telmus, scanning your first stock, understanding every field in the output, exporting JSON, and comparing two tickers.
-
 ## 1. Install
 
-telmus requires Python 3.10 or newer.
+Python 3.10 or newer.
 
 ```bash
 pip install telmus
+telmus --version
 ```
 
-If you use a virtual environment, activate it before installing.
+Use a virtual environment (`python -m venv .venv`) and avoid creating it inside a cloud-synced folder such as OneDrive, which can corrupt installs on Windows.
 
-## 2. Scan your first stock
-
-Run the first scan for Infosys:
+## 2. Scan a stock
 
 ```bash
-telmus scan INFY
+telmus scan AAPL          # US
+telmus scan INFY.NS       # NSE (India); BSE uses .BO
 ```
 
-Expected output example:
+Tickers use Yahoo Finance symbols. Non-US stocks need the exchange suffix.
+
+The output has Valuation, Health, Growth and Quality tables, a rule-based summary, and a line for every metric that could not be computed. This is real output on a **synthetic** company with deliberately incomplete data (not a real stock):
 
 ```text
-Valuation
----------
-Ticker    P/E    P/B    EV/EBITDA
-INFY      12.92  2.8    8.11
+Valuation   P/E ratio 25.00 | P/B ratio 5.00 | EV/EBITDA n/a
+Health      Piotroski F-score 8 | Altman Z-score 4.65 | Debt/Equity 0.83 | Current ratio 2.00
+Growth      Revenue CAGR 3y n/a | Margin trend improving | FCF yield 3.0%
+Quality     ROE (DuPont) 21.4% | Net margin 12.0% | ROIC n/a | Cash conversion (days) n/a
 
-Health
-------
-Ticker    Piotroski F    Altman Z    D/E    Current Ratio    Interest Coverage
-INFY      4              3.12        0.29   1.9              87.0
-
-Growth
-------
-Ticker    Revenue CAGR 3y    Margin Trend
-INFY      3.4%                stable
-
-Analyst brief
-------------
-Weak fundamentals (Piotroski F of 4). Revenue growth 3.4% over three years, margins stable. No red flags detected. Suitable for DCF or comparable company analysis.
+Note: ROIC not reported: effective tax rate unavailable (no rate is assumed).
 ```
 
-The output includes three tables:
+By default a scan also writes `<TICKER>_analysis.xlsx` and `<TICKER>_dashboard.html` in the current folder and opens the HTML. Use `--no-report --no-open` for terminal-only output.
 
-- `Valuation` for the market multiple view.
-- `Health` for balance sheet and earnings quality.
-- `Growth` for revenue and margin momentum.
-- A deterministic `Analyst brief` panel summarizing the result.
+## 3. Reading the scores
 
-## 3. Understand the output
+| Metric | How to read it |
+|---|---|
+| Piotroski F (0-9) | 8-9 strong, 5-7 average, 0-4 weak. Only reported when all nine signals are computable. |
+| Altman Z″ | above 2.6 safe, 1.1-2.6 grey zone, below 1.1 distress. Not applicable to banks and insurers. |
+| Beneish M (8-variable) | above -2.22 suggests possible earnings manipulation. Not applicable to financial firms. |
+| FCF yield | (operating cash flow minus capex) / market cap |
+| ROIC | EBIT x (1 - effective tax rate) / average invested capital |
+| Cash conversion cycle | DSO + DIO - DPO, in days |
 
-### P/E ratio
-The price-to-earnings ratio compares a company's market price to its earnings per share. A lower P/E can indicate value or earnings risk; a higher P/E can indicate strong growth expectations or an expensive stock.
+Exact definitions: [Methodology](methodology.md). A flagged score is a prompt to look closer, not a verdict.
 
-### P/B ratio
-Price-to-book compares the stock price to the company's book value per share. Values below 1.0 may signal that the market values the company below its accounting assets, while values above 3.0 suggest investors are paying a premium for intangible assets or future growth.
-
-### EV/EBITDA
-Enterprise value divided by EBITDA measures how expensive the company is relative to its operating cash profit. Lower EV/EBITDA is generally more attractive, while values above 15-20 can indicate a richly valued company.
-
-### Piotroski F-score
-The Piotroski F-score is a nine-point score that measures financial strength.
-
-- `0-2`: distressed
-- `3-4`: weak
-- `5-6`: adequate
-- `7-9`: strong
-
-A higher score means stronger profitability, cash flow, leverage, liquidity, and earnings quality.
-
-### Altman Z-score
-The Altman Z-score estimates bankruptcy risk using five balance-sheet and income-statement factors.
-
-- `Z > 2.99`: safe zone
-- `1.81 <= Z <= 2.99`: grey zone
-- `Z < 1.81`: distress zone
-
-### Beneish M-score
-The Beneish M-score estimates the likelihood of earnings manipulation.
-
-- `M <= -2.22`: normal range
-- `M > -2.22`: manipulation risk is elevated
-
-A higher score is a warning sign for aggressive accounting or earnings management.
-
-### Revenue CAGR
-Revenue compound annual growth rate measures how quickly sales have grown over three years. A positive CAGR means the business is expanding revenue; a negative CAGR means revenue is contracting.
-
-### Margin trend
-Margin trend describes how profitability is moving over time:
-
-- `improving` margins are expanding.
-- `stable` margins are holding steady.
-- `declining` margins are contracting.
-
-## 4. Export to JSON
-
-Use `--json` to print structured output and `--export` to save a report file.
+## 4. JSON and exports
 
 ```bash
-telmus scan INFY --json
+telmus scan AAPL --json
+telmus scan AAPL --export aapl.json      # .json, .csv or .xlsx
 ```
-
-```bash
-telmus scan INFY --export report.json
-```
-
-The generated JSON contains `valuation`, `health`, `growth`, `flags`, and `analyst_brief` sections, making it easy to load into analytics pipelines.
 
 ## 5. Compare two stocks
 
-Compare INFY with TCS:
-
 ```bash
-telmus compare INFY TCS
+telmus compare AAPL MSFT
 ```
 
-Expected comparison output:
+## 6. Files written
 
-```text
-Ticker    P/E    P/B    EV/EBITDA    Piotroski F    Altman Z    Revenue CAGR 3y    Margin Trend
-INFY      12.92  2.8    8.11         4              3.12        3.4%                stable
-TCS       25.40  5.1    15.2         7              4.50        7.8%                improving
+| Command | Files |
+|---|---|
+| `scan T` | `T_analysis.xlsx`, `T_dashboard.html` |
+| `compare A B` | `AvsB_comparison.xlsx`, `AvsB_dashboard.html` |
+| `screen IT` | printed table; `--export` for `.xlsx`/`.csv`/`.json` |
 
-Analyst brief
-------------
-INFY: stable revenue growth with a moderate balance sheet. TCS: stronger earnings quality and growth, but a higher valuation multiple.
-```
+## Troubleshooting
 
-## 6. What gets auto-generated
-
-Every main command in `telmus` generates high-quality files and opens interactive dashboards in your default web browser instantly.
-
-### When running `telmus scan TICKER`:
-1. **`{TICKER}_analysis.xlsx` (Excel Workbook, ~15 KB)**:
-   - **Dashboard (Sheet 1, Index 0)**: The active home tab featuring a summary data table and three grid-aligned charts (Piotroski F-Score with value-based bar colors, Valuation comparison, and Growth CAGR percentages).
-   - **Summary (Sheet 2)**: Contains metadata like Company Name, Ticker, Exchange, and the detailed Analyst Brief.
-   - **Valuation (Sheet 3)**: Contains multiples like P/E, P/B, EV/EBITDA, and sector comparisons.
-   - **Health (Sheet 4)**: Piotroski, Altman, leverage ratios, and liquidity ratings.
-   - **Growth (Sheet 5)**: Revenue CAGR, PAT CAGR, margin trends, and FCF yields.
-   - **Red Flags (Sheet 6)**: Individual warning details and Beneish M-scores.
-2. **`{TICKER}_dashboard.html` (HTML Report, ~12 KB)**:
-   - Self-contained dark-theme HTML file utilizing Chart.js.
-   - Company profiles, analyst brief, interactive bar charts, and conditional warning flags table.
-
-### When running `telmus compare TICKER_A TICKER_B`:
-1. **`{TICKERA}vs{TICKERB}_comparison.xlsx` (Excel Workbook, ~12 KB)**:
-   - Side-by-side metric comparison highlighting the winning peer for each parameter (Valuation, Health, Growth).
-2. **`{TICKERA}vs{TICKERB}_dashboard.html` (HTML Report, ~15 KB)**:
-   - Interactive grouped column charts comparing multiples, health indicators, and growth rates between both tickers side-by-side.
-
-### When running `telmus screen --sector IT`:
-1. **`screen_results.xlsx` (Excel Workbook, ~10 KB)**:
-   - Summarized table of all companies matching the screen criteria, with averages calculated automatically at the bottom.
-2. **`screen_dashboard.html` (HTML Report, ~15 KB)**:
-   - Multi-company bar charts comparing quality scores and a sortable data table.
-
+- `Could not reach Yahoo Finance`: check your connection or proxy, and retry in a minute (Yahoo rate-limits).
+- `No data`: check the symbol and exchange suffix on finance.yahoo.com.
+- Add `--debug` to any command for the full traceback when reporting an issue.

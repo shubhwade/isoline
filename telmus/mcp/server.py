@@ -33,7 +33,7 @@ TOOL_DEFINITIONS: list[types.Tool] = [
     types.Tool(
         name="scan_ticker",
         title="Scan ticker with exchange",
-        description="Run a financial scan for a ticker symbol and optional exchange.",
+        description="Scan a ticker, with an optional exchange (NSE, BSE, LSE, NYSE, NASDAQ) to pick the right listing.",
         inputSchema={
             "type": "object",
             "properties": {
@@ -90,6 +90,21 @@ TOOL_DEFINITIONS: list[types.Tool] = [
 ]
 
 
+EXCHANGE_SUFFIXES = {"NSE": ".NS", "BSE": ".BO", "LSE": ".L", "NYSE": "", "NASDAQ": "", "US": ""}
+
+
+def _with_exchange(ticker: str, exchange: str | None) -> str:
+    """Apply an exchange hint to a bare symbol (``INFY`` + ``NSE`` -> ``INFY.NS``)."""
+    if not exchange:
+        return ticker
+    suffix = EXCHANGE_SUFFIXES.get(exchange.strip().upper())
+    if suffix is None:
+        raise ValueError(
+            f"Unknown exchange '{exchange}'. Supported: {', '.join(sorted(EXCHANGE_SUFFIXES))}"
+        )
+    return ticker if "." in ticker else ticker + suffix
+
+
 def _scan_and_serialize(scanner: TelmusScanner, ticker: str) -> str:
     result = scanner.scan(ticker)
     return result.to_json()
@@ -117,6 +132,8 @@ async def handle_tool_call(
         ticker = arguments.get("ticker")
         if not ticker:
             raise ValueError("Missing ticker")
+        if name == "scan_ticker":
+            ticker = _with_exchange(ticker, arguments.get("exchange"))
         payload = {"result": json.loads(_scan_and_serialize(TelmusScanner(), ticker))}
     elif name == "compare":
         ticker_a = arguments.get("ticker_a")
@@ -126,34 +143,22 @@ async def handle_tool_call(
         comparison = TelmusScanner().compare(ticker_a, ticker_b)
         payload = {"result": json.loads(comparison.to_json())}
     elif name == "screen":
-        sector = arguments.get("sector", "IT")
-        min_piotroski = int(arguments.get("min_piotroski", 0))
-        max_de = float(arguments.get("max_de", 10.0))
-        universe = {
-            "IT": ["INFY", "TCS", "WIPRO", "HCLTECH", "TECHM"],
-            "Banking": ["HDFCBANK", "ICICIBANK", "KOTAKBANK", "SBIN", "AXISBANK"],
+        from telmus.core.screening import screen_sector
+
+        outcome = screen_sector(
+            arguments.get("sector", "IT"),
+            int(arguments.get("min_piotroski", 0)),
+            float(arguments.get("max_de", 10.0)),
+        )
+        payload = {
+            "matches": [r.to_dict() for r in outcome.matches],
+            "skipped": outcome.skipped,
         }
-        tickers = universe.get(sector, universe["IT"])
-        scanner = TelmusScanner()
-        matches: list[dict[str, Any]] = []
-        for ticker in tickers:
-            result = scanner.scan(ticker)
-            if (
-                result.health.piotroski_f is None
-                or result.health.debt_to_equity is None
-            ):
-                continue
-            if (
-                result.health.piotroski_f >= min_piotroski
-                and result.health.debt_to_equity <= max_de
-            ):
-                matches.append(result.to_dict())
-        payload = {"matches": matches}
     elif name == "info":
         payload = {
             "version": __version__,
             "data_source": "yfinance",
-            "coverage": ["valuation", "health", "growth", "flags"],
+            "coverage": ["valuation", "health", "growth", "quality", "flags"],
             "description": "Financial statement analysis MCP server for AI IDEs.",
         }
     else:
