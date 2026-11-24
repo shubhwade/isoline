@@ -278,7 +278,11 @@ def test_scanner_end_to_end_with_mocked_provider() -> None:
     assert result.valuation.vs_sector is None
     assert result.highest_concern == "low"
     payload = result.to_dict()  # serialisable, with explanatory notes list
-    assert payload["notes"] == []
+    assert result.health.notes == []
+    # the fixture has no tax/inventory lines, so quality reports n/a with reasons (not zeros)
+    assert result.quality is not None and result.quality.roic is None
+    assert payload["notes"] == result.quality.notes  # health/flag engines had nothing to explain
+    assert any("ROIC" in n for n in payload["notes"])
     with patch("telmus.core.scanner.load_financials", return_value=fin):
         cmp = TelmusScanner().compare("ACME", "ACME")
     assert cmp.result_a.ticker == cmp.result_b.ticker == "ACME"
@@ -295,3 +299,113 @@ def test_scan_result_carries_notes_for_every_na() -> None:
     assert result.health.piotroski_f is None and result.beneish_m is None
     assert any("Piotroski" in n for n in result.notes)
     assert any("Beneish" in n for n in result.notes)
+
+
+# ----------------------------------------------------------------------- Quality
+def quality_company() -> dict[str, object]:
+    income = frame(
+        {
+            "Total Revenue": [1000, 900, 800],
+            "Cost Of Revenue": [600, 560, 500],
+            "Net Income": [120, 80, 60],
+            "Operating Income": [150, 120, 100],
+            "Pretax Income": [150, 110, 90],
+            "Tax Provision": [30, 22, 18],
+        }
+    )
+    balance = frame(
+        {
+            "Total Assets": [1100, 1000, 900],
+            "Stockholders Equity": [600, 520, 440],
+            "Total Debt": [150, 200, 220],
+            "Cash And Cash Equivalents": [100, 80, 60],
+            "Accounts Receivable": [120, 90, 80],
+            "Inventory": [60, 50, 45],
+            "Accounts Payable": [80, 70, 60],
+            "Ordinary Shares Number": [98, 100, 100],
+        }
+    )
+    cashflow = frame({"Operating Cash Flow": [150, 100, 90], "Capital Expenditure": [-60, -50, -40]})
+    return {"income_stmt": income, "balance_sheet": balance, "cashflow": cashflow, "info": {}}
+
+
+def test_quality_metrics_hand_computed() -> None:
+    from telmus.core.engines.quality import QualityEngine
+
+    q = QualityEngine().run(quality_company())
+    # DuPont with average balances: avg assets 1050, avg equity 560
+    assert q.net_margin == pytest.approx(0.12)
+    assert q.asset_turnover == pytest.approx(1000 / 1050)
+    assert q.equity_multiplier == pytest.approx(1.875)
+    assert q.roe == pytest.approx(120 / 560)
+    assert q.roe == pytest.approx(q.net_margin * q.asset_turnover * q.equity_multiplier)  # identity
+    # ROIC: NOPAT 150*(1-30/150)=120 ; invested capital avg (650+640)/2 = 645
+    assert q.roic == pytest.approx(120 / 645)
+    # FCF = 150 - |-60| = 90
+    assert (q.fcf, q.fcf_margin, q.fcf_to_net_income) == (90, pytest.approx(0.09), pytest.approx(0.75))
+    assert q.accruals_ratio == pytest.approx(-30 / 1050)
+    # DSO 43.8, DIO 36.5, DPO 48.6667 -> CCC 31.6333
+    assert q.dso_days == pytest.approx(43.8)
+    assert q.dio_days == pytest.approx(36.5)
+    assert q.dpo_days == pytest.approx(80 / 600 * 365)
+    assert q.cash_conversion_cycle_days == pytest.approx(31.63333, abs=1e-4)
+    assert q.share_count_change == pytest.approx(-0.02)
+    assert q.notes == []
+
+
+def test_roic_not_reported_without_a_tax_rate_and_none_is_not_assumed() -> None:
+    from telmus.core.engines.quality import QualityEngine
+
+    f = quality_company()
+    f["income_stmt"] = f["income_stmt"].drop("Tax Provision")  # type: ignore[union-attr]
+    q = QualityEngine().run(f)
+    assert q.roic is None
+    assert any("tax rate" in n for n in q.notes)
+
+
+def test_missing_inventory_is_not_treated_as_zero() -> None:
+    from telmus.core.engines.quality import QualityEngine
+
+    f = quality_company()
+    f["balance_sheet"] = f["balance_sheet"].drop("Inventory")  # type: ignore[union-attr]
+    q = QualityEngine().run(f)
+    assert q.cash_conversion_cycle_days is None and q.dio_days is None
+    assert q.dso_days == pytest.approx(43.8)  # components that exist are still reported
+    assert any("inventory" in n.lower() for n in q.notes)
+
+
+def test_negative_equity_and_loss_making_edge_cases() -> None:
+    from telmus.core.engines.quality import QualityEngine
+
+    f = quality_company()
+    bs = f["balance_sheet"].copy()  # type: ignore[union-attr]
+    bs.loc["Stockholders Equity"] = [-100, -50, 10]
+    inc = f["income_stmt"].copy()  # type: ignore[union-attr]
+    inc.loc["Net Income"] = [-20, 80, 60]
+    q = QualityEngine().run({**f, "balance_sheet": bs, "income_stmt": inc})
+    assert q.roe is None and q.equity_multiplier is None
+    assert q.fcf_to_net_income is None  # not meaningful when net income <= 0
+    assert q.net_margin == pytest.approx(-0.02)  # a genuine negative value is kept
+
+
+def test_quality_not_applicable_to_financials_and_empty_input() -> None:
+    from telmus.core.engines.quality import QualityEngine
+
+    f = quality_company()
+    f["info"] = {"sector": "Financial Services"}
+    q = QualityEngine().run(f)
+    assert q.roic is None and q.cash_conversion_cycle_days is None
+    assert q.roe == pytest.approx(120 / 560)  # DuPont still applies
+    empty = QualityEngine().run({})
+    assert empty.roe is None and empty.fcf is None and empty.share_count_change is None
+
+
+def test_scan_result_includes_quality_in_json() -> None:
+    from unittest.mock import patch
+
+    from telmus.core.scanner import TelmusScanner
+
+    with patch("telmus.core.scanner.load_financials", return_value=quality_company()):
+        result = TelmusScanner().scan("Q")
+    assert result.quality is not None
+    assert result.to_dict()["quality"]["roe"] == pytest.approx(120 / 560)

@@ -43,6 +43,27 @@ class GrowthResult:
 
 
 @dataclass
+class QualityResult:
+    """Profitability, cash-flow and working-capital quality metrics (ratios are fractions)."""
+
+    net_margin: float | None = None
+    asset_turnover: float | None = None
+    equity_multiplier: float | None = None
+    roe: float | None = None
+    roic: float | None = None
+    fcf: float | None = None
+    fcf_margin: float | None = None
+    fcf_to_net_income: float | None = None
+    accruals_ratio: float | None = None
+    dso_days: float | None = None
+    dio_days: float | None = None
+    dpo_days: float | None = None
+    cash_conversion_cycle_days: float | None = None
+    share_count_change: float | None = None
+    notes: list[str] = field(default_factory=list)
+
+
+@dataclass
 class FlagsResult:
     red_flags: list[RedFlag]
     beneish_m: float | None
@@ -65,12 +86,14 @@ class ScanResult:
     beneish_m: float | None = None
     schema_version: int = 1
     notes: list[str] = field(default_factory=list)
+    quality: QualityResult | None = None
 
     def to_dict(self) -> dict[str, Any]:
         result = asdict(self)
         result["valuation"] = asdict(self.valuation)
         result["health"] = asdict(self.health)
         result["growth"] = asdict(self.growth)
+        result["quality"] = asdict(self.quality) if self.quality else None
         result["red_flags"] = [asdict(flag) for flag in self.red_flags]
         return result
 

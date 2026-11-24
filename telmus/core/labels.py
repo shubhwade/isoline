@@ -84,6 +84,10 @@ ALIASES: dict[str, list[str]] = {
     "ppe": ["Net PPE", "Property Plant Equipment Net", "Property Plant And Equipment Net"],
     "cash": ["Cash And Cash Equivalents", "Cash", "Cash Cash Equivalents And Short Term Investments"],
     "shares": ["Ordinary Shares Number", "Share Issued"],
+    "inventory": ["Inventory"],
+    "payables": ["Accounts Payable", "Payables"],
+    "tax": ["Tax Provision", "Income Tax Expense"],
+    "pretax": ["Pretax Income", "Income Before Tax"],
     "cfo": [
         "Operating Cash Flow",
         "Cash Flow From Continuing Operating Activities",
