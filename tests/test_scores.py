@@ -231,3 +231,30 @@ def test_valuation_cash_lookup_does_not_raise_on_series_truthiness() -> None:
     assert out.ev_ebitda == pytest.approx((200 + 5 - 10) / 20)
     assert out.vs_sector is None  # peer comparison is not implemented; no invented answer
     assert math.isfinite(out.pe_ratio)  # type: ignore[arg-type]
+
+
+# ------------------------------------------------------------------------ Growth
+def test_growth_fcf_yield_and_cagr_hand_computed() -> None:
+    from telmus.core.engines.growth import GrowthEngine
+
+    inc = pd.DataFrame(
+        {
+            "Total Revenue": {"2024": 1331.0, "2023": 1210.0, "2022": 1100.0, "2021": 1000.0},
+            "Net Income": {"2024": 266.2, "2023": 200.0, "2022": 150.0, "2021": 100.0},
+            "Operating Income": {"2024": 266.2, "2023": 200.0, "2022": 180.0, "2021": 150.0},
+        }
+    ).T
+    cf = frame({"Operating Cash Flow": [300, 0, 0], "Capital Expenditure": [-100, 0, 0]})
+    out = GrowthEngine().run({"income_stmt": inc, "cashflow": cf, "info": {"marketCap": 4000}})
+    assert out.revenue_cagr_3y == pytest.approx(0.10, abs=1e-9)  # (1331/1000)^(1/3)-1
+    assert out.pat_cagr_3y == pytest.approx(0.385913, abs=1e-5)  # (266.2/100)^(1/3)-1
+    # FCF = 300 - |-100| = 200 ; 200 / 4000 = 5%. (The old code gave (300+100)/4000 = 10%.)
+    assert out.fcf_yield == pytest.approx(0.05)
+    assert out.margin_trend == "improving"  # 20% vs 15% operating margin
+
+
+def test_margin_trend_unknown_when_a_year_is_missing_not_zero() -> None:
+    from telmus.core.engines.growth import GrowthEngine
+
+    inc = frame({"Total Revenue": [100, 100, 100], "Operating Income": [20, 20, None]})
+    assert GrowthEngine()._margin_trend(inc) is None

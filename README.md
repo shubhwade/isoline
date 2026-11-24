@@ -90,7 +90,7 @@ get `n/a` for Altman and Beneish because those models do not apply to them.
 
 | Problem | Fix |
 |---|---|
-| `telmus: command not found` | Open a new terminal; with pip use `python -m telmus.cli.app`, or install with `pipx` |
+| `telmus: command not found` | Open a new terminal; with pip use `python -m telmus`, or install with `pipx` |
 | `No financial data available` | Check the symbol on finance.yahoo.com and add the exchange suffix |
 | Rate limited / unreachable | Wait a few minutes; check proxy/VPN. Telmus retries 3 times automatically |
 | `telmus serve` says it needs an extra | `pip install "telmus[mcp]"` |

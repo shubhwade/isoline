@@ -6,6 +6,7 @@ import typing
 import numpy as np
 import pandas as pd
 
+from telmus.core.labels import at, divide, series, to_float
 from telmus.core.result import GrowthResult
 
 logger = logging.getLogger(__name__)
@@ -84,49 +85,32 @@ class GrowthEngine:
         )
 
     def _revenue_cagr(self, income_stmt: pd.DataFrame) -> float | None:
-        revenue = _get_series(income_stmt, "Total Revenue")
+        """3-year CAGR: needs four annual revenue figures (t-3 .. t)."""
+        revenue = series(income_stmt, "revenue")
         if revenue is None or len(revenue) < 4:
             logger.warning("Insufficient revenue history for CAGR")
             return None
-        start = _safe_value(revenue.iloc[3])
-        end = _safe_value(revenue.iloc[0])
-        if start is None or end is None:
-            return None
-        return _cagr(float(start), float(end), 3.0)
+        return _cagr(at(revenue, 3), at(revenue, 0), 3.0)
 
     def _pat_cagr(self, income_stmt: pd.DataFrame) -> float | None:
-        net_income = _get_series(income_stmt, "Net Income")
+        net_income = series(income_stmt, "net_income")
         if net_income is None or len(net_income) < 4:
             logger.warning("Insufficient net income history for CAGR")
             return None
-        start = _safe_value(net_income.iloc[3])
-        end = _safe_value(net_income.iloc[0])
-        if start is None or end is None:
-            return None
-        return _cagr(float(start), float(end), 3.0)
+        return _cagr(at(net_income, 3), at(net_income, 0), 3.0)
 
     def _margin_trend(self, income_stmt: pd.DataFrame) -> str | None:
-        revenue = _get_series(income_stmt, "Total Revenue")
-        operating_income = _get_series(income_stmt, "Operating Income")
+        """Operating-margin change over three years; None if any year is missing."""
+        revenue = series(income_stmt, "revenue")
+        operating_income = series(income_stmt, "ebit")
         if revenue is None or operating_income is None:
             logger.warning("Insufficient data for margin trend")
             return None
-        if len(revenue) < 3 or len(operating_income) < 3:
-            logger.warning(
-                "Margin trend requires 3 years of revenue and operating income"
-            )
-            return None
-        margins = []
-        for i in range(3):
-            rev = _safe_value(revenue.iloc[i])
-            op_inc = _safe_value(operating_income.iloc[i])
-            margin = _safe_divide(op_inc, rev)
-            margins.append(margin if margin is not None else 0.0)
-        first = margins[2]
-        last = margins[0]
+        margins = [divide(at(operating_income, i), at(revenue, i)) for i in range(3)]
+        first, last = margins[2], margins[0]
         if first is None or last is None:
-            logger.warning("Margin trend invalid values")
-            return "stable"
+            logger.warning("Margin trend: operating margin unavailable for a required year")
+            return None
         diff = last - first
         if diff > 0.02:
             return "improving"
@@ -137,30 +121,11 @@ class GrowthEngine:
     def _fcf_yield(
         self, cashflow: pd.DataFrame, info: dict[str, typing.Any]
     ) -> float | None:
-        cash_from_ops_series = _get_series(
-            cashflow, "Total Cash From Operating Activities"
-        )
-        if cash_from_ops_series is None:
-            cash_from_ops_series = _get_series(cashflow, "Operating Cash Flow")
-        capex_series = _get_series(cashflow, "Capital Expenditures")
-        if capex_series is None:
-            capex_series = _get_series(cashflow, "Capital Expenditure")
-        if cash_from_ops_series is None:
-            logger.warning("Operating cash flow missing for FCF yield")
-            return None
-        if capex_series is None:
-            logger.warning("Capital expenditures missing for FCF yield")
-            return None
-        cash_from_ops = _safe_value(cash_from_ops_series.iloc[0])
-        capex = _safe_value(capex_series.iloc[0])
-        market_cap = _safe_value(info.get("marketCap"))
-        if (
-            cash_from_ops is None
-            or capex is None
-            or market_cap is None
-            or market_cap == 0
-        ):
+        """(Operating cash flow - |capex|) / market cap. yfinance reports capex as negative."""
+        cfo = at(series(cashflow, "cfo"), 0)
+        capex = at(series(cashflow, "capex"), 0)
+        market_cap = to_float(info.get("marketCap"))
+        if cfo is None or capex is None or market_cap is None or market_cap <= 0:
             logger.warning("Insufficient values for FCF yield")
             return None
-        fcf = cash_from_ops - capex
-        return _safe_divide(fcf, market_cap)
+        return divide(cfo - abs(capex), market_cap)
