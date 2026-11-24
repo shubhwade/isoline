@@ -267,6 +267,12 @@ def scan(
     export: str | None = typer.Option(
         None, "--export", help="Save result to file (.xlsx, .csv, or .json)."
     ),
+    report: bool = typer.Option(
+        True, "--report/--no-report", help="Write the Excel + HTML reports (default: yes)."
+    ),
+    open_browser: bool = typer.Option(
+        True, "--open/--no-open", help="Open the HTML report in your browser (default: yes)."
+    ),
 ) -> None:
     """Run a financial scan for a ticker.
 
@@ -413,7 +419,7 @@ def scan(
             console.print(f"Saved to {export}")
 
         # Auto-generate dashboards
-        if not json_output:
+        if not json_output and report:
             ticker_clean = ticker.replace(".NS", "").replace(".BO", "")
             excel_path = f"{ticker_clean}_analysis.xlsx"
             html_path = f"{ticker_clean}_dashboard.html"
@@ -425,9 +431,10 @@ def scan(
             HtmlDashboardExporter().export_scan(result, html_path)
             print(f"Saved: {excel_path} and {html_path}")
 
-            import webbrowser
+            if open_browser:
+                import webbrowser
 
-            webbrowser.open(html_path)
+                webbrowser.open(html_path)
 
     except Exception as exc:
         _fail(exc)
@@ -441,7 +448,7 @@ def comp(
         None, "--export", help="Save comparison to file (.xlsx, .csv, or .json)."
     ),
 ) -> None:
-    compare(ticker_a, ticker_b, export)
+    compare(ticker_a, ticker_b, export, True, True)
 
 
 @app.command()
@@ -450,6 +457,12 @@ def compare(
     ticker_b: str,
     export: str | None = typer.Option(
         None, "--export", help="Save comparison to file (.xlsx, .csv, or .json)."
+    ),
+    report: bool = typer.Option(
+        True, "--report/--no-report", help="Write the Excel + HTML reports (default: yes)."
+    ),
+    open_browser: bool = typer.Option(
+        True, "--open/--no-open", help="Open the HTML report in your browser (default: yes)."
     ),
 ) -> None:
     """Compare two tickers side by side.
@@ -677,6 +690,8 @@ def compare(
                     handle.write(comparison.to_json())
             console.print(f"Saved to {export}")
 
+        if not report:
+            return
         # Auto-generate dashboards
         name = (
             f"{ticker_a.replace('.NS', '').replace('.BO', '')}"
@@ -690,9 +705,10 @@ def compare(
         HtmlDashboardExporter().export_compare(comparison, f"{name}_dashboard.html")
         print(f"Saved: {name}_comparison.xlsx and {name}_dashboard.html")
 
-        import webbrowser
+        if open_browser:
+            import webbrowser
 
-        webbrowser.open(f"{name}_dashboard.html")
+            webbrowser.open(f"{name}_dashboard.html")
 
     except Exception as exc:
         _fail(exc)

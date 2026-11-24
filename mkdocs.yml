@@ -52,6 +52,7 @@ plugins:
 nav:
   - Home: index.md
   - Quick start: quickstart.md
+  - Methodology: methodology.md
   - Reference:
     - CLI: cli.md
     - MCP server: mcp.md

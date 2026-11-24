@@ -1,10 +1,11 @@
-# Security Audit
+# Security
 
-This document tracks known security issues found during routine audits.
+Report vulnerabilities privately by email to shubhwade@gmail.com (or a GitHub private security
+advisory). Please do not open a public issue for security problems.
 
-## High Issues
-- `B602` in `telmus/cli/app.py`: subprocess call with `shell=True`. **Status**: Fixed in v0.2.0 by replacing `subprocess.Popen("start ...", shell=True)` with the native Python `webbrowser.open()` module.
-
-## Dependency Audit
-- The `pip-audit` scan found vulnerable dependencies in the global python environment. 
-- Telmus core dependencies (`yfinance`, `pandas`, `rich`, `typer`, `openpyxl`) are secure when used within standard bounds. We recommend users always run `pip install --upgrade` on their environments.
+Notes
+- Telmus makes outbound requests only to Yahoo Finance (via yfinance) and, for HTML reports, to
+  public CDNs for Chart.js and company logos. It stores no credentials.
+- Report pages HTML-escape all third-party text (company names, exchanges, flags).
+- `--export` writes to the path you give it; it does not validate or restrict it.
+- No `shell=True` or `eval` is used (the earlier `shell=True` issue was fixed in v0.2.0).

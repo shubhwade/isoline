@@ -4,7 +4,7 @@ This quickstart guide walks you through installing telmus, scanning your first s
 
 ## 1. Install
 
-telmus requires Python 3.9 or newer.
+telmus requires Python 3.10 or newer.
 
 ```bash
 pip install telmus

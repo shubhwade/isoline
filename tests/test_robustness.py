@@ -71,7 +71,7 @@ def test_unexpected_error_hides_traceback_unless_debug() -> None:
 def test_scan_prints_disclaimer() -> None:
     with patch("telmus.cli.app.TelmusScanner") as scanner:
         scanner.return_value.scan.return_value = fake_scan_result()
-        out = runner.invoke(app, ["scan", "INFY"])
+        out = runner.invoke(app, ["scan", "INFY", "--no-report"])
     assert out.exit_code == 0
     assert "not investment advice" in out.stdout
 
@@ -140,3 +140,30 @@ def test_html_report_escapes_untrusted_company_name(tmp_path) -> None:
     assert "<img src=x" not in page
     assert "<script>evil()" not in page
     assert "&lt;script&gt;alert" in page
+
+
+def test_no_report_writes_no_files_and_opens_no_browser(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    with (
+        patch("telmus.cli.app.TelmusScanner") as scanner,
+        patch("webbrowser.open") as opener,
+    ):
+        scanner.return_value.scan.return_value = fake_scan_result()
+        out = runner.invoke(app, ["scan", "INFY", "--no-report"])
+    assert out.exit_code == 0
+    assert list(tmp_path.iterdir()) == []
+    opener.assert_not_called()
+
+
+def test_default_scan_writes_reports_and_can_skip_browser(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    with (
+        patch("telmus.cli.app.TelmusScanner") as scanner,
+        patch("webbrowser.open") as opener,
+        patch("telmus.exporters.html_dashboard.get_company_logo_url", return_value=""),
+    ):
+        scanner.return_value.scan.return_value = fake_scan_result()
+        out = runner.invoke(app, ["scan", "INFY", "--no-open"])
+    assert out.exit_code == 0
+    assert {p.name for p in tmp_path.iterdir()} == {"INFY_analysis.xlsx", "INFY_dashboard.html"}
+    opener.assert_not_called()
