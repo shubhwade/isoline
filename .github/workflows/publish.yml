@@ -1,6 +1,8 @@
 name: Publish to PyPI
 # Triggered by pushing a tag such as v0.3.0. The `pypi` environment can be set
 # to "Required reviewers" in the repo settings so a human approves every release.
+# Emergency stop: set the repository variable RELEASES_DISABLED=true (Settings ->
+# Secrets and variables -> Actions -> Variables). See RELEASE_PROCESS.md.
 on:
   push:
     tags: ["v*"]
@@ -11,6 +13,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ vars.RELEASES_DISABLED != 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,6 +23,11 @@ jobs:
         run: |
           PKG=$(python -c "import re,pathlib;print(re.search(r'__version__ = \"(.+?)\"', pathlib.Path('telmus/__init__.py').read_text()).group(1))")
           if [ "v$PKG" != "${GITHUB_REF_NAME}" ]; then echo "Tag ${GITHUB_REF_NAME} != package v$PKG"; exit 1; fi
+      - name: Version must not already exist on PyPI
+        run: |
+          PKG="${GITHUB_REF_NAME#v}"
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/telmus/${PKG}/json")
+          if [ "$CODE" = "200" ]; then echo "telmus $PKG is already on PyPI; published versions are never overwritten. Bump the version."; exit 1; fi
       - run: python -m pip install -e ".[dev]"
       - run: ruff check telmus tests && pytest
       - run: python -m build
@@ -49,3 +57,21 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "${GITHUB_REF_NAME}" dist/* --repo "${GITHUB_REPOSITORY}" --title "${GITHUB_REF_NAME}" --generate-notes
+
+  smoke-test:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the published release in a clean venv
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          python -m venv "$RUNNER_TEMP/smoke"
+          for i in 1 2 3 4 5 6; do
+            "$RUNNER_TEMP/smoke/bin/pip" install "telmus==${VERSION}" && break
+            echo "PyPI index not updated yet; retry $i"; sleep 20
+          done
+          "$RUNNER_TEMP/smoke/bin/telmus" --version | grep -F "${VERSION}"
+          "$RUNNER_TEMP/smoke/bin/telmus" --help > /dev/null
