@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import asyncio
 import json
-from telmus.mcp.server import handle_tool_call, TOOL_DEFINITIONS
-
 import pytest
+
+pytest.importorskip("mcp")
+from telmus.mcp.server import handle_tool_call, TOOL_DEFINITIONS  # noqa: E402
 
 @pytest.fixture
 def anyio_backend():
     return 'asyncio'
 
+@pytest.mark.network
 @pytest.mark.anyio
 async def test_all_tools() -> None:
     """Test all 5 MCP tools."""

@@ -20,7 +20,6 @@ warnings.filterwarnings(
     category=Warning,
     module=r"^curl_cffi(\.|$)",
 )
-from importlib.metadata import version
 
 import typer
 from rich.console import Console
@@ -29,9 +28,31 @@ from rich.table import Table
 
 from telmus.core.scanner import TelmusScanner
 from telmus.core.result import ScanResult
-from telmus.mcp.server import run_mcp_server
+from telmus import __version__
 
-app = typer.Typer(help="telmus financial statement analysis CLI")
+app = typer.Typer(
+    help="telmus: financial statement analysis (Piotroski F, Altman Z, Beneish M, ratios).",
+    epilog="Examples:  telmus scan AAPL  |  telmus scan INFY --export report.xlsx  |  telmus compare AAPL MSFT",
+    no_args_is_help=True,
+    add_completion=False,
+)
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"telmus {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def _main(
+    version_flag: bool = typer.Option(
+        False, "--version", "-V", callback=_version_callback, is_eager=True,
+        help="Show the version and exit.",
+    ),
+) -> None:
+    """telmus: financial statement analysis from your terminal."""
+
 console = Console()
 logging.getLogger("telmus").setLevel(logging.ERROR)
 logging.getLogger("telmus.core.engines.health").setLevel(logging.ERROR)
@@ -365,7 +386,7 @@ def scan(
         raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command(hidden=True)
 def comp(
     ticker_a: str,
     ticker_b: str,
@@ -777,7 +798,15 @@ def screen(
 
 @app.command()
 def serve() -> None:
-    """Start the telmus MCP server."""
+    """Start the telmus MCP server (needs the optional mcp extra)."""
+    try:
+        from telmus.mcp.server import run_mcp_server
+    except ImportError:
+        console.print(
+            "[bold red]Error:[/] the MCP server needs an extra package.\n"
+            'Install it with:  pip install "telmus\\[mcp]"'
+        )
+        raise typer.Exit(code=1)
     config = {
         "mcpServers": {
             "telmus": {
@@ -794,10 +823,7 @@ def serve() -> None:
 @app.command()
 def info() -> None:
     """Print package info."""
-    try:
-        package_version = version("telmus")
-    except Exception:
-        package_version = "0.1.0"
+    package_version = __version__
     console.print(f"Version: [green]{package_version}[/green]")
     console.print(f"Python: [green]{sys.version.split()[0]}[/green]")
     console.print("Data source: [green]yfinance[/green]")

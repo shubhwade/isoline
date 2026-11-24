@@ -4,19 +4,19 @@ build-backend = "hatchling.build"
 
 [project]
 name = "telmus"
-version = "0.2.6"
-description = "Financial statement analysis for AI IDEs and coding agents"
+dynamic = ["version"]
+description = "Financial statement analysis CLI: Piotroski F, Altman Z, Beneish M, ratios, Excel and HTML reports, optional MCP server"
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [{name = "Shubh Wade", email = "shubhwade@gmail.com"}]
 dependencies = [
     "openpyxl>=3.0",
     "typer>=0.9.0",
     "rich>=13.0.0",
     "pandas>=2.0.0",
-    "yfinance>=0.2.0",
-    "mcp>=0.1.0",
+    "numpy>=1.24",
+    "yfinance>=0.2.40",
 ]
 keywords = ["finance", "financial-analysis", "ai", "python", "financial-modeling"]
 classifiers = [
@@ -25,9 +25,10 @@ classifiers = [
     "Intended Audience :: Financial and Insurance Industry",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Office/Business :: Financial",
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
@@ -42,7 +43,11 @@ Changelog = "https://shubhwade.github.io/telmus/changelog/"
 telmus = "telmus.cli.app:app"
 
 [project.optional-dependencies]
+mcp = ["mcp>=1.20,<2"]
 dev = [
+    "mcp>=1.20,<2",
+    "mypy",
+    "build",
     "pytest>=7.0",
     "pytest-cov",
     "ruff",
@@ -55,3 +60,19 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["telmus"]
+
+[tool.hatch.version]
+path = "telmus/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["telmus", "tests", "README.md", "LICENSE", "CHANGELOG.md", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["network: tests that need the live internet (deselect with -m 'not network')"]
+addopts = "-m 'not network'"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+extend-exclude = ["scripts"]

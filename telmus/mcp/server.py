@@ -8,11 +8,12 @@ import mcp.types as types
 from mcp.server import NotificationOptions, Server
 from mcp.server.stdio import stdio_server
 
+from telmus import __version__
 from telmus.core.scanner import TelmusScanner
 
 server = Server(
     "telmus",
-    version="0.1.0",
+    version=__version__,
     instructions="Financial statement analysis MCP server for AI IDEs.",
 )
 
@@ -155,7 +156,7 @@ async def handle_tool_call(
         payload = {"matches": matches}
     elif name == "info":
         payload = {
-            "version": "0.1.0",
+            "version": __version__,
             "data_source": "yfinance",
             "coverage": ["valuation", "health", "growth", "flags"],
             "description": "Financial statement analysis MCP server for AI IDEs.",
