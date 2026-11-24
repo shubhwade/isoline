@@ -12,4 +12,4 @@ Legend: **done** / **next** / **planned**. No dates are promised.
 | 0.7 Reports and web | redesigned HTML report, PDF export, Streamlit app polish, product site | planned |
 | 1.0 | stable public API (`telmus.sdk`), semver guarantees, docs, 100+ golden tests | planned |
 
-Growth plan: see `docs/growth-roadmap.md` and BUSINESS_STRATEGY.md. Downloads targets are aspirations, not forecasts.
+Growth plan: see the [growth plan](growth-roadmap.md) and `docs/internal/business-strategy.md`. Downloads targets are aspirations, not forecasts.

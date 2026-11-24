@@ -1,19 +1,31 @@
+# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
-dist/
-build/
 .venv/
 venv/
-.env
-*.log
-site/
+build/
+dist/
+
+# Tooling caches
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 .coverage
+htmlcov/
+site/
+
+# Local environment and secrets
+.env
+.pypirc
+
+# Generated reports and logs (the website page is tracked)
 *.xlsx
 *.html
 !website/index.html
-*.txt
-*.pyc
+!docs/overrides/*.html
+*.log
+
+# OS
 .DS_Store
+Thumbs.db

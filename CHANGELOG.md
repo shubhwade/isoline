@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.3
+### Changed
+- **Repository layout.** The root now holds only standard files (README, LICENSE, CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, pyproject, mkdocs.yml). Project docs moved to `docs/project/` (architecture, data sources, release process, roadmap, growth plan) and internal notes to `docs/internal/` (kept out of the published site). The Streamlit app moved from `dashboard/` to `examples/`. Removed `scripts/capture.py` (a one-off screenshot helper with hard-coded personal paths) and an unused logo file. `.gitignore` reorganised and now ignores `.pypirc`.
+
 ## v0.4.2
 ### Changed
 - **Report fonts and charts.** Headings use Times New Roman and numbers use a lining, tabular sans-serif (Georgia's old-style digits made figures look uneven). Scan reports now include two inline-SVG charts built from up to four fiscal years of real statement data, matched by date: revenue and net income with operating margin, and net income vs operating cash flow vs free cash flow. A year that was not reported has no bar (never a zero bar). New `history` field in the JSON output.

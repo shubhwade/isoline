@@ -2,7 +2,7 @@ name: Publish to PyPI
 # Triggered by pushing a tag such as v0.3.0. The `pypi` environment can be set
 # to "Required reviewers" in the repo settings so a human approves every release.
 # Emergency stop: set the repository variable RELEASES_DISABLED=true (Settings ->
-# Secrets and variables -> Actions -> Variables). See RELEASE_PROCESS.md.
+# Secrets and variables -> Actions -> Variables). See docs/project/release-process.md.
 on:
   push:
     tags: ["v*"]

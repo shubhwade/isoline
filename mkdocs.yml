@@ -1,6 +1,8 @@
 site_name: telmus
 site_description: Financial statement analysis for AI IDEs and coding agents
 docs_dir: docs
+exclude_docs: |
+  internal/
 site_url: https://shubhwade.github.io/telmus
 repo_url: https://github.com/shubhwade/telmus
 repo_name: shubhwade/telmus
@@ -62,9 +64,9 @@ nav:
     - Formulas and sources: methodology.md
     - Health engine: engines/health.md
   - Project:
-    - Architecture: architecture.md
-    - Data sources: data-sources.md
-    - Release process: release-process.md
-    - Roadmap: roadmap.md
-    - Growth plan: growth-roadmap.md
+    - Architecture: project/architecture.md
+    - Data sources: project/data-sources.md
+    - Release process: project/release-process.md
+    - Roadmap: project/roadmap.md
+    - Growth plan: project/growth-roadmap.md
     - Changelog: changelog.md

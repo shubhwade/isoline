@@ -8,7 +8,8 @@ telmus/
     labels.py         canonical line-item aliases; all engines read data only through this
     errors.py         typed errors (+ hint, exit code)
     engines/          health (F, Z''), flags (Beneish, red flags), growth, valuation, quality, history (chart series)
-    scanner.py        orchestrates engines -> ScanResult
+    scanner.py        orchestrates engines -> ScanResult (compare scans both tickers concurrently)
+    screening.py      sector screening shared by the CLI and the MCP server
     result.py         dataclasses; to_dict() is the stable JSON shape
   exporters/          report.py (self-contained HTML), html_dashboard.py (thin wrapper), excel, powerbi; _safe.py escapes all text
   sdk/                public Python API (scan, compare, TelmusScanner)

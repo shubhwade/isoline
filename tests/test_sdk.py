@@ -182,20 +182,14 @@ def test_scan_report_contains_two_svg_charts_and_no_zero_bar_for_gaps(tmp_path) 
     assert html.count("<rect") >= 8 + 10
 
 
-def test_docs_site_copies_of_project_docs_do_not_drift() -> None:
-    """The root files and their docs/ copies (published on the docs site) must match."""
+def test_docs_changelog_copy_does_not_drift() -> None:
+    """docs/changelog.md (published on the docs site) must equal the root CHANGELOG.md."""
     import pathlib
 
     root = pathlib.Path(__file__).resolve().parent.parent
-    for top, page in {
-        "ARCHITECTURE.md": "architecture.md",
-        "DATA_SOURCES.md": "data-sources.md",
-        "RELEASE_PROCESS.md": "release-process.md",
-        "ROADMAP.md": "roadmap.md",
-    }.items():
-        assert (root / top).read_text(encoding="utf-8") == (root / "docs" / page).read_text(
-            encoding="utf-8"
-        ), f"{top} and docs/{page} differ; copy the root file over the docs page"
+    assert (root / "CHANGELOG.md").read_text(encoding="utf-8") == (
+        root / "docs" / "changelog.md"
+    ).read_text(encoding="utf-8"), "copy CHANGELOG.md over docs/changelog.md"
 
 
 def test_every_docs_page_is_in_the_nav_and_nav_targets_exist() -> None:
@@ -205,6 +199,19 @@ def test_every_docs_page_is_in_the_nav_and_nav_targets_exist() -> None:
     root = pathlib.Path(__file__).resolve().parent.parent
     nav_text = (root / "mkdocs.yml").read_text(encoding="utf-8").split("nav:")[1]
     targets = set(re.findall(r":\s*([\w\-/]+\.md)\s*$", nav_text, re.M))
-    pages = {p.relative_to(root / "docs").as_posix() for p in (root / "docs").rglob("*.md")}
+    pages = {
+        p.relative_to(root / "docs").as_posix()
+        for p in (root / "docs").rglob("*.md")
+        if "internal" not in p.relative_to(root / "docs").parts  # excluded from the site
+    }
     assert targets <= pages, f"nav points at missing pages: {targets - pages}"
     assert pages <= targets, f"pages missing from the nav: {pages - targets}"
+
+
+def test_repository_root_stays_tidy() -> None:
+    """Only standard top-level files; project notes live under docs/."""
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parent.parent
+    allowed_md = {"README.md", "CHANGELOG.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md"}
+    assert {p.name for p in root.glob("*.md")} <= allowed_md

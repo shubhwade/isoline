@@ -3,7 +3,7 @@
 Last updated: 2026-11-25. Repository head: see `git log`.
 
 ## Stage
-Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.4.2`: quality metrics plus the second-audit fixes (see CHANGELOG). Release `v0.4.2` needs the owner to create the tag/release.
+Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.4.3`: quality metrics plus the second-audit fixes (see CHANGELOG). Release `v0.4.3` needs the owner to create the tag/release.
 
 ## Implemented and tested (offline, 99 tests, Python 3.11/3.12 locally)
 - Install fix: `mcp` is an optional extra; clean-venv wheel install verified.
@@ -19,7 +19,7 @@ Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-
 - HTML compare/screen pages and the Excel compare/screen sheets were only smoke-tested with sparse data (no crash, no literal placeholders); their per-metric zero defaults in chart arrays are not individually audited.
 
 ## Planned (not started)
-Provider abstraction (SEC EDGAR / user-supplied data), DCF with explicit assumptions, screening, portfolio analytics, rebuilt website, web app, release-please automation. See ROADMAP.md.
+Provider abstraction (SEC EDGAR / user-supplied data), DCF with explicit assumptions, screening, portfolio analytics, rebuilt website, web app, release-please automation. See [roadmap](../project/roadmap.md).
 
 ## Decisions
 - Missing data is `None`, never 0. No assumed tax rates, no fake peer comparisons.

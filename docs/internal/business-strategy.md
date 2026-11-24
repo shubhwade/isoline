@@ -3,7 +3,7 @@
 ## Positioning
 An open-source, scriptable, **explainable** fundamentals toolkit for developers and analysts: every score shows its inputs and says n/a when data is missing. It is a CLI + Python library + MCP server, which GUI-only screeners do not offer.
 
-## Evidence so far (see COMPETITOR_RESEARCH.md)
+## Evidence so far (see [competitor research](competitor-research.md))
 Retail screeners charge roughly: Screener.in Premium Rs 4,999/yr, Tickertape Pro Rs 399/mo or Rs 2,999/yr, Trendlyne PRO Rs 8,900/yr, Simply Wall St about $10-20/mo (all as found in searches during this project; re-verify before use). So paid willingness exists for polished GUIs with curated data; an open library competes on openness and automation, not on data.
 
 ## Monetisation options (none implemented)

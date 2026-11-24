@@ -124,6 +124,19 @@ ruff check telmus tests && mypy && pytest
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Tests never use the live internet unless marked `network`.
 
+### Repository layout
+
+```text
+telmus/          the package (cli/, core/ engines, exporters/, mcp/, sdk/)
+tests/           offline test suite
+docs/            documentation site (MkDocs): guides, methodology, project docs
+examples/        runnable examples (Streamlit app)
+website/         the landing page
+.github/         CI, release and docs workflows, issue/PR templates
+```
+
+Architecture, data sources, the release process and the roadmap are in [docs/project](docs/project/).
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
