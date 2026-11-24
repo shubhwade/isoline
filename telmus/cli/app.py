@@ -252,6 +252,19 @@ def _print_scan(result: ScanResult) -> None:
     console.print(_render_bar_chart("Health Chart", health_metrics, "cyan"))
     console.print(_render_section("Growth", growth_metrics))
     console.print(_render_bar_chart("Growth Chart", growth_metrics, "cyan"))
+    if result.quality is not None:
+        q = result.quality
+        quality_metrics = [
+            ("ROE (DuPont)", q.roe, None),
+            ("Net margin", q.net_margin, None),
+            ("Asset turnover", q.asset_turnover, None),
+            ("Equity multiplier", q.equity_multiplier, None),
+            ("ROIC", q.roic, None),
+            ("FCF margin", q.fcf_margin, None),
+            ("Accruals ratio", q.accruals_ratio, None),
+            ("Cash conversion (days)", q.cash_conversion_cycle_days, None),
+        ]
+        console.print(_render_section("Quality", quality_metrics))
     console.print(Panel(escape(result.analyst_brief), title="Analyst brief", expand=False))
     for note in result.notes:
         console.print(f"[dim]Note: {escape(note)}[/dim]")

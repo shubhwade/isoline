@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.3
+### Added
+- **Quality metrics** (`ScanResult.quality`, CLI "Quality" table, HTML report section): DuPont ROE decomposition, ROIC, free-cash-flow margin and FCF/net income, accruals ratio, DSO/DIO/DPO, cash conversion cycle, share-count change. Formulas in `docs/methodology.md`; missing inputs give n/a with a note.
+- Release safeguards: `RELEASES_DISABLED` kill switch, PyPI version-conflict check, post-release smoke test (see RELEASE_PROCESS.md).
+- Project docs: ROADMAP, ARCHITECTURE, DATA_SOURCES, RELEASE_PROCESS, BUSINESS_STRATEGY, COMPETITOR_RESEARCH, PROJECT_STATUS.
+
 ## v0.3.2
 First published release containing everything below (tags v0.3.0 and v0.3.1 were created but never published; the release workflow now supports PyPI Trusted Publishing).
 

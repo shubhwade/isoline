@@ -167,3 +167,22 @@ def test_default_scan_writes_reports_and_can_skip_browser(tmp_path, monkeypatch)
     assert out.exit_code == 0
     assert {p.name for p in tmp_path.iterdir()} == {"INFY_analysis.xlsx", "INFY_dashboard.html"}
     opener.assert_not_called()
+
+
+def test_scan_cli_and_html_show_quality(tmp_path, monkeypatch) -> None:
+    from unittest.mock import patch
+
+    from typer.testing import CliRunner
+
+    from telmus.cli.app import app
+    from tests.test_scores import quality_company
+
+    fin = quality_company()
+    fin["info"] = {"symbol": "Q", "longName": "Quality Co", "exchange": "X", "marketCap": 5000.0}
+    monkeypatch.chdir(tmp_path)
+    with patch("telmus.core.scanner.load_financials", return_value=fin):
+        out = CliRunner().invoke(app, ["scan", "Q", "--no-open"])
+    assert out.exit_code == 0, out.output
+    assert "Quality" in out.output and "ROE (DuPont)" in out.output
+    html = next(tmp_path.glob("*.html")).read_text(encoding="utf-8")
+    assert "Cash conversion cycle (days)" in html and "21.4%" in html  # 120/560

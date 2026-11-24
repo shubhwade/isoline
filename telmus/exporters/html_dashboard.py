@@ -29,6 +29,39 @@ def get_company_logo_url(ticker: str, info: dict | None = None) -> str:
     return ""
 
 
+def _quality_rows(result: ScanResult) -> str:
+    """HTML rows for the quality metrics (values were already escaped upstream)."""
+    q = getattr(result, "quality", None)
+    if q is None:
+        return ""
+    items = [
+        ("ROE (DuPont)", q.roe, "pct"),
+        ("Net margin", q.net_margin, "pct"),
+        ("Asset turnover", q.asset_turnover, "x"),
+        ("Equity multiplier", q.equity_multiplier, "x"),
+        ("ROIC", q.roic, "pct"),
+        ("FCF margin", q.fcf_margin, "pct"),
+        ("Accruals ratio", q.accruals_ratio, "pct"),
+        ("Cash conversion cycle (days)", q.cash_conversion_cycle_days, "d"),
+    ]
+    rows = []
+    for label, value, kind in items:
+        if value is None:
+            text = "n/a"
+        elif kind == "pct":
+            text = f"{value * 100:.1f}%"
+        elif kind == "x":
+            text = f"{value:.2f}x"
+        else:
+            text = f"{value:.0f}"
+        rows.append(
+            f'<div class="metric-row"><span class="metric-label">{label}</span>'
+            f'<span class="metric-val" style="color:var(--text)">{text}</span></div>'
+        )
+    return "".join(rows)
+
+
+
 class HtmlDashboardExporter:
     def _fmt(self, val: typing.Any) -> str:
         if val is None:
@@ -897,6 +930,12 @@ class HtmlDashboardExporter:
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="brief-card">
+            <div class="section-label">Quality</div>
+            <div class="section-title" style="margin-bottom:0.75rem;">Profitability, cash and working capital</div>
+            {_quality_rows(result)}
         </div>
 
         <!-- ═══ ANALYST BRIEF ═══ -->
