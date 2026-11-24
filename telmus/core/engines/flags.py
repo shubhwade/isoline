@@ -9,6 +9,7 @@ A missing input gives ``None``. It is never replaced by zero.
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 import pandas as pd
 
@@ -33,7 +34,7 @@ def _ratio_of_ratios(a_num, a_den, b_num, b_den) -> float | None:
 
 
 class FlagsEngine:
-    def run(self, financials: dict[str, object]) -> FlagsResult:
+    def run(self, financials: dict[str, Any]) -> FlagsResult:
         income = _frame(financials, "income_stmt")
         balance = _frame(financials, "balance_sheet")
         cashflow = _frame(financials, "cashflow")

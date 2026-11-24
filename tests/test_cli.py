@@ -3,12 +3,10 @@ from __future__ import annotations
 import json
 from unittest.mock import patch
 
-import pytest
 from typer.testing import CliRunner
 
 from telmus.cli.app import app
-from telmus.core.result import ScanResult
-from telmus.core.result import ValuationResult, HealthResult, GrowthResult, RedFlag
+from telmus.core.result import GrowthResult, HealthResult, ScanResult, ValuationResult
 
 runner = CliRunner()
 

@@ -234,4 +234,4 @@ class HealthEngine:
         return divide(ebit, abs(interest))
 
 
-__all__ = ["HealthEngine", "PIOTROSKI_SIGNALS", "first_of"]
+__all__ = ["PIOTROSKI_SIGNALS", "HealthEngine", "first_of"]

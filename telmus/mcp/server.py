@@ -4,7 +4,7 @@ import asyncio
 import json
 from typing import Any
 
-import mcp.types as types
+from mcp import types
 from mcp.server import NotificationOptions, Server
 from mcp.server.stdio import stdio_server
 
@@ -113,12 +113,7 @@ async def handle_tool_call(
     name: str, arguments: dict[str, Any] | None
 ) -> types.CallToolResult:
     arguments = arguments or {}
-    if name == "scan":
-        ticker = arguments.get("ticker")
-        if not ticker:
-            raise ValueError("Missing ticker")
-        payload = {"result": json.loads(_scan_and_serialize(TelmusScanner(), ticker))}
-    elif name == "scan_ticker":
+    if name == "scan" or name == "scan_ticker":
         ticker = arguments.get("ticker")
         if not ticker:
             raise ValueError("Missing ticker")

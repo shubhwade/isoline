@@ -1,9 +1,21 @@
 from __future__ import annotations
-import typing
 
 import logging
+import os
+import re
 import sys
+import typing
 import warnings
+
+import typer
+from rich.console import Console
+from rich.markup import escape
+from rich.panel import Panel
+from rich.table import Table
+
+from telmus import __version__
+from telmus.core.result import ScanResult
+from telmus.core.scanner import TelmusScanner
 
 warnings.filterwarnings(
     "ignore",
@@ -20,16 +32,6 @@ warnings.filterwarnings(
     category=Warning,
     module=r"^curl_cffi(\.|$)",
 )
-
-import typer
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-
-from telmus.core.scanner import TelmusScanner
-from telmus.core.result import ScanResult
-from telmus import __version__
-
 app = typer.Typer(
     help="telmus: financial statement analysis (Piotroski F, Altman Z, Beneish M, ratios).",
     epilog="Examples:  telmus scan AAPL  |  telmus scan INFY --export report.xlsx  |  telmus compare AAPL MSFT",
@@ -50,8 +52,14 @@ def _main(
         False, "--version", "-V", callback=_version_callback, is_eager=True,
         help="Show the version and exit.",
     ),
+    debug: bool = typer.Option(
+        False, "--debug", help="Show full tracebacks and detailed logs (or set TELMUS_DEBUG=1)."
+    ),
 ) -> None:
     """telmus: financial statement analysis from your terminal."""
+    if debug:
+        _STATE["debug"] = True
+        logging.getLogger("telmus").setLevel(logging.DEBUG)
 
 console = Console()
 logging.getLogger("telmus").setLevel(logging.ERROR)
@@ -62,6 +70,37 @@ logging.getLogger("telmus.core.engines.growth").setLevel(logging.ERROR)
 logging.getLogger("yfinance").setLevel(logging.ERROR)
 logging.getLogger("curl_cffi").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
+
+
+_STATE = {"debug": os.environ.get("TELMUS_DEBUG", "") not in ("", "0", "false")}
+_TICKER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9.\-^=& ]{0,39}")
+
+
+def _validate_ticker(raw: str) -> str:
+    """Accept tickers (AAPL, INFY.NS, BRK-B, ^GSPC) and short company names."""
+    ticker = raw.strip()
+    if not _TICKER_RE.fullmatch(ticker):
+        console.print(
+            f"[bold red]Error:[/] '{escape(raw[:40])}' is not a valid ticker.\n"
+            "Use a symbol such as AAPL, MSFT or INFY.NS."
+        )
+        raise typer.Exit(code=2)
+    return ticker
+
+
+def _fail(exc: BaseException) -> typing.NoReturn:
+    """Print a friendly error (traceback only with --debug) and exit with a clear code."""
+    if isinstance(exc, typer.Exit):
+        raise exc
+    if _STATE["debug"]:
+        console.print_exception()
+    console.print(f"[bold red]Error:[/] {escape(str(exc))}")
+    hint = getattr(exc, "hint", "")
+    if hint:
+        console.print(f"[yellow]Hint:[/] {escape(hint)}")
+    elif not _STATE["debug"]:
+        console.print("[dim]Run again with --debug for details.[/dim]")
+    raise typer.Exit(code=getattr(exc, "exit_code", 1))
 
 
 def _format_metric(value: typing.Any | None) -> str:
@@ -131,7 +170,7 @@ def _render_bar_chart(
     ]
     max_val = max(valid_data + [0.001])
 
-    for metric, value, flag in metrics:
+    for metric, value, _flag in metrics:
         if value is None or not isinstance(value, (int, float)):
             table.add_row(metric, "n/a", "")
             continue
@@ -184,7 +223,7 @@ def _render_compare_chart(
 
 def _print_scan(result: ScanResult) -> None:
     console.rule(
-        f"[bold blue]{result.company}[/] — [green]{result.ticker}[/] — [cyan]{result.exchange}[/]"
+        f"[bold blue]{escape(result.company)}[/] — [green]{escape(result.ticker)}[/] — [cyan]{escape(result.exchange)}[/]"
     )
     console.print(f"Scan duration: {result.scan_duration_ms} ms")
 
@@ -213,7 +252,12 @@ def _print_scan(result: ScanResult) -> None:
     console.print(_render_bar_chart("Health Chart", health_metrics, "cyan"))
     console.print(_render_section("Growth", growth_metrics))
     console.print(_render_bar_chart("Growth Chart", growth_metrics, "cyan"))
-    console.print(Panel(result.analyst_brief, title="Analyst brief", expand=False))
+    console.print(Panel(escape(result.analyst_brief), title="Analyst brief", expand=False))
+    for note in result.notes:
+        console.print(f"[dim]Note: {escape(note)}[/dim]")
+    console.print(
+        "[dim]Screening statistics from public data (Yahoo Finance); not investment advice.[/dim]"
+    )
 
 
 @app.command()
@@ -224,7 +268,11 @@ def scan(
         None, "--export", help="Save result to file (.xlsx, .csv, or .json)."
     ),
 ) -> None:
-    """Run a financial scan for a ticker."""
+    """Run a financial scan for a ticker.
+
+    Example: telmus scan AAPL --export aapl.xlsx
+    """
+    ticker = _validate_ticker(ticker)
     try:
         scanner = TelmusScanner()
         result = scanner.scan(ticker)
@@ -382,8 +430,7 @@ def scan(
             webbrowser.open(html_path)
 
     except Exception as exc:
-        console.print(f"[bold red]Error:[/] {exc}")
-        raise typer.Exit(code=1)
+        _fail(exc)
 
 
 @app.command(hidden=True)
@@ -405,7 +452,12 @@ def compare(
         None, "--export", help="Save comparison to file (.xlsx, .csv, or .json)."
     ),
 ) -> None:
-    """Compare two tickers side by side."""
+    """Compare two tickers side by side.
+
+    Example: telmus compare AAPL MSFT
+    """
+    ticker_a = _validate_ticker(ticker_a)
+    ticker_b = _validate_ticker(ticker_b)
     try:
         scanner = TelmusScanner()
         comparison = scanner.compare(ticker_a, ticker_b)
@@ -643,8 +695,7 @@ def compare(
         webbrowser.open(f"{name}_dashboard.html")
 
     except Exception as exc:
-        console.print(f"[bold red]Error:[/] {exc}")
-        raise typer.Exit(code=1)
+        _fail(exc)
 
 
 @app.command()
@@ -806,7 +857,7 @@ def serve() -> None:
             "[bold red]Error:[/] the MCP server needs an extra package.\n"
             'Install it with:  pip install "telmus\\[mcp]"'
         )
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
     config = {
         "mcpServers": {
             "telmus": {
@@ -833,6 +884,7 @@ def info() -> None:
 @app.command()
 def check(ticker: str) -> None:
     """Run a quick health check for a ticker."""
+    ticker = _validate_ticker(ticker)
     try:
         scanner = TelmusScanner()
         result = scanner.scan(ticker)
@@ -841,8 +893,7 @@ def check(ticker: str) -> None:
         )
         console.print(f"Altman Z-score: [bold]{result.health.altman_z or 'n/a'}[/bold]")
     except Exception as exc:
-        console.print(f"[bold red]Error:[/] {exc}")
-        raise typer.Exit(code=1)
+        _fail(exc)
 
 
 @app.command()
@@ -894,5 +945,4 @@ def powerbi(
             console.print(f"Saved to {export}")
             console.print(f"Saved to {html_export}")
     except Exception as exc:
-        console.print(f"[bold red]Error:[/] {exc}")
-        raise typer.Exit(code=1)
+        _fail(exc)

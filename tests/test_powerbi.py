@@ -3,9 +3,9 @@ from __future__ import annotations
 import csv
 import os
 import tempfile
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from telmus.core.result import ScanResult, ValuationResult, HealthResult, GrowthResult, RedFlag
+from telmus.core.result import GrowthResult, HealthResult, RedFlag, ScanResult, ValuationResult
 from telmus.exporters.powerbi import PowerBIExporter
 
 
@@ -73,7 +73,7 @@ def test_powerbi_export_portfolio(mock_scanner_class: MagicMock) -> None:
 
         assert os.path.exists(csv_path)
 
-        with open(csv_path, "r", newline="", encoding="utf-8") as f:
+        with open(csv_path, newline="", encoding="utf-8") as f:
             reader = csv.reader(f)
             rows = list(reader)
 
@@ -113,7 +113,7 @@ def test_powerbi_export_flags(mock_scanner_class: MagicMock) -> None:
 
         assert os.path.exists(csv_path)
 
-        with open(csv_path, "r", newline="", encoding="utf-8") as f:
+        with open(csv_path, newline="", encoding="utf-8") as f:
             reader = csv.reader(f)
             rows = list(reader)
 

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import os
 import tempfile
+
 from openpyxl import load_workbook
 
-from telmus.core.result import ScanResult, ValuationResult, HealthResult, GrowthResult, RedFlag
+from telmus.core.result import GrowthResult, HealthResult, RedFlag, ScanResult, ValuationResult
 from telmus.exporters.excel import ExcelExporter
 
 

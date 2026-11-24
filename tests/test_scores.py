@@ -17,7 +17,7 @@ DATES = ["2024-12-31", "2023-12-31", "2022-12-31"]
 
 def frame(rows: dict[str, list[float | None]]) -> pd.DataFrame:
     """yfinance orientation: items as rows, newest period first."""
-    return pd.DataFrame({k: dict(zip(DATES, v)) for k, v in rows.items()}).T
+    return pd.DataFrame({k: dict(zip(DATES, v, strict=False)) for k, v in rows.items()}).T
 
 
 def company() -> dict[str, object]:

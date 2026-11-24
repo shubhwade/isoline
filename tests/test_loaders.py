@@ -60,6 +60,5 @@ def test_load_financials_raises_for_unknown_company_name() -> None:
 
     with patch("telmus.core.loaders._import_yfinance", return_value=fake_yf), patch(
         "telmus.core.loaders._resolve_ticker_by_name", return_value=None
-    ):
-        with pytest.raises(ValueError, match="No financial data available"):
-            load_financials("UNKNOWN")
+    ), pytest.raises(ValueError, match="No financial data available"):
+        load_financials("UNKNOWN")

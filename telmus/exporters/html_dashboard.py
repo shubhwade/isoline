@@ -1,9 +1,11 @@
 from __future__ import annotations
+
+import datetime
+import json
 import typing
 
-import json
-import datetime
-from telmus.core.result import ScanResult, CompareResult
+from telmus.core.result import CompareResult, ScanResult
+from telmus.exporters._safe import escape_obj
 
 
 def get_company_logo_url(ticker: str, info: dict | None = None) -> str:
@@ -459,6 +461,7 @@ class HtmlDashboardExporter:
     # SCAN DASHBOARD
     # ═══════════════════════════════════════════════════════════════════════════
     def export_scan(self, result: ScanResult, path: str) -> None:
+        result = escape_obj(result)
 
         def _safe_get(obj, attr, default=0.0):
             try:
@@ -690,7 +693,7 @@ class HtmlDashboardExporter:
         <header class="header-section" style="position:relative; padding:1.5rem; border-radius:12px; border:1px solid var(--border);">
 
             <div style="display:flex;justify-content:space-between;align-items:center;gap:1.5rem;">
-                <img src="{logo_url}" 
+                <img src="{logo_url}"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
                      style="width:56px;height:56px;border-radius:50%;object-fit:contain;background:white;padding:4px;">
                 <div style="display:{"none" if logo_url else "flex"};align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--teal-10);border:1px solid var(--teal-20);color:var(--teal);font-family:'JetBrains Mono', monospace;font-weight:700;font-size:1.5rem;" class="letter-avatar">{result.ticker[0]}</div>
@@ -1144,6 +1147,7 @@ class HtmlDashboardExporter:
     # COMPARE DASHBOARD
     # ═══════════════════════════════════════════════════════════════════════════
     def export_compare(self, result: CompareResult, path: str) -> None:
+        result = escape_obj(result)
         scan_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         ticker_a = result.ticker_a
         ticker_b = result.ticker_b
@@ -1574,6 +1578,7 @@ class HtmlDashboardExporter:
     # SCREEN DASHBOARD
     # ═══════════════════════════════════════════════════════════════════════════
     def export_screen(self, results: list[ScanResult], path: str) -> None:
+        results = escape_obj(results)
         scan_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         n = len(results)
 

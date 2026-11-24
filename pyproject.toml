@@ -76,3 +76,13 @@ addopts = "-m 'not network'"
 target-version = "py310"
 line-length = 100
 extend-exclude = ["scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+files = ["telmus/core"]

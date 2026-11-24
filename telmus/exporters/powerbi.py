@@ -1,10 +1,12 @@
 from __future__ import annotations
-import typing
-from telmus.core.result import ScanResult
 
 import csv
 import datetime
+import typing
+
+from telmus.core.result import ScanResult
 from telmus.core.scanner import TelmusScanner
+from telmus.exporters._safe import escape_obj
 
 
 class PowerBIExporter:
@@ -130,6 +132,7 @@ class PowerBIExporter:
         return "\n".join(html)
 
     def _generate_html_report(self, results: list[ScanResult], html_path: str) -> None:
+        results = escape_obj(results)
         import json
 
         # Extract data for simple charts
@@ -575,7 +578,7 @@ class PowerBIExporter:
                         ctx.moveTo(xPos, top);
                         ctx.lineTo(xPos, bottom);
                         ctx.stroke();
-                        
+
                         // Add text label
                         ctx.fillStyle = '#ef4444';
                         ctx.font = '10px Inter';

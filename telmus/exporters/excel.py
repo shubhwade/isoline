@@ -1,17 +1,18 @@
 from __future__ import annotations
-import logging
-
-logger = logging.getLogger(__name__)
 
 import datetime
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils import get_column_letter
-from openpyxl.chart import BarChart, LineChart, Reference
-from openpyxl.chart.series import SeriesLabel
-from openpyxl.chart.data_source import StrRef
+import logging
 
-from telmus.core.result import ScanResult, CompareResult
+from openpyxl import Workbook
+from openpyxl.chart import BarChart, LineChart, Reference
+from openpyxl.chart.data_source import StrRef
+from openpyxl.chart.series import SeriesLabel
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+from openpyxl.utils import get_column_letter
+
+from telmus.core.result import CompareResult, ScanResult
+
+logger = logging.getLogger(__name__)
 
 
 class ExcelExporter:
@@ -101,8 +102,7 @@ class ExcelExporter:
                 if is_merged:
                     continue
                 val_str = str(cell.value if cell.value is not None else "")
-                if len(val_str) > max_len:
-                    max_len = len(val_str)
+                max_len = max(max_len, len(val_str))
             ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
 
     def _val(self, v: typing.Any) -> any:
@@ -317,7 +317,7 @@ class ExcelExporter:
         ]
 
         curr_row = 2
-        for idx, (m, v, s, note) in enumerate(health_rows):
+        for m, v, s, note in health_rows:
             fill = self.fill_alt if curr_row % 2 == 1 else self.fill_white
 
             ws_health.cell(row=curr_row, column=1, value=m)
@@ -616,8 +616,8 @@ class ExcelExporter:
             chart3.series[0].graphicalProperties.solidFill = "10B981"  # Emerald
 
         # Fetch raw financials to construct line chart for margin trend if multiple periods available
-        from telmus.core.loaders import load_financials
         from telmus.core.labels import get_series_fallback as _get_series_fallback
+        from telmus.core.loaders import load_financials
 
         chart4 = None
         chart5 = None

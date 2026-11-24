@@ -5,6 +5,15 @@ import functools
 import importlib
 import io
 import logging
+import time
+from typing import Any
+
+from telmus.core.errors import (
+    NoDataError,
+    ProviderUnavailableError,
+    RateLimitError,
+    TelmusError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -82,8 +91,44 @@ def _load_data(symbol: str) -> tuple[dict[str, object], object, object, object, 
     return info, income_stmt, balance_sheet, cashflow, fast_info
 
 
+_ATTEMPTS = 3
+_sleep = time.sleep  # replaced in tests
+
+
+def _classify(exc: Exception) -> TelmusError | None:
+    """Map a provider exception to a typed error, or None if it is not transient."""
+    text = f"{type(exc).__name__} {exc}".lower()
+    if "ratelimit" in text or "too many requests" in text or "429" in text:
+        return RateLimitError(f"Yahoo Finance rate limit reached ({exc})")
+    transient = (
+        "timeout", "timed out", "connection", "curl", "ssl", "proxy",
+        "name or service", "temporary failure", "network", "403", "502", "503", "504",
+    )
+    if isinstance(exc, (OSError, TimeoutError)) or any(t in text for t in transient):
+        return ProviderUnavailableError(f"Could not reach Yahoo Finance ({exc})")
+    return None
+
+
+def _load_data_with_retry(symbol: str):
+    """Call _load_data, retrying transient failures with exponential backoff."""
+    last: TelmusError | None = None
+    for attempt in range(_ATTEMPTS):
+        try:
+            return _load_data(symbol)
+        except Exception as exc:
+            typed = _classify(exc)
+            if typed is None:
+                raise
+            last = typed
+            logger.debug("Attempt %d/%d for %s failed: %s", attempt + 1, _ATTEMPTS, symbol, exc)
+            if attempt < _ATTEMPTS - 1:
+                _sleep(2**attempt)  # 1s, 2s
+    assert last is not None
+    raise last
+
+
 @functools.lru_cache(maxsize=128)
-def load_financials(ticker: str) -> dict[str, object]:
+def load_financials(ticker: str) -> dict[str, Any]:
     """Load financial data for a ticker from yfinance.
 
     Args:
@@ -98,19 +143,19 @@ def load_financials(ticker: str) -> dict[str, object]:
     try:
         ticker_symbol = ticker
 
-        info, income_stmt, balance_sheet, cashflow, fast_info = _load_data(
+        info, income_stmt, balance_sheet, cashflow, fast_info = _load_data_with_retry(
             ticker_symbol
         )
         if not info.get("symbol"):
             resolved = _resolve_ticker_by_name(ticker)
             if resolved and resolved != ticker_symbol:
                 ticker_symbol = resolved
-                info, income_stmt, balance_sheet, cashflow, fast_info = _load_data(
+                info, income_stmt, balance_sheet, cashflow, fast_info = _load_data_with_retry(
                     ticker_symbol
                 )
 
         if not _is_valid_financial_data(info, income_stmt, balance_sheet, cashflow):
-            raise ValueError(f"No financial data available for ticker '{ticker}'")
+            raise NoDataError(f"No financial data available for ticker '{ticker}'")
 
         return {
             "info": info,
@@ -119,6 +164,8 @@ def load_financials(ticker: str) -> dict[str, object]:
             "cashflow": cashflow,
             "fast_info": fast_info,
         }
+    except TelmusError:
+        raise
     except Exception as exc:
         logger.debug("Failed to load financials for %s: %s", ticker, exc, exc_info=True)
         raise ValueError(
