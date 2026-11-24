@@ -425,7 +425,7 @@
     <nav class="navbar" id="navbar">
         <div class="nav-logo-container">
             <a href="#" class="nav-logo">telmus</a>
-            <span class="nav-version">v0.4.1</span>
+            <span class="nav-version">v0.4.2</span>
         </div>
         <button class="mobile-menu-btn" onclick="toggleMenu()">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -452,15 +452,15 @@
     <section class="hero" id="hero">
         <div class="hero-layout">
             <div class="hero-left">
-                <div class="hero-top-line">$ pip install telmus   —   v0.4.1   —   MIT License</div>
+                <div class="hero-top-line">$ pip install telmus   —   v0.4.2   —   MIT License</div>
                 <h1>
                     <span class="hero-line hero-line-1">Financial analysis.</span>
                     <span class="hero-line hero-line-2">One command.</span>
                 </h1>
                 <p class="hero-subtitle">
                     telmus scans any stock, calculates Piotroski F-score, Altman Z-score,
-                    Beneish M-score, and generates an Excel report + interactive dashboard
-                    — instantly. No API key. No account. Just Python.
+                    Beneish M-score, and generates an Excel workbook and a print-ready HTML report
+                    — fast. No API key. No account. Just Python.
                 </p>
                 <div class="hero-buttons">
                     <button class="btn-install copy-btn" onclick="copyText('pip install telmus', this)">
@@ -529,8 +529,8 @@
             </div>
             <div class="card fade-up-feat">
                 <div class="card-icon">UI</div>
-                <h3>HTML Dashboard</h3>
-                <p>Interactive browser dashboard with gauges, radar charts, valuation benchmarks. Print to A4 in one click.</p>
+                <h3>HTML Report</h3>
+                <p>A formal, self-contained report: summary, score cards, tables explaining every metric, two charts, and notes on missing data. Works offline and prints cleanly to A4.</p>
             </div>
             <div class="card fade-up-feat">
                 <div class="card-icon">MCP</div>
@@ -543,7 +543,7 @@
     <!-- HOW IT WORKS -->
     <section id="how-it-works" class="nav-section">
         <div class="section-header">
-            <h2>From command to dashboard in seconds</h2>
+            <h2>From command to report</h2>
         </div>
         <div class="steps-list">
             <div class="step-row slide-in-row">
@@ -575,8 +575,8 @@
             <div class="step-row slide-in-row">
                 <div class="step-num">4</div>
                 <div class="step-content">
-                    <h3>Open your dashboard</h3>
-                    <p>TICKER_analysis.xlsx and TICKER_dashboard.html open automatically. Print the dashboard as a one-page A4 report.</p>
+                    <h3>Open your report</h3>
+                    <p>TICKER_analysis.xlsx and TICKER_dashboard.html are written to the current folder and the HTML opens in your browser. Use --no-report to skip files.</p>
                     <div class="step-code"><span class="c-comment"># Excel + HTML auto-generated</span></div>
                 </div>
             </div>
@@ -615,7 +615,7 @@
                 <div class="cmd-block"><span class="c-cmd">telmus</span> scan <span class="c-arg">INFY.NS</span>
 <span class="c-cmd">telmus</span> scan <span class="c-arg">AAPL</span>
 <span class="c-cmd">telmus</span> scan <span class="c-arg">RELIANCE.NS</span> <span class="c-flag">--json</span></div></div>
-                <p>Runs full analysis: valuation, health, growth, and flags engines. Generates analysis workbook and interactive dashboard instantly.</p>
+                <p>Runs full analysis: valuation, health, growth, quality and red-flag engines. Writes an Excel workbook and an HTML report.</p>
                 <div class="files-wrap">
                     <span class="file-chip">INFY_analysis.xlsx</span>
                     <span class="file-chip">INFY_dashboard.html</span>
@@ -793,7 +793,7 @@
                 <span class="i-arrow">&rarr;</span>
                 <span class="i-step">telmus scan AAPL</span>
                 <span class="i-arrow">&rarr;</span>
-                <span class="i-step">Dashboard opens automatically</span>
+                <span class="i-step">Report opens in your browser</span>
             </div>
 
             <div>

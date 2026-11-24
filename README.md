@@ -8,7 +8,7 @@
 
 **Financial-statement analysis from your terminal.** One command gives you the Piotroski F-score,
 Altman Z″-score, Beneish M-score, key ratios and red flags for a listed company, plus an Excel
-workbook and an HTML dashboard. An optional MCP server exposes the same analysis to AI coding tools.
+workbook and a print-ready HTML report. An optional MCP server exposes the same analysis to AI coding tools.
 
 ```bash
 pip install telmus
@@ -98,7 +98,7 @@ get `n/a` for Altman and Beneish because those models do not apply to them.
 | `telmus serve` says it needs an extra | `pip install "telmus[mcp]"` |
 | Anything else | `telmus --debug scan AAPL` and open an issue with the output |
 
-Charts in the HTML report load Chart.js from a CDN, so they need an internet connection to render.
+The HTML report is fully self-contained (no scripts, fonts or CDN), so it opens and prints the same offline.
 
 ## MCP server (optional)
 

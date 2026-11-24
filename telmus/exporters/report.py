@@ -13,6 +13,7 @@ Design rules:
 from __future__ import annotations
 
 import datetime
+import math
 from collections.abc import Callable, Sequence
 
 from telmus import __version__
@@ -32,22 +33,28 @@ CSS = """
 *{box-sizing:border-box}
 html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{margin:0;background:#eef0f4;color:var(--ink);
-font:14px/1.5 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+font:14px/1.5 Calibri,"Segoe UI",Arial,"Helvetica Neue",sans-serif;
+font-variant-numeric:lining-nums tabular-nums}
 .page{max-width:900px;margin:24px auto;background:#fff;padding:40px 48px;
 border:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.06)}
 header.rep{border-bottom:3px solid var(--navy);padding-bottom:14px;margin-bottom:22px}
 .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-h1{font:600 26px/1.25 Georgia,"Times New Roman",serif;margin:4px 0 2px;color:var(--navy)}
+h1{font:700 27px/1.25 "Times New Roman",Times,serif;margin:4px 0 2px;color:var(--navy);letter-spacing:.2px}
 .sub{color:var(--muted);font-size:13px}
-h2{font:600 16px/1.3 Georgia,"Times New Roman",serif;color:var(--navy);margin:28px 0 8px;
+h2{font:700 16px/1.3 "Times New Roman",Times,serif;color:var(--navy);margin:28px 0 8px;
 padding-bottom:4px;border-bottom:1px solid var(--line)}
 .summary{background:var(--soft);border-left:4px solid var(--navy);padding:12px 16px;margin:0 0 6px}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 4px}
 .card{border:1px solid var(--line);padding:12px 14px;border-radius:4px;min-width:0}
 .card .lab{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.card .val{font:600 26px/1.2 Georgia,serif;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.card .val{font:700 25px/1.2 Calibri,"Segoe UI",Arial,sans-serif;margin:4px 0 2px;color:var(--navy)}
 .card .sub2{font-size:12px;font-weight:600}
 .bar{position:relative;height:6px;background:#e6e9ef;border-radius:3px;margin-top:8px}
+.fig{margin:10px 0 4px;border:1px solid var(--line);padding:10px 12px 6px}
+.fig figcaption{font:700 13px "Times New Roman",Times,serif;color:var(--navy);margin-bottom:2px}
+.fig .src{font-size:11px;color:var(--muted)}
+.fig svg{width:100%;height:auto;display:block}
+.fig text{font-family:Calibri,"Segoe UI",Arial,sans-serif;fill:#3b4354}
 .bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--navy)}
 table{border-collapse:collapse;width:100%;margin:4px 0;table-layout:fixed}
 table.t4 th:nth-child(1){width:27%}table.t4 th:nth-child(2){width:15%}table.t4 th:nth-child(3){width:17%}table.t4 th:nth-child(4){width:41%}
@@ -162,10 +169,10 @@ def _card(label: str, value: str, status: tuple[str, str], fill: float | None) -
     bar = ""
     if fill is not None:
         bar = f'<div class="bar"><i style="width:{max(0.0, min(1.0, fill)) * 100:.0f}%"></i></div>'
-    kind = {"good": "good", "warn": "warn", "bad": "bad", "na": "none"}[status[1]]
+    tag = "" if status[1] == "na" else f'<span class="tag {status[1]}">{status[0]}</span>'
     return (
         f'<div class="card"><div class="lab">{label}</div><div class="val">{value}</div>'
-        f'<div class="sub2"><span class="tag {kind}">{status[0]}</span></div>{bar}</div>'
+        f'<div class="sub2">{tag or "&nbsp;"}</div>{bar}</div>'
     )
 
 
@@ -189,6 +196,158 @@ def _notes(notes: Sequence[str]) -> str:
         return ""
     items = "".join(f"<li>{n}</li>" for n in notes)
     return f"<h2>Data notes</h2><p class=\"none\">Metrics shown as n/a, and why.</p><ul class=\"notes\">{items}</ul>"
+
+
+# ----------------------------------------------------------------------------- charts (inline SVG)
+PALETTE = ["#1f3354", "#7d97c4", "#a9b0bd"]
+LINE_COLOR = "#a05a00"
+
+
+def _scale(values: Sequence[float | None]) -> tuple[float, str]:
+    nums = [abs(v) for v in values if v is not None]
+    m = max(nums) if nums else 0
+    if m >= 1e12:
+        return 1e12, "trillions"
+    if m >= 1e9:
+        return 1e9, "billions"
+    if m >= 1e6:
+        return 1e6, "millions"
+    if m >= 1e3:
+        return 1e3, "thousands"
+    return 1.0, ""
+
+
+def _ticks(lo: float, hi: float, n: int = 5) -> list[float]:
+    if hi == lo:
+        hi = lo + 1
+    raw = (hi - lo) / n
+    # nice step from {1, 2, 2.5, 5, 10} x power of ten
+    exp = math.floor(math.log10(raw)) if raw > 0 else 0
+    base = 10.0**exp
+    step = next(m * base for m in (1, 2, 2.5, 5, 10) if m * base >= raw)
+    start = math.floor(lo / step) * step
+    out = []
+    t = start
+    while t <= hi + step * 0.001:
+        out.append(round(t, 10))
+        t += step
+    return out
+
+
+def _chart(
+    title: str,
+    years: Sequence[str],
+    bars: Sequence[tuple[str, Sequence[float | None]]],
+    currency: str,
+    line: tuple[str, Sequence[float | None]] | None = None,
+) -> str:
+    """Grouped bar chart (+ optional line on a right-hand % axis) as inline SVG."""
+    all_vals = [v for _, vals in bars for v in vals]
+    if not any(v is not None for v in all_vals):
+        return ""
+    div, unit_word = _scale(all_vals)
+    unit = (currency + " " if currency else "") + unit_word
+    unit = unit.strip()
+    scaled = [(n, [None if v is None else v / div for v in vals]) for n, vals in bars]
+    flat = [v for _, vals in scaled for v in vals if v is not None]
+    lo, hi = min(0.0, min(flat)), max(0.0, max(flat))
+    ticks = _ticks(lo, hi)
+    lo, hi = ticks[0], ticks[-1]
+
+    W, H = 720, 310
+    ml, mr, mt, mb = 58, 58 if line else 18, 30, 66
+    pw, ph = W - ml - mr, H - mt - mb
+    n = len(years)
+
+    def y(v: float) -> float:
+        return mt + ph * (1 - (v - lo) / (hi - lo))
+
+    out = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="{title}">']
+    for t in ticks:
+        out.append(f'<line x1="{ml}" x2="{W - mr}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#e3e6ec" stroke-width="1"/>')
+        out.append(f'<text x="{ml - 8}" y="{y(t) + 4:.1f}" font-size="11" text-anchor="end">{t:g}</text>')
+    out.append(f'<line x1="{ml}" x2="{W - mr}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#7a8294" stroke-width="1.2"/>')
+    if unit:
+        out.append(f'<text x="{ml}" y="14" font-size="11" text-anchor="start" style="fill:#5b6475">Amounts in {unit}</text>')
+
+    group = pw / n
+    bw = group * 0.66 / len(scaled)
+    for i, year in enumerate(years):
+        gx = ml + group * i + group * 0.17
+        for j, (_, vals) in enumerate(scaled):
+            v = vals[i]
+            if v is None:
+                continue
+            x = gx + j * bw
+            top, bottom = (y(v), y(0)) if v >= 0 else (y(0), y(v))
+            out.append(f'<rect x="{x:.1f}" y="{top:.1f}" width="{bw - 3:.1f}" height="{max(bottom - top, 0.5):.1f}" fill="{PALETTE[j % 3]}"/>')
+            ly = top - 4 if v >= 0 else bottom + 11
+            out.append(f'<text x="{x + (bw - 3) / 2:.1f}" y="{ly:.1f}" font-size="10.5" text-anchor="middle">{v:,.1f}</text>')
+        out.append(f'<text x="{ml + group * (i + 0.5):.1f}" y="{H - mb + 18}" font-size="12" text-anchor="middle">{year}</text>')
+
+    if line:
+        lname, lvals = line
+        nums = [v for v in lvals if v is not None]
+        if nums:
+            llo, lhi = min(nums + [0.0]), max(nums + [0.0])
+            pad = (lhi - llo) * 0.15 or 0.02
+            llo, lhi = llo - pad, lhi + pad
+
+            def ly_(v: float) -> float:
+                return mt + ph * (1 - (v - llo) / (lhi - llo))
+
+            for t in _ticks(llo, lhi, 5):
+                if llo <= t <= lhi:
+                    out.append(f'<text x="{W - mr + 8}" y="{ly_(t) + 4:.1f}" font-size="11">{t * 100:.0f}%</text>')
+            pts = [(ml + group * (i + 0.5), ly_(v), v) for i, v in enumerate(lvals) if v is not None]
+            for (x1, y1, _), (x2, y2, _) in zip(pts, pts[1:], strict=False):
+                out.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{LINE_COLOR}" stroke-width="2"/>')
+            for x, yy, v in pts:
+                out.append(f'<circle cx="{x:.1f}" cy="{yy:.1f}" r="3.5" fill="#fff" stroke="{LINE_COLOR}" stroke-width="2"/>')
+                out.append(f'<text x="{x:.1f}" y="{yy - 8:.1f}" font-size="10.5" text-anchor="middle" style="fill:{LINE_COLOR}">{v * 100:.1f}%</text>')
+
+    # legend
+    lx = ml
+    ly = H - 14
+    for j, (name, _) in enumerate(scaled):
+        out.append(f'<rect x="{lx}" y="{ly - 9}" width="11" height="11" fill="{PALETTE[j % 3]}"/>')
+        out.append(f'<text x="{lx + 16}" y="{ly}" font-size="12">{name}</text>')
+        lx += 16 + 7 * len(name) + 22
+    if line:
+        out.append(f'<line x1="{lx}" x2="{lx + 16}" y1="{ly - 4}" y2="{ly - 4}" stroke="{LINE_COLOR}" stroke-width="2"/>')
+        out.append(f'<circle cx="{lx + 8}" cy="{ly - 4}" r="3.5" fill="#fff" stroke="{LINE_COLOR}" stroke-width="2"/>')
+        out.append(f'<text x="{lx + 22}" y="{ly}" font-size="12">{line[0]} (right axis)</text>')
+    out.append("</svg>")
+    return (
+        f'<figure class="fig"><figcaption>{title}</figcaption>{"".join(out)}'
+        '<div class="src">Source: company annual statements via Yahoo Finance. A missing bar means the figure was not reported.</div></figure>'
+    )
+
+
+def _charts(r: ScanResult) -> str:
+    hst = r.history
+    if hst is None:
+        return ""
+    c1 = _chart(
+        "Revenue, net income and operating margin",
+        hst.years,
+        [("Revenue", hst.revenue), ("Net income", hst.net_income)],
+        hst.currency,
+        line=("Operating margin", hst.operating_margin),
+    )
+    c2 = _chart(
+        "Earnings quality: net income vs cash generation",
+        hst.years,
+        [
+            ("Net income", hst.net_income),
+            ("Operating cash flow", hst.operating_cash_flow),
+            ("Free cash flow", hst.free_cash_flow),
+        ],
+        hst.currency,
+    )
+    if not (c1 or c2):
+        return ""
+    return f"<h2>Performance charts</h2>{c1}{c2}"
 
 
 # ----------------------------------------------------------------------------- scan
@@ -300,6 +459,7 @@ def scan_report(r: ScanResult) -> str:
 <h2>Valuation</h2>{valuation}
 <h2>Financial health</h2>{health}
 <h2>Growth</h2>{growth}
+{_charts(r)}
 {quality}
 <h2>Piotroski F-score signals</h2>{sig_table}
 <h2>Red flags</h2>{flags}

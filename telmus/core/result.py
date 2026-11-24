@@ -64,6 +64,19 @@ class QualityResult:
 
 
 @dataclass
+class HistoryResult:
+    """Up to four fiscal years, oldest first. None = not reported (never zero)."""
+
+    years: list[str]
+    revenue: list[float | None]
+    net_income: list[float | None]
+    operating_cash_flow: list[float | None]
+    free_cash_flow: list[float | None]
+    operating_margin: list[float | None]
+    currency: str = ""
+
+
+@dataclass
 class FlagsResult:
     red_flags: list[RedFlag]
     beneish_m: float | None
@@ -87,6 +100,7 @@ class ScanResult:
     schema_version: int = 1
     notes: list[str] = field(default_factory=list)
     quality: QualityResult | None = None
+    history: HistoryResult | None = None
 
     def to_dict(self) -> dict[str, Any]:
         result = asdict(self)
@@ -94,6 +108,7 @@ class ScanResult:
         result["health"] = asdict(self.health)
         result["growth"] = asdict(self.growth)
         result["quality"] = asdict(self.quality) if self.quality else None
+        result["history"] = asdict(self.history) if self.history else None
         result["red_flags"] = [asdict(flag) for flag in self.red_flags]
         return result
 

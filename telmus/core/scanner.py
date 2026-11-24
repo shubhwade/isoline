@@ -6,6 +6,7 @@ from telmus.core.brief import generate_brief
 from telmus.core.engines.flags import FlagsEngine
 from telmus.core.engines.growth import GrowthEngine
 from telmus.core.engines.health import HealthEngine
+from telmus.core.engines.history import HistoryEngine
 from telmus.core.engines.quality import QualityEngine
 from telmus.core.engines.valuation import ValuationEngine
 from telmus.core.loaders import load_financials
@@ -64,6 +65,7 @@ class TelmusScanner:
             beneish_m=flags.beneish_m,
             notes=[*health.notes, *flags.notes, *quality.notes],
             quality=quality,
+            history=HistoryEngine().run(financials),
         )
 
     def compare(self, ticker_a: str, ticker_b: str) -> CompareResult:

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.2
+### Changed
+- **Report fonts and charts.** Headings use Times New Roman and numbers use a lining, tabular sans-serif (Georgia's old-style digits made figures look uneven). Scan reports now include two inline-SVG charts built from up to four fiscal years of real statement data, matched by date: revenue and net income with operating margin, and net income vs operating cash flow vs free cash flow. A year that was not reported has no bar (never a zero bar). New `history` field in the JSON output.
+- **Docs site.** New Reports page; Architecture, Data sources, Release process, Roadmap and Changelog are now published in the docs navigation (a test keeps the root files and their docs copies identical and checks that every page is in the nav). The docs workflow builds with `--strict` before deploying.
+- Website and README text updated to describe the report accurately (no more "interactive dashboard with gauges, radar charts"; no CDN claim).
+
 ## v0.4.1
 ### Changed
 - **Reports rebuilt.** The HTML scan, compare and screen reports are now formal, print-ready documents: light layout, serif headings, tables with "what it measures" columns, status words (Strong / Adequate / Weak / n/a) instead of colour alone, a Piotroski signal table, notes explaining every n/a, and a disclaimer. They are fully self-contained (no JavaScript, no Chart.js CDN, no web fonts, no logo lookups), so they look the same offline and print cleanly. This also fixes the misaligned, differently sized gauges.
@@ -23,7 +29,7 @@
 ## v0.3.3
 ### Added
 - **Quality metrics** (`ScanResult.quality`, CLI "Quality" table, HTML report section): DuPont ROE decomposition, ROIC, free-cash-flow margin and FCF/net income, accruals ratio, DSO/DIO/DPO, cash conversion cycle, share-count change. Formulas in `docs/methodology.md`; missing inputs give n/a with a note.
-- Release safeguards: `RELEASES_DISABLED` kill switch, PyPI version-conflict check, post-release smoke test (see RELEASE_PROCESS.md).
+- Release safeguards: `RELEASES_DISABLED` kill switch, PyPI version-conflict check, post-release smoke test (see Release process).
 - Project docs: ROADMAP, ARCHITECTURE, DATA_SOURCES, RELEASE_PROCESS, BUSINESS_STRATEGY, COMPETITOR_RESEARCH, PROJECT_STATUS.
 
 ## v0.3.2

@@ -124,3 +124,87 @@ def test_reports_are_self_contained_and_formal(tmp_path) -> None:
         assert html.count("<h1>") == 1
     assert "Piotroski F-score signals" in pages["scan"] and "21.4%" in pages["scan"]
     assert "Stronger" in pages["compare"] and "AAA" in pages["compare"]
+
+
+def _multi_year_company() -> dict:
+    import pandas as pd
+
+    cols = pd.to_datetime(["2024-03-31", "2023-03-31", "2022-03-31", "2021-03-31"])
+    income = pd.DataFrame(
+        {
+            "Total Revenue": [1200, 1000, 900, 800],
+            "Net Income": [150, 120, 100, 80],
+            "Operating Income": [200, 160, 135, 100],
+        },
+        index=cols,
+    ).T
+    cash = pd.DataFrame(
+        {
+            "Operating Cash Flow": [180, 140, 110, None],  # 2021 not reported
+            "Capital Expenditure": [-60, -50, -40, None],
+        },
+        index=cols,
+    ).T
+    return {"income_stmt": income, "cashflow": cash, "balance_sheet": pd.DataFrame(), "info": {"financialCurrency": "USD"}}
+
+
+def test_history_engine_aligns_by_date_and_keeps_gaps_as_none() -> None:
+    from telmus.core.engines.history import HistoryEngine
+
+    h = HistoryEngine().run(_multi_year_company())
+    assert h is not None and h.years == ["FY2021", "FY2022", "FY2023", "FY2024"]  # oldest first
+    assert h.revenue == [800, 900, 1000, 1200]
+    assert h.operating_cash_flow == [None, 110, 140, 180]
+    assert h.free_cash_flow == [None, 70, 90, 120]  # CFO - |capex|; gap stays None
+    assert h.operating_margin[3] == pytest.approx(200 / 1200)
+    assert h.currency == "USD"
+    assert HistoryEngine().run({}) is None  # nothing to chart
+
+
+def test_scan_report_contains_two_svg_charts_and_no_zero_bar_for_gaps(tmp_path) -> None:
+    from unittest.mock import patch
+
+    from telmus.core.scanner import TelmusScanner
+    from telmus.exporters.html_dashboard import HtmlDashboardExporter
+
+    fin = _multi_year_company()
+    fin["info"].update({"symbol": "MY", "longName": "Multi Year Co", "exchange": "X"})
+    with patch("telmus.core.scanner.load_financials", return_value=fin):
+        r = TelmusScanner().scan("MY")
+    assert r.history is not None and r.to_dict()["history"]["years"][-1] == "FY2024"
+    out = tmp_path / "r.html"
+    HtmlDashboardExporter().export_scan(r, str(out))
+    html = out.read_text(encoding="utf-8")
+    assert html.count("<svg") == 2 and "Earnings quality" in html
+    assert "FY2021" in html and "<script" not in html.lower()
+    assert "Times New Roman" in html and "Georgia" not in html  # lining figures, formal fonts
+    # 4 revenue + 4 net income bars in chart 1 (+ gaps skipped in chart 2: 3 CFO + 3 FCF + 4 NI)
+    assert html.count("<rect") >= 8 + 10
+
+
+def test_docs_site_copies_of_project_docs_do_not_drift() -> None:
+    """The root files and their docs/ copies (published on the docs site) must match."""
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parent.parent
+    for top, page in {
+        "ARCHITECTURE.md": "architecture.md",
+        "DATA_SOURCES.md": "data-sources.md",
+        "RELEASE_PROCESS.md": "release-process.md",
+        "ROADMAP.md": "roadmap.md",
+    }.items():
+        assert (root / top).read_text(encoding="utf-8") == (root / "docs" / page).read_text(
+            encoding="utf-8"
+        ), f"{top} and docs/{page} differ; copy the root file over the docs page"
+
+
+def test_every_docs_page_is_in_the_nav_and_nav_targets_exist() -> None:
+    import pathlib
+    import re
+
+    root = pathlib.Path(__file__).resolve().parent.parent
+    nav_text = (root / "mkdocs.yml").read_text(encoding="utf-8").split("nav:")[1]
+    targets = set(re.findall(r":\s*([\w\-/]+\.md)\s*$", nav_text, re.M))
+    pages = {p.relative_to(root / "docs").as_posix() for p in (root / "docs").rglob("*.md")}
+    assert targets <= pages, f"nav points at missing pages: {targets - pages}"
+    assert pages <= targets, f"pages missing from the nav: {pages - targets}"

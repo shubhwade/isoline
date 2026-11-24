@@ -6,7 +6,7 @@ at pepy.tech/projects/telmus (and pypistats.org) before starting: that is month 
 
 | Milestone | Target month | What has to be true |
 |---|---|---|
-| 15K | 3 | v0.3.2 is the stable, easy install; first tutorials and a launch post are out |
+| 15K | 3 | v0.4.x is the stable, easy install; first tutorials and a launch post are out |
 | 25K | 5 | Telmus is used in public notebooks / blog posts by people other than the author |
 | 50K | 8 | Listed in awesome-lists and an MCP directory; some downstream tool depends on it |
 | 75K | 11 | Regular contributors; second wave of features (peer valuation, DCF) shipped |
@@ -15,10 +15,10 @@ at pepy.tech/projects/telmus (and pypistats.org) before starting: that is month 
 ## Why people will install it (and recommend it)
 1. **It works first time.** `pip install telmus && telmus scan AAPL`, on every OS. This release fixes the crash that hit fresh installs.
 2. **It is correct and says so.** Published formulas with citations and hand-computed tests (docs/methodology.md). "Shows n/a rather than guessing" is a differentiator versus scraped-ratio tools.
-3. **It produces something shareable:** an Excel workbook and an HTML dashboard from one command, plus an MCP server for AI coding tools.
+3. **It produces something shareable:** an Excel workbook and a print-ready HTML report from one command, plus an MCP server for AI coding tools.
 
 ## Months 1-3: foundation (to 15K)
-- Release v0.3.2; GitHub release notes; pin the README badges; add topics: `finance`, `piotroski`, `altman-z-score`, `beneish`, `stock-analysis`, `yfinance`, `mcp`, `cli`.
+- Release the current version; GitHub release notes; pin the README badges; add topics: `finance`, `piotroski`, `altman-z-score`, `beneish`, `stock-analysis`, `yfinance`, `mcp`, `cli`.
 - Record a 60-second terminal GIF from a **real** run; add it to the README and the PyPI page.
 - Write three tutorials: "Screen for weak balance sheets with the Piotroski F-score", "Spot earnings manipulation with the Beneish M-score in Python", "Give Claude/Cursor real financial ratios with MCP". Publish on the project docs, dev.to and Medium; cross-link to the repo.
 - Post once, honestly, to r/Python, r/algotrading, r/SecurityAnalysis, r/mcp and "Show HN": what it is, what it does not do, how it is validated. Answer every comment.

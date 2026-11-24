@@ -7,7 +7,7 @@ telmus/
     loaders.py        provider access (yfinance today) with retry/backoff -> dict of DataFrames
     labels.py         canonical line-item aliases; all engines read data only through this
     errors.py         typed errors (+ hint, exit code)
-    engines/          health (F, Z''), flags (Beneish, red flags), growth, valuation, quality
+    engines/          health (F, Z''), flags (Beneish, red flags), growth, valuation, quality, history (chart series)
     scanner.py        orchestrates engines -> ScanResult
     result.py         dataclasses; to_dict() is the stable JSON shape
   exporters/          report.py (self-contained HTML), html_dashboard.py (thin wrapper), excel, powerbi; _safe.py escapes all text
@@ -17,4 +17,4 @@ telmus/
 
 Principles: engines are pure functions of data frames (testable offline); provider quirks live only in `loaders.py` and `labels.py`; every n/a carries a note; exporters never trust text.
 
-Planned: a `DataProvider` protocol returning the same frames so SEC EDGAR or CSV sources plug into `loaders.py` without touching engines (see DATA_SOURCES.md).
+Planned: a `DataProvider` protocol returning the same frames so SEC EDGAR or CSV sources plug into `loaders.py` without touching engines (see Data sources).

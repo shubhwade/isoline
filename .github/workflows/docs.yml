@@ -2,7 +2,7 @@ name: Deploy docs
 on:
   push:
     branches: [main]
-    paths: ["docs/**", "mkdocs.yml", "README.md", "CHANGELOG.md"]
+    paths: ["docs/**", "mkdocs.yml", "README.md", "CHANGELOG.md", "ARCHITECTURE.md", "ROADMAP.md", "RELEASE_PROCESS.md", "DATA_SOURCES.md"]
 permissions:
   contents: write
 jobs:
@@ -14,4 +14,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install mkdocs-material "mkdocstrings[python]"
-      - run: mkdocs gh-deploy --force
+      - run: mkdocs build --strict   # fail on broken links before deploying
+        env:
+          NO_MKDOCS_2_WARNING: "1"
+      - run: mkdocs gh-deploy --force   # updates only the gh-pages branch, never main

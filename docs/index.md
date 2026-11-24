@@ -20,7 +20,7 @@ Every formula is documented in [Methodology](methodology.md) and checked by hand
 
 ## Features
 
-- **Reports:** each scan can write an Excel workbook and an HTML dashboard (`--no-report` to skip).
+- **Reports:** each scan can write an Excel workbook and a formal, self-contained HTML report with two charts (`--no-report` to skip). See [Reports](reports.md).
 - **Data:** Yahoo Finance via `yfinance`. No API key needed. It is an unofficial source: coverage varies by company and exchange, and values can be delayed or wrong.
 - **Python SDK** and **MCP server** (optional extra) on the same engine.
 - **Local:** runs on your machine; telmus sends no telemetry.

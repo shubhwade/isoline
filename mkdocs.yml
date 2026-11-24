@@ -52,13 +52,19 @@ plugins:
 nav:
   - Home: index.md
   - Quick start: quickstart.md
-  - Methodology: methodology.md
-  - Growth roadmap: growth-roadmap.md
   - Reference:
     - CLI: cli.md
+    - Python SDK: sdk.md
     - MCP server: mcp.md
-    - SDK: sdk.md
-  - Power BI: powerbi.md
-  - Engines:
-    - Health: engines/health.md
-  - Changelog: changelog.md
+    - Reports: reports.md
+    - Power BI: powerbi.md
+  - Methodology:
+    - Formulas and sources: methodology.md
+    - Health engine: engines/health.md
+  - Project:
+    - Architecture: architecture.md
+    - Data sources: data-sources.md
+    - Release process: release-process.md
+    - Roadmap: roadmap.md
+    - Growth plan: growth-roadmap.md
+    - Changelog: changelog.md
