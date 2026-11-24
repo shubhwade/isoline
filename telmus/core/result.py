@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 
@@ -24,12 +24,13 @@ class ValuationResult:
 @dataclass
 class HealthResult:
     piotroski_f: int | None
-    piotroski_signals: dict[str, bool]
+    piotroski_signals: dict[str, int]
     altman_z: float | None
     debt_to_equity: float | None
     current_ratio: float | None
     interest_coverage: float | None
     flag: str | None
+    notes: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -46,6 +47,7 @@ class FlagsResult:
     red_flags: list[RedFlag]
     beneish_m: float | None
     highest_concern: str
+    notes: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -62,6 +64,7 @@ class ScanResult:
     analyst_brief: str
     beneish_m: float | None = None
     schema_version: int = 1
+    notes: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         result = asdict(self)

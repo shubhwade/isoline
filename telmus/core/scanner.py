@@ -60,6 +60,7 @@ class TelmusScanner:
             highest_concern=flags.highest_concern,
             analyst_brief=brief,
             beneish_m=flags.beneish_m,
+            notes=[*health.notes, *flags.notes],
         )
 
     def compare(self, ticker_a: str, ticker_b: str) -> CompareResult:

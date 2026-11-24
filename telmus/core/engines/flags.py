@@ -1,230 +1,178 @@
+"""Earnings-quality and cash-flow red flags (Beneish M-score, leverage, FCF).
+
+Beneish, M. (1999). The Detection of Earnings Manipulation.
+Financial Analysts Journal 55(5), 24-36.
+
+A missing input gives ``None``. It is never replaced by zero.
+"""
+
 from __future__ import annotations
 
 import logging
 
-import numpy as np
 import pandas as pd
 
+from telmus.core.labels import at, divide, first_of, is_financial_company, series
 from telmus.core.result import FlagsResult, RedFlag
 
 logger = logging.getLogger(__name__)
 
-
-def _safe_value(value: object) -> float | None:
-    if value is None:
-        return None
-    try:
-        value_float = float(value)
-    except (TypeError, ValueError, Exception):
-        return None
-    if np.isnan(value_float):
-        return None
-    return value_float
+# Beneish's 8-variable model. -1.78 is the paper's balanced cut-off; -2.22 is more
+# sensitive (accepts more false positives). Telmus uses the more sensitive one.
+BENEISH_THRESHOLD = -2.22
 
 
-def _safe_divide(numerator: float | None, denominator: float | None) -> float | None:
-    if numerator is None or denominator is None or denominator == 0:
-        return None
-    return numerator / denominator
+def _frame(financials: dict[str, object], key: str) -> pd.DataFrame:
+    value = financials.get(key)
+    return value if isinstance(value, pd.DataFrame) else pd.DataFrame()
 
 
-def _get_series(df: pd.DataFrame, label: str) -> pd.Series | None:
-    if label in df.index:
-        return df.loc[label]
-    if label in df.columns:
-        return df[label]
-    return None
+def _ratio_of_ratios(a_num, a_den, b_num, b_den) -> float | None:
+    a, b = divide(a_num, a_den), divide(b_num, b_den)
+    return divide(a, b)
 
 
 class FlagsEngine:
     def run(self, financials: dict[str, object]) -> FlagsResult:
-        income_stmt = financials.get("income_stmt")
-        if income_stmt is None:
-            income_stmt = pd.DataFrame()
-        balance_sheet = financials.get("balance_sheet")
-        if balance_sheet is None:
-            balance_sheet = pd.DataFrame()
-        cashflow = financials.get("cashflow")
-        if cashflow is None:
-            cashflow = pd.DataFrame()
+        income = _frame(financials, "income_stmt")
+        balance = _frame(financials, "balance_sheet")
+        cashflow = _frame(financials, "cashflow")
+        info = financials.get("info") or {}
+        notes: list[str] = []
 
-        beneish_m = self._beneish_m_score(income_stmt, balance_sheet, cashflow)
+        beneish_m: float | None = None
+        if is_financial_company(info):
+            notes.append("Beneish M-score is not applicable to financial firms.")
+        else:
+            beneish_m = self._beneish_m_score(income, balance, cashflow)
+            if beneish_m is None:
+                notes.append("Beneish M-score not reported: required inputs are missing.")
+
         red_flags: list[RedFlag] = []
+        if beneish_m is not None and beneish_m > BENEISH_THRESHOLD:
+            red_flags.append(RedFlag(type="beneish_m", value=round(beneish_m, 2), severity="high"))
 
-        if beneish_m is not None and beneish_m > -2.22:
-            red_flags.append(
-                RedFlag(type="beneish_m", value=round(beneish_m, 2), severity="high")
-            )
+        equity = at(series(balance, "equity"), 0)
+        if equity is not None and equity < 0:
+            red_flags.append(RedFlag(type="negative_equity", value=round(equity, 2), severity="high"))
 
-        de_ratio = self._de_ratio(balance_sheet)
+        de_ratio = self._de_ratio(balance)
         if de_ratio is not None and de_ratio > 2.0:
-            red_flags.append(
-                RedFlag(type="de_ratio", value=round(de_ratio, 2), severity="medium")
-            )
+            red_flags.append(RedFlag(type="de_ratio", value=round(de_ratio, 2), severity="medium"))
 
         negative_fcf_count = self._negative_fcf_years(cashflow)
         if negative_fcf_count >= 2:
             red_flags.append(
-                RedFlag(
-                    type="negative_fcf", value=negative_fcf_count, severity="medium"
-                )
+                RedFlag(type="negative_fcf", value=negative_fcf_count, severity="medium")
             )
 
-        highest = "low"
-        for flag in red_flags:
-            if flag.severity == "high":
-                highest = "high"
-                break
-            if flag.severity == "medium" and highest != "high":
-                highest = "medium"
-
+        severities = {f.severity for f in red_flags}
+        highest = "high" if "high" in severities else "medium" if "medium" in severities else "low"
         return FlagsResult(
-            red_flags=red_flags, beneish_m=beneish_m, highest_concern=highest
+            red_flags=red_flags, beneish_m=beneish_m, highest_concern=highest, notes=notes
         )
 
     def _beneish_m_score(
-        self,
-        income_stmt: pd.DataFrame,
-        balance_sheet: pd.DataFrame,
-        cashflow: pd.DataFrame,
+        self, income: pd.DataFrame, balance: pd.DataFrame, cashflow: pd.DataFrame
     ) -> float | None:
-        if (
-            "Gross Profit" not in income_stmt.index
-            or "Total Revenue" not in income_stmt.index
-        ):
-            logger.warning("Beneish score missing revenue or gross profit")
+        """Eight-variable Beneish M-score; None unless every input exists for t and t-1."""
+        components = self.beneish_components(income, balance, cashflow)
+        if components is None:
             return None
+        c = components
+        return (
+            -4.84
+            + 0.920 * c["DSRI"]
+            + 0.528 * c["GMI"]
+            + 0.404 * c["AQI"]
+            + 0.892 * c["SGI"]
+            + 0.115 * c["DEPI"]
+            - 0.172 * c["SGAI"]
+            + 4.679 * c["TATA"]
+            - 0.327 * c["LVGI"]
+        )
 
-        if (
-            _get_series(balance_sheet, "Total Assets") is None
-            or _get_series(balance_sheet, "Total Current Assets") is None
-        ):
-            logger.warning("Beneish score missing assets")
-            return None
+    def beneish_components(
+        self, income: pd.DataFrame, balance: pd.DataFrame, cashflow: pd.DataFrame
+    ) -> dict[str, float] | None:
+        rev = series(income, "revenue")
+        cogs = series(income, "cogs")
+        gp = series(income, "gross_profit")
+        ni = at(series(income, "net_income"), 0)
+        sga = series(income, "sga")
+        dep = first_of([income, cashflow], "depreciation")
+        rec = series(balance, "receivables")
+        ppe = series(balance, "ppe")
+        ta = series(balance, "total_assets")
+        ca = series(balance, "current_assets")
+        cl = series(balance, "current_liabilities")
+        ltd = series(balance, "long_term_debt")
+        cfo = at(series(cashflow, "cfo"), 0)
 
-        if _get_series(cashflow, "Total Cash From Operating Activities") is None:
-            logger.warning("Beneish score missing cash flow")
-            return None
+        def gross_margin(i: int) -> float | None:
+            r = at(rev, i)
+            g = at(gp, i)
+            if g is None and r is not None and at(cogs, i) is not None:
+                g = r - at(cogs, i)  # type: ignore[operator]
+            return divide(g, r)
 
-        def val(series: pd.Series, index: int = 0) -> float | None:
-            if len(series) <= index:
+        def aq(i: int) -> float | None:
+            c, p, t = at(ca, i), at(ppe, i), at(ta, i)
+            if c is None or p is None or t is None:
                 return None
-            return _safe_value(series.iloc[index])
+            return divide(t - c - p, t)
 
-        try:
-            gp_series = _get_series(income_stmt, "Gross Profit")
-            rev_series = _get_series(income_stmt, "Total Revenue")
-            ta_series = _get_series(balance_sheet, "Total Assets")
-            ca_series = _get_series(balance_sheet, "Total Current Assets")
-            cfo_series = _get_series(cashflow, "Total Cash From Operating Activities")
-            gp0 = val(gp_series, 0) if gp_series is not None else None
-            gp1 = val(gp_series, 1) if gp_series is not None else None
-            rev0 = val(rev_series, 0) if rev_series is not None else None
-            rev1 = val(rev_series, 1) if rev_series is not None else None
-            ta0 = val(ta_series, 0) if ta_series is not None else None
-            ta1 = val(ta_series, 1) if ta_series is not None else None
-            ca0 = val(ca_series, 0) if ca_series is not None else None
-            ca1 = val(ca_series, 1) if ca_series is not None else None
-            cfo0 = val(cfo_series, 0) if cfo_series is not None else None
-            sga_series = _get_series(income_stmt, "Selling General Administrative")
-            dep_series = _get_series(income_stmt, "Depreciation")
-            xi_series = _get_series(income_stmt, "Interest Expense")
-            net_income_series = _get_series(income_stmt, "Net Income")
-            sga0 = val(sga_series, 0) if sga_series is not None else None
-            sga1 = val(sga_series, 1) if sga_series is not None else None
-            dep0 = val(dep_series, 0) if dep_series is not None else None
-            dep1 = val(dep_series, 1) if dep_series is not None else None
-            xi0 = val(xi_series, 0) if xi_series is not None else None
-            xi1 = val(xi_series, 1) if xi_series is not None else None
-            net_income0 = (
-                val(net_income_series, 0) if net_income_series is not None else None
-            )
-
-            dsri = _safe_divide(_safe_divide(gp0, rev0), _safe_divide(gp1, rev1))
-            gmi = _safe_divide(
-                _safe_divide(rev1 - gp1 if rev1 and gp1 is not None else None, rev1),
-                _safe_divide(rev0 - gp0 if rev0 and gp0 is not None else None, rev0),
-            )
-            aqi = _safe_divide(
-                _safe_divide(
-                    (1 - (_safe_divide(ca0, ta0) or 0.0)),
-                    (1 - (_safe_divide(ca1, ta1) or 0.0)),
-                ),
-                1,
-            )
-            sgi = _safe_divide(rev0, rev1)
-            depi = _safe_divide(
-                _safe_divide(
-                    (1 - (_safe_divide(dep0, (dep0 or 0) + (gp0 or 0)) or 0.0)),
-                    (1 - (_safe_divide(dep1, (dep1 or 0) + (gp1 or 0)) or 0.0)),
-                ),
-                1,
-            )
-            sgai = _safe_divide(_safe_divide(sga0, rev0), _safe_divide(sga1, rev1))
-            tata = _safe_divide(
-                _safe_value(cfo0 - net_income0)
-                if cfo0 is not None and net_income0 is not None
-                else None,
-                cfo0,
-            )
-            lvgi = _safe_divide(
-                _safe_divide((rev0 - xi0) if rev0 and xi0 is not None else None, rev0),
-                _safe_divide((rev1 - xi1) if rev1 and xi1 is not None else None, rev1),
-            )
-
-            if (
-                dsri is None
-                or gmi is None
-                or aqi is None
-                or sgi is None
-                or depi is None
-                or sgai is None
-                or tata is None
-                or lvgi is None
-            ):
-                logger.warning("Beneish score missing components")
+        def dep_rate(i: int) -> float | None:
+            d, p = at(dep, i), at(ppe, i)
+            if d is None or p is None:
                 return None
+            return divide(abs(d), abs(d) + p)
 
-            return float(
-                -4.84
-                + 0.92 * float(dsri)
-                + 0.528 * float(gmi)
-                + 0.404 * float(aqi)
-                + 0.892 * float(sgi)
-                + 0.115 * float(depi)
-                - 0.172 * float(sgai)
-                + 4.679 * float(tata)
-                - 0.327 * float(lvgi)
-            )
-        except Exception:
-            logger.exception("Failed to compute Beneish M-score")
-            return None
+        def lev(i: int) -> float | None:
+            l_, d, t = at(cl, i), at(ltd, i), at(ta, i)
+            if l_ is None or d is None or t is None:
+                return None
+            return divide(l_ + d, t)
 
-    def _de_ratio(self, balance_sheet: pd.DataFrame) -> float | None:
-        total_liab_series = _get_series(balance_sheet, "Total Liab")
-        total_equity_series = _get_series(balance_sheet, "Total Stockholder Equity")
-        if total_liab_series is None or total_equity_series is None:
-            logger.warning("D/E ratio missing values")
+        gm0, gm1 = gross_margin(0), gross_margin(1)
+        dep0, dep1 = dep_rate(0), dep_rate(1)
+        aq0, aq1 = aq(0), aq(1)
+        lev0, lev1 = lev(0), lev(1)
+        parts = {
+            "DSRI": _ratio_of_ratios(at(rec, 0), at(rev, 0), at(rec, 1), at(rev, 1)),
+            "GMI": divide(gm1, gm0),
+            "AQI": divide(aq0, aq1),
+            "SGI": divide(at(rev, 0), at(rev, 1)),
+            "DEPI": divide(dep1, dep0),
+            "SGAI": _ratio_of_ratios(at(sga, 0), at(rev, 0), at(sga, 1), at(rev, 1)),
+            "TATA": divide(None if ni is None or cfo is None else ni - cfo, at(ta, 0)),
+            "LVGI": divide(lev0, lev1),
+        }
+        missing = [k for k, v in parts.items() if v is None]
+        if missing:
+            logger.warning("Beneish M-score missing components: %s", ", ".join(missing))
             return None
-        total_liab = _safe_value(total_liab_series.iloc[0])
-        total_equity = _safe_value(total_equity_series.iloc[0])
-        if total_liab is None or total_equity is None:
-            logger.warning("D/E ratio missing values")
+        return {k: float(v) for k, v in parts.items()}  # type: ignore[arg-type]
+
+    def _de_ratio(self, balance: pd.DataFrame) -> float | None:
+        liabilities = at(series(balance, "total_liabilities"), 0)
+        equity = at(series(balance, "equity"), 0)
+        if liabilities is None or equity is None or equity <= 0:
             return None
-        return _safe_divide(total_liab, total_equity)
+        return divide(liabilities, equity)
 
     def _negative_fcf_years(self, cashflow: pd.DataFrame) -> int:
-        cashflow_series = _get_series(cashflow, "Total Cash From Operating Activities")
-        capex_series = _get_series(cashflow, "Capital Expenditures")
-        if cashflow_series is None or capex_series is None:
-            logger.warning("Negative FCF check missing cash flow or capex")
+        """Count of the last three years with FCF < 0 (FCF = CFO - |capex|)."""
+        cfo = series(cashflow, "cfo")
+        capex = series(cashflow, "capex")
+        if cfo is None or capex is None:
+            logger.warning("Negative-FCF check missing operating cash flow or capex")
             return 0
         count = 0
-        for i in range(min(3, len(cashflow_series))):
-            cfo = _safe_value(cashflow_series.iloc[i])
-            capex = _safe_value(capex_series.iloc[i])
-            if cfo is None or capex is None:
+        for i in range(min(3, len(cfo), len(capex))):
+            c, x = cfo[i], capex[i]
+            if c is None or x is None:
                 continue
-            if cfo - capex < 0:
+            if c - abs(x) < 0:  # capex is reported negative by yfinance, positive elsewhere
                 count += 1
         return count

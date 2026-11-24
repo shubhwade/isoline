@@ -617,7 +617,7 @@ class ExcelExporter:
 
         # Fetch raw financials to construct line chart for margin trend if multiple periods available
         from telmus.core.loaders import load_financials
-        from telmus.core.engines.health import _get_series_fallback
+        from telmus.core.labels import get_series_fallback as _get_series_fallback
 
         chart4 = None
         chart5 = None

@@ -1,581 +1,237 @@
+"""Balance-sheet health: Piotroski F-score, Altman Z''-score and basic ratios.
+
+Rules followed throughout:
+* A missing input gives ``None`` ("n/a"), never ``0`` and never ``False``.
+* A score is only reported when every component needed for it is available.
+* These are screening statistics, not investment advice.
+
+References
+----------
+Piotroski, J. (2000). Value Investing: The Use of Historical Financial
+Statement Information to Separate Winners from Losers. J. Accounting Research 38.
+Altman, E. (1968, 1983, 1995). Z''-score for non-manufacturers / emerging markets.
+"""
+
 from __future__ import annotations
-import typing
 
 import logging
+import typing
 
-import numpy as np
 import pandas as pd
 
+from telmus.core.labels import at, divide, first_of, is_financial_company, series
 from telmus.core.result import HealthResult
 
 logger = logging.getLogger(__name__)
 
+PIOTROSKI_SIGNALS = (
+    "ROA Positive",
+    "CFO Positive",
+    "ROA Improving",
+    "Low Accruals",
+    "Leverage Falling",
+    "Liquidity Rising",
+    "No Dilution",
+    "Gross Margin Rising",
+    "Asset Turnover Rising",
+)
 
-def _safe_value(value: typing.Any) -> float | None:
-    if value is None:
-        return None
-    try:
-        value_float = float(value)
-    except (TypeError, ValueError, Exception):
-        return None
-    if np.isnan(value_float):
-        return None
-    return value_float
-
-
-def _safe_divide(numerator: float | None, denominator: float | None) -> float | None:
-    if numerator is None or denominator is None or denominator == 0:
-        return None
-    return numerator / denominator
+# Altman Z'' zones (no constant term): > 2.60 safe, 1.10 - 2.60 grey, < 1.10 distress.
+ALTMAN_SAFE = 2.6
+ALTMAN_DISTRESS = 1.1
 
 
-def _get_series(df: pd.DataFrame, label: str) -> pd.Series | None:
-    if label in df.index:
-        return df.loc[label]
-    if label in df.columns:
-        return df[label]
-    return None
+def _frame(financials: dict[str, typing.Any], key: str) -> pd.DataFrame:
+    value = financials.get(key)
+    return value if isinstance(value, pd.DataFrame) else pd.DataFrame()
 
 
-def _get_series_fallback(df: pd.DataFrame, labels: list[str]) -> pd.Series | None:
-    for label in labels:
-        series = _get_series(df, label)
-        if series is not None:
-            return series
-    return None
-
-
-def _series_value(series: pd.Series | None, index: int = 0) -> float | None:
-    if series is None or len(series) <= index:
-        return None
-    return _safe_value(series.iloc[index])
+def _gt(a: float | None, b: float | None) -> bool | None:
+    return None if a is None or b is None else a > b
 
 
 class HealthEngine:
     def run(self, financials: dict[str, typing.Any]) -> HealthResult:
-        income_stmt = financials.get("income_stmt")
-        if income_stmt is None:
-            income_stmt = pd.DataFrame()
-        balance_sheet = financials.get("balance_sheet")
-        if balance_sheet is None:
-            balance_sheet = pd.DataFrame()
-        cashflow = financials.get("cashflow")
-        if cashflow is None:
-            cashflow = pd.DataFrame()
+        income = _frame(financials, "income_stmt")
+        balance = _frame(financials, "balance_sheet")
+        cashflow = _frame(financials, "cashflow")
         info = financials.get("info") or {}
+        notes: list[str] = []
 
-        piotroski_f, piotroski_signals = self._compute_piotroski(
-            income_stmt, balance_sheet, cashflow
-        )
-        altman_z = self._compute_altman_z(income_stmt, balance_sheet, info)
-        debt_to_equity = self._compute_debt_to_equity(balance_sheet)
-        current_ratio = self._compute_current_ratio(balance_sheet)
-        interest_coverage = self._compute_interest_coverage(income_stmt, balance_sheet)
+        f_score, signals, missing = self._compute_piotroski(income, balance, cashflow)
+        if missing:
+            notes.append(
+                "Piotroski F-score not reported: missing data for "
+                + ", ".join(missing)
+                + "."
+            )
+
+        altman_z: float | None = None
+        if is_financial_company(info):
+            notes.append(
+                "Altman Z'' is not applicable to banks, insurers and other financial firms."
+            )
+        else:
+            altman_z = self._compute_altman_z(income, balance)
+            if altman_z is None:
+                notes.append("Altman Z'' not reported: required inputs are missing.")
 
         health_flag = None
-        if piotroski_f is not None and piotroski_f < 5:
+        if f_score is not None and f_score < 5:
             health_flag = "weak fundamentals"
-        elif altman_z is not None and altman_z < 1.1:
+        elif altman_z is not None and altman_z < ALTMAN_DISTRESS:
             health_flag = "distress risk"
 
         return HealthResult(
-            piotroski_f=piotroski_f,
-            piotroski_signals=piotroski_signals,
+            piotroski_f=f_score,
+            piotroski_signals=signals,
             altman_z=altman_z,
-            debt_to_equity=debt_to_equity,
-            current_ratio=current_ratio,
-            interest_coverage=interest_coverage,
+            debt_to_equity=self._compute_debt_to_equity(balance),
+            current_ratio=self._compute_current_ratio(balance),
+            interest_coverage=self._compute_interest_coverage(income),
             flag=health_flag,
+            notes=notes,
         )
 
+    # ------------------------------------------------------------------ Piotroski
     def _compute_piotroski(
-        self,
-        income_stmt: pd.DataFrame,
-        balance_sheet: pd.DataFrame,
-        cashflow: pd.DataFrame,
-    ) -> tuple[int | None, dict]:
-        signals = {}
-        signals["ROA Positive"] = self._roa_positive(income_stmt, balance_sheet)
-        signals["CFO Positive"] = self._cfo_positive(cashflow)
-        signals["ROA Improving"] = self._roa_increasing(income_stmt, balance_sheet)
-        signals["Low Accruals"] = self._accruals(income_stmt, cashflow)
-        signals["Leverage Falling"] = self._leverage_decreasing(balance_sheet)
-        signals["Liquidity Rising"] = self._liquidity_increasing(balance_sheet)
-        signals["No Dilution"] = self._no_dilution(balance_sheet)
-        signals["Gross Margin Rising"] = self._gross_margin_increasing(income_stmt)
-        signals["Asset Turnover Rising"] = self._asset_turnover_increasing(
-            income_stmt, balance_sheet
-        )
-        score = sum(1 for v in signals.values() if v)
-        signals = {k: 1 if v else 0 for k, v in signals.items()}
-        return score, signals
+        self, income: pd.DataFrame, balance: pd.DataFrame, cashflow: pd.DataFrame
+    ) -> tuple[int | None, dict[str, int], list[str]]:
+        raw: dict[str, bool | None] = {
+            "ROA Positive": self._roa_positive(income, balance),
+            "CFO Positive": self._cfo_positive(cashflow),
+            "ROA Improving": self._roa_increasing(income, balance),
+            "Low Accruals": self._accruals(income, cashflow),
+            "Leverage Falling": self._leverage_decreasing(balance),
+            "Liquidity Rising": self._liquidity_increasing(balance),
+            "No Dilution": self._no_dilution(balance),
+            "Gross Margin Rising": self._gross_margin_increasing(income),
+            "Asset Turnover Rising": self._asset_turnover_increasing(income, balance),
+        }
+        signals = {k: int(v) for k, v in raw.items() if v is not None}
+        missing = [k for k, v in raw.items() if v is None]
+        score = sum(signals.values()) if not missing else None
+        return score, signals, missing
 
-    def _roa_positive(
-        self, income_stmt: pd.DataFrame, balance_sheet: pd.DataFrame
-    ) -> bool:
-        net_income = _series_value(
-            _get_series_fallback(
-                income_stmt,
-                ["Net Income", "NetIncome", "Net Income Common Stockholders"],
-            ),
-            0,
+    def _roa(self, income: pd.DataFrame, balance: pd.DataFrame, i: int) -> float | None:
+        """Net income of period i over total assets at the START of period i."""
+        return divide(
+            at(series(income, "net_income"), i), at(series(balance, "total_assets"), i + 1)
         )
-        total_assets = _series_value(
-            _get_series_fallback(balance_sheet, ["Total Assets", "TotalAssets"]), 0
-        )
-        roa = _safe_divide(net_income, total_assets)
-        if roa is None:
-            logger.warning("ROA positive signal missing data")
-            return False
-        return roa > 0
 
-    def _cfo_positive(self, cashflow: pd.DataFrame) -> bool:
-        cfo_series = _get_series_fallback(
-            cashflow,
-            [
-                "Total Cash From Operating Activities",
-                "Cash Flow From Operating Activities",
-                "Operating Cash Flow",
-                "CashFlowFromOperatingActivities",
-            ],
-        )
-        cfo = _series_value(cfo_series, 0)
-        if cfo is None:
-            logger.warning("CFO positive signal missing data")
-            return False
-        return cfo > 0
+    def _roa_positive(self, income: pd.DataFrame, balance: pd.DataFrame) -> bool | None:
+        roa = self._roa(income, balance, 0)
+        return None if roa is None else roa > 0
 
-    def _roa_increasing(
-        self, income_stmt: pd.DataFrame, balance_sheet: pd.DataFrame
-    ) -> bool:
-        net_income = _get_series_fallback(
-            income_stmt, ["Net Income", "NetIncome", "Net Income Common Stockholders"]
-        )
-        total_assets = _get_series_fallback(
-            balance_sheet, ["Total Assets", "TotalAssets"]
-        )
-        if net_income is None or total_assets is None:
-            logger.warning("ROA increasing signal missing data")
-            return False
-        if len(net_income) < 2 or len(total_assets) < 2:
-            logger.warning("ROA increasing signal requires 2 years of data")
-            return False
-        prior_roa = _safe_divide(
-            _safe_value(net_income.iloc[1]), _safe_value(total_assets.iloc[1])
-        )
-        current_roa = _safe_divide(
-            _safe_value(net_income.iloc[0]), _safe_value(total_assets.iloc[0])
-        )
-        if prior_roa is None or current_roa is None:
-            logger.warning("ROA increasing signal invalid values")
-            return False
-        return current_roa > prior_roa
+    def _cfo_positive(self, cashflow: pd.DataFrame) -> bool | None:
+        cfo = at(series(cashflow, "cfo"), 0)
+        return None if cfo is None else cfo > 0
 
-    def _accruals(self, income_stmt: pd.DataFrame, cashflow: pd.DataFrame) -> bool:
-        net_income = _series_value(
-            _get_series_fallback(
-                income_stmt,
-                ["Net Income", "NetIncome", "Net Income Common Stockholders"],
-            ),
-            0,
-        )
-        cfo = _series_value(
-            _get_series_fallback(
-                cashflow,
-                [
-                    "Total Cash From Operating Activities",
-                    "Cash Flow From Operating Activities",
-                    "Operating Cash Flow",
-                    "CashFlowFromOperatingActivities",
-                ],
-            ),
-            0,
-        )
-        if net_income is None or cfo is None:
-            logger.warning("Accruals signal missing data")
-            return False
-        accruals = net_income - cfo
-        return accruals < 0
+    def _roa_increasing(self, income: pd.DataFrame, balance: pd.DataFrame) -> bool | None:
+        return _gt(self._roa(income, balance, 0), self._roa(income, balance, 1))
 
-    def _leverage_decreasing(self, balance_sheet: pd.DataFrame) -> bool:
-        long_term_debt = _get_series_fallback(
-            balance_sheet,
-            [
-                "Long Term Debt",
-                "Long Term Debt And Capital Lease Obligation",
-                "LongTermDebt",
-            ],
-        )
-        total_equity = _get_series_fallback(
-            balance_sheet,
-            [
-                "Total Stockholder Equity",
-                "Stockholders Equity",
-                "Total Equity Gross Minority Interest",
-                "Common Stock Equity",
-                "Total Equity",
-                "StockholdersEquity",
-            ],
-        )
-        if long_term_debt is None or total_equity is None:
-            logger.warning("Leverage signal missing data")
-            return False
-        if len(long_term_debt) < 2 or len(total_equity) < 2:
-            logger.warning("Leverage signal requires 2 years of data")
-            return False
-        current_de = _safe_divide(
-            _series_value(long_term_debt, 0), _series_value(total_equity, 0)
-        )
-        prior_de = _safe_divide(
-            _series_value(long_term_debt, 1), _series_value(total_equity, 1)
-        )
-        if current_de is None or prior_de is None:
-            logger.warning("Leverage decreasing signal invalid values")
-            return False
-        return current_de < prior_de
+    def _accruals(self, income: pd.DataFrame, cashflow: pd.DataFrame) -> bool | None:
+        """Signal = 1 when operating cash flow exceeds net income (CFO/TA > ROA, same TA)."""
+        ni = at(series(income, "net_income"), 0)
+        cfo = at(series(cashflow, "cfo"), 0)
+        return _gt(cfo, ni)
 
-    def _liquidity_increasing(self, balance_sheet: pd.DataFrame) -> bool:
-        current_assets = _get_series_fallback(
-            balance_sheet,
-            [
-                "Total Current Assets",
-                "Current Assets",
-                "TotalCurrentAssets",
-                "CurrentAssets",
-            ],
-        )
-        current_liabilities = _get_series_fallback(
-            balance_sheet,
-            [
-                "Total Current Liabilities",
-                "Current Liabilities",
-                "TotalCurrentLiabilities",
-                "CurrentLiabilities",
-            ],
-        )
-        if current_assets is None or current_liabilities is None:
-            logger.warning("Liquidity signal missing data")
-            return False
-        if len(current_assets) < 2 or len(current_liabilities) < 2:
-            logger.warning("Liquidity signal requires 2 years of data")
-            return False
-        current_ratio = _safe_divide(
-            _series_value(current_assets, 0), _series_value(current_liabilities, 0)
-        )
-        prior_ratio = _safe_divide(
-            _series_value(current_assets, 1), _series_value(current_liabilities, 1)
-        )
-        if current_ratio is None or prior_ratio is None:
-            logger.warning("Liquidity increasing signal invalid values")
-            return False
-        return current_ratio > prior_ratio
+    def _leverage_ratio(self, balance: pd.DataFrame, i: int) -> float | None:
+        """Long-term debt / average total assets for period i."""
+        assets = series(balance, "total_assets")
+        ltd = series(balance, "long_term_debt")
+        debt_now = at(ltd, i)
+        if debt_now is None and at(series(balance, "total_debt"), i) == 0:
+            debt_now = 0.0  # debt-free company: an explicit zero, not a missing value
+        a_now, a_prev = at(assets, i), at(assets, i + 1)
+        if debt_now is None or a_now is None or a_prev is None:
+            return None
+        return divide(debt_now, (a_now + a_prev) / 2)
 
-    def _no_dilution(self, balance_sheet: pd.DataFrame) -> bool:
-        common_stock_series = _get_series_fallback(
-            balance_sheet,
-            ["Common Stock", "CommonStock", "Share Issued", "Ordinary Shares Number"],
-        )
-        share_issuance_series = _get_series_fallback(
-            balance_sheet, ["Share Issuance", "ShareIssuance"]
-        )
-        if common_stock_series is None and share_issuance_series is None:
-            logger.warning("No dilution signal missing data")
-            return False
-        if common_stock_series is not None and len(common_stock_series) >= 2:
-            current_shares = _series_value(common_stock_series, 0)
-            prior_shares = _series_value(common_stock_series, 1)
-            if current_shares is not None and prior_shares is not None:
-                return current_shares <= prior_shares
-        logger.warning("No dilution signal could not determine share issuance")
-        return False
+    def _leverage_decreasing(self, balance: pd.DataFrame) -> bool | None:
+        now, prev = self._leverage_ratio(balance, 0), self._leverage_ratio(balance, 1)
+        return None if now is None or prev is None else now < prev
 
-    def _gross_margin_increasing(self, income_stmt: pd.DataFrame) -> bool:
-        revenue = _get_series_fallback(
-            income_stmt, ["Total Revenue", "TotalRevenue", "Revenue"]
+    def _current_ratio_at(self, balance: pd.DataFrame, i: int) -> float | None:
+        return divide(
+            at(series(balance, "current_assets"), i),
+            at(series(balance, "current_liabilities"), i),
         )
-        gross_profit = _get_series_fallback(
-            income_stmt, ["Gross Profit", "GrossProfit"]
+
+    def _liquidity_increasing(self, balance: pd.DataFrame) -> bool | None:
+        return _gt(self._current_ratio_at(balance, 0), self._current_ratio_at(balance, 1))
+
+    def _no_dilution(self, balance: pd.DataFrame) -> bool | None:
+        """No increase in shares outstanding (a share COUNT, not the par-value amount)."""
+        shares = series(balance, "shares")
+        now, prev = at(shares, 0), at(shares, 1)
+        return None if now is None or prev is None else now <= prev
+
+    def _gross_margin_at(self, income: pd.DataFrame, i: int) -> float | None:
+        revenue = at(series(income, "revenue"), i)
+        gross = at(series(income, "gross_profit"), i)
+        if gross is None:
+            cogs = at(series(income, "cogs"), i)
+            gross = None if revenue is None or cogs is None else revenue - cogs
+        return divide(gross, revenue)
+
+    def _gross_margin_increasing(self, income: pd.DataFrame) -> bool | None:
+        return _gt(self._gross_margin_at(income, 0), self._gross_margin_at(income, 1))
+
+    def _turnover(self, income: pd.DataFrame, balance: pd.DataFrame, i: int) -> float | None:
+        return divide(
+            at(series(income, "revenue"), i), at(series(balance, "total_assets"), i + 1)
         )
-        if revenue is None or gross_profit is None:
-            logger.warning("Gross margin signal missing data")
-            return False
-        if len(revenue) < 2 or len(gross_profit) < 2:
-            logger.warning("Gross margin signal requires 2 years of data")
-            return False
-        prior_margin = _safe_divide(
-            _series_value(gross_profit, 1), _series_value(revenue, 1)
-        )
-        current_margin = _safe_divide(
-            _series_value(gross_profit, 0), _series_value(revenue, 0)
-        )
-        if prior_margin is None or current_margin is None:
-            logger.warning("Gross margin signal invalid values")
-            return False
-        return current_margin > prior_margin
 
     def _asset_turnover_increasing(
-        self, income_stmt: pd.DataFrame, balance_sheet: pd.DataFrame
-    ) -> bool:
-        revenue = _get_series_fallback(
-            income_stmt, ["Total Revenue", "TotalRevenue", "Revenue"]
-        )
-        total_assets = _get_series_fallback(
-            balance_sheet, ["Total Assets", "TotalAssets"]
-        )
-        if revenue is None or total_assets is None:
-            logger.warning("Asset turnover signal missing data")
-            return False
-        if len(revenue) < 2 or len(total_assets) < 2:
-            logger.warning("Asset turnover signal requires 2 years of data")
-            return False
-        prior_turnover = _safe_divide(
-            _series_value(revenue, 1), _series_value(total_assets, 1)
-        )
-        current_turnover = _safe_divide(
-            _series_value(revenue, 0), _series_value(total_assets, 0)
-        )
-        if prior_turnover is None or current_turnover is None:
-            logger.warning("Asset turnover signal invalid values")
-            return False
-        return current_turnover > prior_turnover
+        self, income: pd.DataFrame, balance: pd.DataFrame
+    ) -> bool | None:
+        return _gt(self._turnover(income, balance, 0), self._turnover(income, balance, 1))
 
-    def _compute_altman_z(
-        self,
-        income_stmt: pd.DataFrame,
-        balance_sheet: pd.DataFrame,
-        info: dict[str, typing.Any],
-    ) -> float | None:
-        total_assets = _safe_value(
-            _series_value(
-                _get_series_fallback(balance_sheet, ["Total Assets", "TotalAssets"]), 0
-            )
-        )
-        working_capital = None
-        retained_earnings = None
-        ebit = None
-        total_liabilities = None
-        revenue = None
-        market_cap = None
+    # --------------------------------------------------------------------- Altman
+    def _compute_altman_z(self, income: pd.DataFrame, balance: pd.DataFrame) -> float | None:
+        """Altman Z'' = 6.56*X1 + 3.26*X2 + 6.72*X3 + 1.05*X4.
 
-        current_assets = _series_value(
-            _get_series_fallback(
-                balance_sheet,
-                [
-                    "Total Current Assets",
-                    "Current Assets",
-                    "TotalCurrentAssets",
-                    "CurrentAssets",
-                ],
-            ),
-            0,
-        )
-        current_liabilities = _series_value(
-            _get_series_fallback(
-                balance_sheet,
-                [
-                    "Total Current Liabilities",
-                    "Current Liabilities",
-                    "TotalCurrentLiabilities",
-                    "CurrentLiabilities",
-                ],
-            ),
-            0,
-        )
-        if current_assets is not None and current_liabilities is not None:
-            working_capital = _safe_value(current_assets - current_liabilities)
-
-        retained_earnings = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    balance_sheet, ["Retained Earnings", "RetainedEarnings"]
-                ),
-                0,
-            )
-        )
-        if retained_earnings is None:
-            retained_earnings = _safe_value(
-                _series_value(
-                    _get_series_fallback(
-                        balance_sheet,
-                        [
-                            "Total Stockholder Equity",
-                            "Stockholders Equity",
-                            "Total Equity Gross Minority Interest",
-                            "Common Stock Equity",
-                            "Total Equity",
-                            "StockholdersEquity",
-                        ],
-                    ),
-                    0,
-                )
-            )
-        if retained_earnings is None:
-            retained_earnings = 0.0
-
-        ebit = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    income_stmt,
-                    [
-                        "Ebit",
-                        "EBIT",
-                        "Operating Income",
-                        "OperatingIncome",
-                        "Ebitda",
-                        "EBITDA",
-                    ],
-                ),
-                0,
-            )
-        )
-
-        total_liabilities = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    balance_sheet,
-                    [
-                        "Total Liab",
-                        "Total Liabilities Net Minority Interest",
-                        "Total Liabilities",
-                        "TotalLiabilities",
-                    ],
-                ),
-                0,
-            )
-        )
-
-        revenue = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    income_stmt, ["Total Revenue", "TotalRevenue", "Revenue"]
-                ),
-                0,
-            )
-        )
-
-        market_cap = _safe_value(info.get("marketCap"))
-
-        x1 = _safe_divide(working_capital, total_assets)
-        x2 = _safe_divide(retained_earnings, total_assets)
-        x3 = _safe_divide(ebit, total_assets)
-        x4 = _safe_divide(market_cap, total_liabilities)
-        _safe_divide(revenue, total_assets)
-
-        if x1 is None or x2 is None or x3 is None or x4 is None:
-            logger.warning("Altman Z-score missing required inputs")
+        X1 working capital / total assets, X2 retained earnings / total assets,
+        X3 EBIT / total assets, X4 BOOK equity / total liabilities.
+        """
+        assets = at(series(balance, "total_assets"), 0)
+        ca = at(series(balance, "current_assets"), 0)
+        cl = at(series(balance, "current_liabilities"), 0)
+        re = at(series(balance, "retained_earnings"), 0)
+        ebit = at(series(income, "ebit"), 0)
+        equity = at(series(balance, "equity"), 0)
+        liabilities = at(series(balance, "total_liabilities"), 0)
+        if None in (assets, ca, cl, re, ebit, equity, liabilities):
+            logger.warning("Altman Z'' missing required inputs")
             return None
-
-        return float(
-            6.56 * float(x1) + 3.26 * float(x2) + 6.72 * float(x3) + 1.05 * float(x4)
-        )
-
-    def _compute_debt_to_equity(self, balance_sheet: pd.DataFrame) -> float | None:
-        total_liab = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    balance_sheet,
-                    [
-                        "Total Liab",
-                        "Total Liabilities Net Minority Interest",
-                        "Total Liabilities",
-                        "TotalLiabilities",
-                    ],
-                ),
-                0,
-            )
-        )
-        total_equity = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    balance_sheet,
-                    [
-                        "Total Stockholder Equity",
-                        "Stockholders Equity",
-                        "Total Equity Gross Minority Interest",
-                        "Common Stock Equity",
-                        "Total Equity",
-                        "StockholdersEquity",
-                    ],
-                ),
-                0,
-            )
-        )
-        if total_liab is None or total_equity is None:
-            logger.warning("Debt-to-equity missing balance sheet values")
+        x1 = divide(ca - cl, assets)  # type: ignore[operator]
+        x2 = divide(re, assets)
+        x3 = divide(ebit, assets)
+        x4 = divide(equity, liabilities)
+        if None in (x1, x2, x3, x4):
             return None
-        ratio = _safe_divide(total_liab, total_equity)
-        return ratio if ratio is not None else None
+        return 6.56 * x1 + 3.26 * x2 + 6.72 * x3 + 1.05 * x4  # type: ignore[operator]
 
-    def _compute_current_ratio(self, balance_sheet: pd.DataFrame) -> float | None:
-        current_assets = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    balance_sheet,
-                    [
-                        "Total Current Assets",
-                        "Current Assets",
-                        "TotalCurrentAssets",
-                        "CurrentAssets",
-                    ],
-                ),
-                0,
-            )
-        )
-        current_liabilities = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    balance_sheet,
-                    [
-                        "Total Current Liabilities",
-                        "Current Liabilities",
-                        "TotalCurrentLiabilities",
-                        "CurrentLiabilities",
-                    ],
-                ),
-                0,
-            )
-        )
-        if current_assets is None or current_liabilities is None:
-            logger.warning("Current ratio missing balance sheet values")
+    # --------------------------------------------------------------------- Ratios
+    def _compute_debt_to_equity(self, balance: pd.DataFrame) -> float | None:
+        """Total liabilities / shareholders' equity. Not meaningful if equity <= 0."""
+        liabilities = at(series(balance, "total_liabilities"), 0)
+        equity = at(series(balance, "equity"), 0)
+        if liabilities is None or equity is None or equity <= 0:
             return None
-        ratio = _safe_divide(current_assets, current_liabilities)
-        return ratio if ratio is not None else None
+        return divide(liabilities, equity)
 
-    def _compute_interest_coverage(
-        self, income_stmt: pd.DataFrame, balance_sheet: pd.DataFrame
-    ) -> float | None:
-        ebit = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    income_stmt,
-                    [
-                        "Ebit",
-                        "EBIT",
-                        "Operating Income",
-                        "OperatingIncome",
-                        "Ebitda",
-                        "EBITDA",
-                    ],
-                ),
-                0,
-            )
-        )
-        interest_expense = _safe_value(
-            _series_value(
-                _get_series_fallback(
-                    income_stmt,
-                    [
-                        "Interest Expense",
-                        "InterestExpense",
-                        "Interest Expense Net Non Operating",
-                        "InterestPaid",
-                    ],
-                ),
-                0,
-            )
-        )
-        if ebit is None or interest_expense is None:
-            logger.warning("Interest coverage missing income statement values")
+    def _compute_current_ratio(self, balance: pd.DataFrame) -> float | None:
+        return self._current_ratio_at(balance, 0)
+
+    def _compute_interest_coverage(self, income: pd.DataFrame) -> float | None:
+        """EBIT / |interest expense|. EBITDA is deliberately NOT used as a stand-in."""
+        ebit = at(series(income, "ebit"), 0)
+        interest = at(series(income, "interest_expense"), 0)
+        if ebit is None or interest is None:
             return None
-        coverage = _safe_divide(ebit, abs(interest_expense))
-        return coverage if coverage is not None else None
+        return divide(ebit, abs(interest))
+
+
+__all__ = ["HealthEngine", "PIOTROSKI_SIGNALS", "first_of"]
