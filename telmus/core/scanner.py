@@ -67,8 +67,12 @@ class TelmusScanner:
         )
 
     def compare(self, ticker_a: str, ticker_b: str) -> CompareResult:
-        result_a = self.scan(ticker_a)
-        result_b = self.scan(ticker_b)
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=2) as pool:  # the two scans are independent
+            future_a = pool.submit(self.scan, ticker_a)
+            future_b = pool.submit(self.scan, ticker_b)
+            result_a, result_b = future_a.result(), future_b.result()
         return CompareResult(
             ticker_a=ticker_a,
             ticker_b=ticker_b,

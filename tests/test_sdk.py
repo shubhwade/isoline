@@ -95,3 +95,32 @@ def test_excel_report_is_honest_for_sparse_data(tmp_path) -> None:
     notes = [c.value for row in wb["Summary"].iter_rows(min_row=14) for c in row if c.value]
     assert any("Altman" in str(n) for n in notes)
     assert "1.81" not in " ".join(str(c.value) for row in wb["Health"].iter_rows() for c in row)
+
+
+def test_reports_are_self_contained_and_formal(tmp_path) -> None:
+    """No JavaScript, no CDN, no web fonts, no remote images: opens identically offline."""
+    from unittest.mock import patch
+
+    from telmus.core.result import CompareResult
+    from telmus.core.scanner import TelmusScanner
+    from telmus.exporters.html_dashboard import HtmlDashboardExporter
+
+    with patch("telmus.core.scanner.load_financials", side_effect=lambda t: _fin(t, quality_company)):
+        a, b = TelmusScanner().scan("AAA"), TelmusScanner().scan("BBB")
+    exp = HtmlDashboardExporter()
+    pages = {}
+    for name, fn in (
+        ("scan", lambda p: exp.export_scan(a, p)),
+        ("compare", lambda p: exp.export_compare(CompareResult("AAA", "BBB", a, b), p)),
+        ("screen", lambda p: exp.export_screen([a, b], p)),
+    ):
+        path = tmp_path / f"{name}.html"
+        fn(str(path))
+        pages[name] = path.read_text(encoding="utf-8")
+    for html in pages.values():
+        low = html.lower()
+        assert "<script" not in low and "http://" not in low and "https://" not in low
+        assert "investment advice" in low and "not a registered" in low and "telmus v" in low
+        assert html.count("<h1>") == 1
+    assert "Piotroski F-score signals" in pages["scan"] and "21.4%" in pages["scan"]
+    assert "Stronger" in pages["compare"] and "AAA" in pages["compare"]

@@ -74,6 +74,13 @@ def _is_valid_financial_data(
 
 
 def _load_data(symbol: str) -> tuple[dict[str, object], object, object, object, object]:
+    """Fetch info and the three statements concurrently (they are independent HTTP calls).
+
+    Sequential fetching costs roughly the sum of four round trips; running them in
+    parallel costs roughly the slowest one.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
     yf = _import_yfinance()
     with (
         io.StringIO() as dump,
@@ -81,14 +88,26 @@ def _load_data(symbol: str) -> tuple[dict[str, object], object, object, object, 
         contextlib.redirect_stderr(dump),
     ):
         ticker_obj = yf.Ticker(symbol)
-        info = ticker_obj.info or {}
-        income_stmt = ticker_obj.financials if ticker_obj.financials is not None else {}
-        balance_sheet = (
-            ticker_obj.balance_sheet if ticker_obj.balance_sheet is not None else {}
-        )
-        cashflow = ticker_obj.cashflow if ticker_obj.cashflow is not None else {}
-        fast_info = ticker_obj.fast_info if ticker_obj.fast_info is not None else {}
-    return info, income_stmt, balance_sheet, cashflow, fast_info
+
+        def fetch(attr: str) -> object:
+            value = getattr(ticker_obj, attr)
+            return value if value is not None else {}
+
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            futures = {
+                name: pool.submit(fetch, attr)
+                for name, attr in (
+                    ("info", "info"),
+                    ("income", "financials"),
+                    ("balance", "balance_sheet"),
+                    ("cashflow", "cashflow"),
+                )
+            }
+            results = {name: fut.result() for name, fut in futures.items()}
+    info: dict[str, object] = results["info"] or {}  # type: ignore[assignment]
+    # fast_info was fetched but never used by any engine; it is kept as an empty
+    # placeholder so the returned dict keeps its shape.
+    return info, results["income"], results["balance"], results["cashflow"], {}
 
 
 _ATTEMPTS = 3

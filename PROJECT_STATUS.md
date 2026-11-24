@@ -3,9 +3,9 @@
 Last updated: 2026-11-25. Repository head: see `git log`.
 
 ## Stage
-Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.4.0`: quality metrics plus the second-audit fixes (see CHANGELOG). Release `v0.4.0` needs the owner to create the tag/release.
+Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.4.1`: quality metrics plus the second-audit fixes (see CHANGELOG). Release `v0.4.1` needs the owner to create the tag/release.
 
-## Implemented and tested (offline, 92 tests, Python 3.11/3.12 locally)
+## Implemented and tested (offline, 95 tests, Python 3.11/3.12 locally)
 - Install fix: `mcp` is an optional extra; clean-venv wheel install verified.
 - Piotroski F, Altman Z'', Beneish M with hand-computed tests; n/a instead of fabricated zeros.
 - Quality engine: DuPont ROE, ROIC, FCF, accruals, DSO/DIO/DPO, cash conversion cycle, dilution.

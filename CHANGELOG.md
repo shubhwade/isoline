@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.1
+### Changed
+- **Reports rebuilt.** The HTML scan, compare and screen reports are now formal, print-ready documents: light layout, serif headings, tables with "what it measures" columns, status words (Strong / Adequate / Weak / n/a) instead of colour alone, a Piotroski signal table, notes explaining every n/a, and a disclaimer. They are fully self-contained (no JavaScript, no Chart.js CDN, no web fonts, no logo lookups), so they look the same offline and print cleanly. This also fixes the misaligned, differently sized gauges.
+- **Speed.** Statements are fetched concurrently (about the slowest request instead of the sum of four); `compare` scans both tickers at the same time; the unused `fast_info` request and the per-report logo lookup (an extra network call) are gone.
+
 ## v0.4.0
 ### Fixed (reports, docs, screening: found in a second, deeper audit)
 - **HTML report** showed missing data as `0` (P/E 0.0, "HEALTH: WEAK", "GROWTH: DECLINING", "VALUATION: FAIR", "Beneish 0.00 = low manipulation risk") and unavailable Piotroski signals as failures. It now shows `n/a`, "N/A" badges and neutral signal markers. The header said v0.2.6 and the footer printed a literal `{telmus_version}`; both now show the real version.

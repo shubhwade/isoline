@@ -133,8 +133,7 @@ def test_html_report_escapes_untrusted_company_name(tmp_path) -> None:
     result.exchange = "<img src=x onerror=alert(1)>"
     result.analyst_brief = "</div><script>evil()</script>"
     out = tmp_path / "r.html"
-    with patch("telmus.exporters.html_dashboard.get_company_logo_url", return_value=""):
-        HtmlDashboardExporter().export_scan(result, str(out))
+    HtmlDashboardExporter().export_scan(result, str(out))
     page = out.read_text(encoding="utf-8")
     assert "<script>alert" not in page
     assert "<img src=x" not in page
@@ -160,7 +159,6 @@ def test_default_scan_writes_reports_and_can_skip_browser(tmp_path, monkeypatch)
     with (
         patch("telmus.cli.app.TelmusScanner") as scanner,
         patch("webbrowser.open") as opener,
-        patch("telmus.exporters.html_dashboard.get_company_logo_url", return_value=""),
     ):
         scanner.return_value.scan.return_value = fake_scan_result()
         out = runner.invoke(app, ["scan", "INFY", "--no-open"])
@@ -185,7 +183,7 @@ def test_scan_cli_and_html_show_quality(tmp_path, monkeypatch) -> None:
     assert out.exit_code == 0, out.output
     assert "Quality" in out.output and "ROE (DuPont)" in out.output
     html = next(tmp_path.glob("*.html")).read_text(encoding="utf-8")
-    assert "Cash conversion cycle (days)" in html and "21.4%" in html  # 120/560
+    assert "Cash conversion cycle" in html and "21.4%" in html  # 120/560
 
 
 def _empty_scan(ticker: str = "EMPTY"):
@@ -216,9 +214,8 @@ def test_html_reports_show_na_not_zero_and_current_version(tmp_path) -> None:
         assert f"telmus v{telmus.__version__}" in html
         assert "{telmus_version}" not in html and "{__version__}" not in html
     html = scan_p.read_text(encoding="utf-8")
-    assert "HEALTH: N/A" in html and "GROWTH: N/A" in html
-    assert "HEALTH: WEAK" not in html and "GROWTH: DECLINING" not in html
-    assert "VALUATION: N/A" in html and "VALUATION: FAIR" not in html
+    assert "n/a" in html and ">Weak<" not in html and ">Declining<" not in html
+    assert "0.00" not in html and "0.0%" not in html  # missing data is never shown as zero
 
 
 def test_screen_unknown_sector_is_an_error_and_failures_are_reported() -> None:

@@ -10,7 +10,7 @@ telmus/
     engines/          health (F, Z''), flags (Beneish, red flags), growth, valuation, quality
     scanner.py        orchestrates engines -> ScanResult
     result.py         dataclasses; to_dict() is the stable JSON shape
-  exporters/          html_dashboard, excel, powerbi; _safe.py escapes all text
+  exporters/          report.py (self-contained HTML), html_dashboard.py (thin wrapper), excel, powerbi; _safe.py escapes all text
   sdk/                public Python API (scan, compare, TelmusScanner)
   mcp/server.py       optional MCP server (extra: telmus[mcp])
 ```
