@@ -71,3 +71,22 @@ TATA uses the cash-flow form of total accruals. A score above **-2.22** raises a
 Annual data only; no restatement tracking; no currency conversion (ratios are unit-free, absolute
 values are in the reporting currency); fiscal years are not calendar-aligned across companies;
 sector peer valuation is not implemented; data quality is bounded by Yahoo Finance.
+
+## Quality metrics (v0.3.3, `telmus/core/engines/quality.py`)
+
+All flow items are for the latest fiscal year; return denominators use the average of year-end and prior year-end balances. Missing inputs give `n/a` plus a note, never zero, and no tax rate is assumed.
+
+| Metric | Formula |
+|---|---|
+| Net margin | Net income / Revenue |
+| Asset turnover | Revenue / Average total assets |
+| Equity multiplier | Average total assets / Average equity |
+| ROE (DuPont) | Net margin x Asset turnover x Equity multiplier = Net income / Average equity (n/a if average equity <= 0) |
+| ROIC | EBIT x (1 - effective tax rate) / Average invested capital, where invested capital = equity + total debt - cash and effective tax rate = tax provision / pretax income (n/a for financials or if the tax rate is unavailable) |
+| FCF | Operating cash flow - abs(capex); FCF margin = FCF / Revenue; FCF / Net income only when net income > 0 |
+| Accruals ratio | (Net income - Operating cash flow) / Average total assets (Sloan, 1996) |
+| DSO / DIO / DPO | Receivables x 365 / Revenue; Inventory x 365 / COGS; Payables x 365 / COGS (year-end balances) |
+| Cash conversion cycle | DSO + DIO - DPO; n/a unless all three are computable (n/a for financials) |
+| Share count change | (Shares t - Shares t-1) / Shares t-1 |
+
+Verification: every row is covered by a hand-computed test in `tests/test_scores.py`, including the DuPont identity. Not yet verified against live provider data.
