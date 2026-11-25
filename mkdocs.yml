@@ -67,6 +67,7 @@ nav:
     - Architecture: project/architecture.md
     - Data sources: project/data-sources.md
     - Release process: project/release-process.md
+    - Brand migration: project/brand-migration.md
     - Roadmap: project/roadmap.md
     - Growth plan: project/growth-roadmap.md
     - Changelog: changelog.md

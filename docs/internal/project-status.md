@@ -34,3 +34,11 @@ Provider abstraction (SEC EDGAR / user-supplied data), DCF with explicit assumpt
 
 ## Next actions
 Surface quality metrics in CLI/reports; bump to 0.3.3; provider interface; run on real tickers once network is available and record results here.
+
+## Rebrand and terminal transformation (brief received 2026-11-25)
+
+Done: Trading-R1 reviewed; name screening and shortlist (docs/project/brand-migration.md); central
+`telmus/branding.py`; EDGAR fallback (0.5.0). Not started: new name decision (blocked on owner), TUI
+(Textual) with command palette, valuation/DCF, portfolio and risk analytics, PDF/Markdown reports,
+scheduling, LLM assistant, logo, new website and docs theme. Blockers: owner approval of the name; domain
+and trademark checks need a registrar and a trademark search.
