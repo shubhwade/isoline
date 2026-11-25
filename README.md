@@ -21,10 +21,10 @@ isoline scan AAPL
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-terminal.png" alt="isoline scan in the terminal" width="640">
+  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/demo.gif" alt="isoline scan in the terminal, then the HTML report" width="800">
 </p>
 
-<p align="center"><sub>Real output of the real engines on a <b>synthetic sample company</b>, so no real firm's figures are implied.</sub></p>
+<p align="center"><sub>A real run of the real engines on a <b>synthetic sample company</b> (no real firm's figures are implied): the terminal scan, then the report it writes.</sub></p>
 
 ## What you get
 
@@ -36,12 +36,6 @@ isoline scan AAPL
 | **Compare and screen** | Side-by-side comparison; sector screens with reasons for every skipped ticker |
 | **Integrations** | Python SDK, Power BI export, optional MCP server for AI coding tools |
 | **Honest data** | Missing inputs show `n/a` with a note, never a zero. Yahoo Finance first, SEC EDGAR fallback for US tickers |
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png" alt="Isoline HTML report" width="640">
-</p>
-
-<p align="center"><sub>The HTML report (synthetic sample). Self-contained, no scripts or web fonts, prints cleanly.</sub></p>
 
 > **Formerly Telmus.** Isoline is the new name of the `telmus` project. `pip install -U telmus`
 > installs this package and keeps the old command working. Earlier `telmus` releases and their

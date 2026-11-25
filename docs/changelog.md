@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.6.2
+### Changed
+- **Logo redrawn** as a plain geometric mark: a lowercase "i" whose dot sits on a level line (an isoline). The earlier wave motif looked generic.
+- **README** now shows a wide animated demo (terminal scan, then the report) instead of two tall screenshots. `examples/make_demo_gif.py` regenerates it from the real engines and a labelled synthetic company.
+
 ## v0.6.1
 ### Changed
 - **PyPI and GitHub page.** New README with logo, real terminal and report images (rendered from a labelled synthetic company by `examples/make_sample_assets.py`), and a "formerly Telmus" notice.
