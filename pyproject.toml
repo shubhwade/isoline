@@ -34,10 +34,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://shubhwade.github.io/telmus"
-Documentation = "https://shubhwade.github.io/telmus"
-Repository = "https://github.com/shubhwade/telmus"
-Changelog = "https://shubhwade.github.io/telmus/changelog/"
+Homepage = "https://shubhwade.github.io/isoline"
+Documentation = "https://shubhwade.github.io/isoline"
+Repository = "https://github.com/shubhwade/isoline"
+Changelog = "https://shubhwade.github.io/isoline/changelog/"
 
 [project.scripts]
 isoline = "isoline.cli.app:app"

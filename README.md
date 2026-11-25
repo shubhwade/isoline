@@ -1,9 +1,9 @@
 # isoline
 
-[![PyPI version](https://img.shields.io/pypi/v/isoline)](https://pypi.org/project/telmus/)
+[![PyPI version](https://img.shields.io/pypi/v/isoline)](https://pypi.org/project/isoline/)
 [![Downloads](https://static.pepy.tech/personalized-badge/isoline?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/isoline)
-[![Python](https://img.shields.io/pypi/pyversions/isoline)](https://pypi.org/project/telmus/)
-[![CI](https://github.com/shubhwade/telmus/actions/workflows/ci.yml/badge.svg)](https://github.com/shubhwade/telmus/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/pypi/pyversions/isoline)](https://pypi.org/project/isoline/)
+[![CI](https://github.com/shubhwade/isoline/actions/workflows/ci.yml/badge.svg)](https://github.com/shubhwade/isoline/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **Financial-statement analysis from your terminal.** One command gives you the Piotroski F-score,
@@ -116,7 +116,7 @@ comparison is not implemented. Scores are screening statistics, **not investment
 ## Development
 
 ```bash
-git clone https://github.com/shubhwade/telmus && cd isoline
+git clone https://github.com/shubhwade/isoline && cd isoline
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 ruff check isoline tests && mypy && pytest

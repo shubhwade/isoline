@@ -95,7 +95,7 @@ _last_call = 0.0
 
 
 def user_agent() -> str:
-    contact = env("CONTACT").strip() or "https://github.com/shubhwade/telmus"
+    contact = env("CONTACT").strip() or "https://github.com/shubhwade/isoline"
     return f"isoline/{__version__} ({contact})"
 
 

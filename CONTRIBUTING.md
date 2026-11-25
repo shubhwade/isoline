@@ -1,7 +1,7 @@
 # Contributing
 
 ```bash
-git clone https://github.com/shubhwade/telmus && cd isoline
+git clone https://github.com/shubhwade/isoline && cd isoline
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 ```

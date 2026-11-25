@@ -3,8 +3,8 @@ site_description: Financial statement analysis for AI IDEs and coding agents
 docs_dir: docs
 exclude_docs: |
   internal/
-site_url: https://shubhwade.github.io/telmus
-repo_url: https://github.com/shubhwade/telmus
+site_url: https://shubhwade.github.io/isoline
+repo_url: https://github.com/shubhwade/isoline
 repo_name: shubhwade/isoline
 extra_css:
   - stylesheets/extra.css

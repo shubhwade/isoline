@@ -26,7 +26,7 @@ jobs:
       - name: Version must not already exist on PyPI
         run: |
           PKG="${GITHUB_REF_NAME#v}"
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/telmus/${PKG}/json")
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/isoline/${PKG}/json")
           if [ "$CODE" = "200" ]; then echo "isoline $PKG is already on PyPI; published versions are never overwritten. Bump the version."; exit 1; fi
       - run: python -m pip install -e ".[dev]"
       - run: ruff check isoline tests && pytest

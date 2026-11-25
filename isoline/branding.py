@@ -29,8 +29,8 @@ BRAND = Brand(
     module="isoline",
     command="isoline",
     tagline="Financial statements, measured precisely",
-    repo_url="https://github.com/shubhwade/telmus",
-    docs_url="https://shubhwade.github.io/telmus/",
+    repo_url="https://github.com/shubhwade/isoline",
+    docs_url="https://shubhwade.github.io/isoline/",
     legacy_package="telmus",
 )
 
