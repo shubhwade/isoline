@@ -1,0 +1,36 @@
+name: Download badge
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  badge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build badge JSON
+        env:
+          PEPY_API_KEY: ${{ secrets.PEPY_API_KEY }}
+        run: python .github/scripts/downloads_badge.py /tmp/downloads.json
+      - name: Publish to the badges branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git fetch origin badges || true
+          if git rev-parse --verify origin/badges >/dev/null 2>&1; then
+            git checkout -B badges origin/badges
+          else
+            git checkout --orphan badges && git rm -rf . >/dev/null
+          fi
+          cp /tmp/downloads.json downloads.json
+          git add downloads.json
+          git diff --cached --quiet || git commit -m "update download badge"
+          git push origin badges
