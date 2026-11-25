@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.0
+### Added
+- **`isoline tui`**: full-screen terminal interface (optional extra: `pip install "isoline[tui]"`, built on Textual). Four distinct workflows (Fundamental, Valuation, Compare, Screening), a command palette (Ctrl+K), session history, keyboard shortcuts, loading and error states. Work runs in a background thread. Tested headlessly with Textual's pilot.
+### Changed
+- The compare and screen table printers are now shared functions used by both the command line and the terminal interface.
+
 ## v0.7.0
 ### Added
 - **`isoline value TICKER`**: discounted-cash-flow estimate (free cash flow to equity, Gordon-growth terminal value, growth fading to terminal) with bear/base/bull scenarios, a discount-rate x terminal-growth sensitivity grid, margin of safety and a `--json` mode. All assumptions are printed; defaults are labelled; nothing is computed from a non-positive cash flow. Documented on the new Valuation page with sources; the arithmetic is covered by hand-checked tests.

@@ -44,8 +44,10 @@ isoline = "isoline.cli.app:app"
 
 [project.optional-dependencies]
 mcp = ["mcp>=1.20,<2"]
+tui = ["textual>=1.0,<9"]
 dev = [
     "mcp>=1.20,<2",
+    "textual>=1.0,<9",
     "mypy",
     "build",
     "pytest>=7.0",

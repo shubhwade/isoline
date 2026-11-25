@@ -33,6 +33,8 @@ isoline scan AAPL
 | **Quality** | DuPont ROE, ROIC, FCF margin, accruals, cash conversion cycle, dilution |
 | **Reports** | Formal HTML report with two charts, Excel workbook, JSON and CSV export |
 | **Compare and screen** | Side-by-side comparison; sector screens with reasons for every skipped ticker |
+| **Terminal UI** | `pip install "isoline[tui]"` then `isoline tui`: modes, command palette (Ctrl+K), session history |
+| **Valuation** | `isoline value AAPL`: DCF with scenarios, sensitivity and every assumption shown |
 | **Integrations** | Python SDK, Power BI export, optional MCP server for AI coding tools |
 | **Honest data** | Missing inputs show `n/a` with a note, never a zero. Yahoo Finance first, SEC EDGAR fallback for US tickers |
 

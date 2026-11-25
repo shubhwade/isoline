@@ -492,6 +492,31 @@ def comp(
     compare(ticker_a, ticker_b, export, report, open_browser)
 
 
+def _print_compare(comparison: typing.Any) -> None:
+    res_a, res_b = comparison.result_a, comparison.result_b
+    table = Table(show_header=True, header_style="bold magenta")
+    table.add_column("Metric")
+    table.add_column(res_a.ticker, justify="right")
+    table.add_column(res_b.ticker, justify="right")
+    for title, metrics in SECTIONS:
+        table.add_section()
+        table.add_row(f"[bold]{title}[/bold]", "", "")
+        for m in metrics:
+            va, vb = m.get(res_a), m.get(res_b)
+            ta, tb = format_value(va, m.kind), format_value(vb, m.kind)
+            win = stronger(va, vb, m.direction)
+            if win == "a":
+                ta = f"[green]{ta}[/green]"
+            elif win == "b":
+                tb = f"[green]{tb}[/green]"
+            table.add_row(m.label, ta, tb)
+    console.print(table)
+    console.print("[dim]Green marks the stronger value where a direction is meaningful; "
+                  "valuation multiples are not ranked.[/dim]")
+    _print_notes(res_a, res_b)
+
+
+
 @app.command()
 def compare(
     ticker_a: str,
@@ -516,26 +541,7 @@ def compare(
         scanner = IsolineScanner()
         comparison = scanner.compare(ticker_a, ticker_b)
         res_a, res_b = comparison.result_a, comparison.result_b
-        table = Table(show_header=True, header_style="bold magenta")
-        table.add_column("Metric")
-        table.add_column(res_a.ticker, justify="right")
-        table.add_column(res_b.ticker, justify="right")
-        for title, metrics in SECTIONS:
-            table.add_section()
-            table.add_row(f"[bold]{title}[/bold]", "", "")
-            for m in metrics:
-                va, vb = m.get(res_a), m.get(res_b)
-                ta, tb = format_value(va, m.kind), format_value(vb, m.kind)
-                win = stronger(va, vb, m.direction)
-                if win == "a":
-                    ta = f"[green]{ta}[/green]"
-                elif win == "b":
-                    tb = f"[green]{tb}[/green]"
-                table.add_row(m.label, ta, tb)
-        console.print(table)
-        console.print("[dim]Green marks the stronger value where a direction is meaningful; "
-                      "valuation multiples are not ranked.[/dim]")
-        _print_notes(res_a, res_b)
+        _print_compare(comparison)
 
         if export:
             if export.endswith(".xlsx"):
@@ -671,6 +677,25 @@ def _print_value(res: typing.Any) -> None:
     console.print("[dim]Illustrative estimate from stated assumptions; not a price target or investment advice.[/dim]")
 
 
+def _print_screen(outcome: typing.Any, _sector: str = "") -> None:
+    results = outcome.matches
+    for tkr, reason in outcome.skipped.items():
+        console.print(f"[dim]Skipped {escape(tkr)}: {escape(reason)}[/dim]")
+    table = Table(show_header=True, header_style="bold magenta")
+    table.add_column("Ticker")
+    table.add_column("Piotroski F")
+    table.add_column("D/E")
+    table.add_column("Concern")
+    for r in results:
+        table.add_row(
+            r.ticker,
+            str(r.health.piotroski_f),
+            f"{r.health.debt_to_equity:.2f}",
+            r.highest_concern,
+        )
+    console.print(table)
+
+
 @app.command()
 def screen(
     sector: str = typer.Argument("IT", help="Sector to screen."),
@@ -688,21 +713,7 @@ def screen(
     except IsolineError as exc:
         _fail(exc)
     results = outcome.matches
-    for tkr, reason in outcome.skipped.items():
-        console.print(f"[dim]Skipped {escape(tkr)}: {escape(reason)}[/dim]")
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("Ticker")
-    table.add_column("Piotroski F")
-    table.add_column("D/E")
-    table.add_column("Concern")
-    for r in results:
-        table.add_row(
-            r.ticker,
-            str(r.health.piotroski_f),
-            f"{r.health.debt_to_equity:.2f}",
-            r.highest_concern,
-        )
-    console.print(table)
+    _print_screen(outcome)
 
     if export:
         if export.endswith(".xlsx"):
@@ -799,6 +810,17 @@ def screen(
     import webbrowser
 
     webbrowser.open("screen_dashboard.html")
+
+
+@app.command()
+def tui() -> None:
+    """Open the full-screen terminal interface (needs the optional tui extra)."""
+    try:
+        from isoline.tui.app import run
+    except ImportError:
+        console.print('[bold red]The terminal interface needs an extra package.[/] Run: pip install "isoline[tui]"')
+        raise typer.Exit(code=1) from None
+    run()
 
 
 @app.command()

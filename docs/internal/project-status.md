@@ -3,7 +3,7 @@
 Last updated: 2026-11-25. Repository head: see `git log`.
 
 ## Stage
-Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.7.0`: quality metrics plus the second-audit fixes (see CHANGELOG). Release `v0.7.0` needs the owner to create the tag/release.
+Pre-1.0 hardening. `0.3.2` is published on PyPI (clean install verified 2026-11-25: `telmus --version` and `--help` work; live scans untestable from the sandbox). `main` is `0.8.0`: quality metrics plus the second-audit fixes (see CHANGELOG). Release `v0.8.0` needs the owner to create the tag/release.
 
 ## Implemented and tested (offline, 99 tests, Python 3.11/3.12 locally)
 - Install fix: `mcp` is an optional extra; clean-venv wheel install verified.
@@ -42,3 +42,8 @@ Done: Trading-R1 reviewed; name screening and shortlist (docs/project/brand-migr
 (Textual) with command palette, valuation/DCF, portfolio and risk analytics, PDF/Markdown reports,
 scheduling, LLM assistant, logo, new website and docs theme. Blockers: owner approval of the name; domain
 and trademark checks need a registrar and a trademark search.
+
+Update 2026-11-25: shipped in 0.7.0 `isoline value` (DCF) and 0.8.0 `isoline tui` (Textual, optional extra), combined downloads badge job
+(.github/workflows/badges.yml; needs the `badges` branch it creates; optional PEPY_API_KEY secret for all-time totals). Still not built: portfolio and
+risk analytics, comparables-based valuation, PDF/Markdown reports, scheduling and delivery, optional LLM assistant, provider abstraction beyond Yahoo+EDGAR,
+website redesign. Unverified live: EDGAR provider, download badge sources (pypistats/pepy), TUI on Windows terminals.
