@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "telmus"
+version = "0.6.0"
+description = "Telmus has been renamed Isoline. This release forwards to the isoline package."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = ["isoline>=0.6.0"]
+classifiers = ["Development Status :: 7 - Inactive"]
+
+[project.scripts]
+telmus = "telmus:main"
+
+[project.urls]
+Successor = "https://pypi.org/project/isoline/"
+Repository = "https://github.com/shubhwade/telmus"
+
+[tool.hatch.build.targets.wheel]
+packages = ["telmus"]

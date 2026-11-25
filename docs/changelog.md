@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.0 (Isoline)
+### Changed
+- **Renamed from Telmus to Isoline.** New PyPI project `isoline`, command `isoline`, `import isoline`. Behaviour and formulas are unchanged. Environment variables are now `ISOLINE_*`; the old `TELMUS_*` names still work. The earlier `telmus` releases stay on PyPI; a final `telmus` release (see `legacy/telmus-shim`) installs `isoline` and keeps the old command and import working with a deprecation notice. Download counts of `telmus` do not transfer to `isoline`.
+
 ## v0.5.0
 ### Added
 - **SEC EDGAR fallback.** When Yahoo Finance is rate-limited, unreachable or has no statements for a US ticker, Telmus now reads the official annual XBRL facts from SEC EDGAR (free, no key, polite rate limiting, declared User-Agent via `TELMUS_CONTACT`). Results are labelled with their source in the notes; there is no live price from this source, so valuation multiples are `n/a`. Non-US tickers do not fall back. `TELMUS_NO_FALLBACK=1` disables it. Tested offline against a fixture; not yet verified live.

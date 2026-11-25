@@ -7,10 +7,10 @@ import math
 import pandas as pd
 import pytest
 
-from telmus.core.engines.flags import FlagsEngine
-from telmus.core.engines.health import HealthEngine
-from telmus.core.engines.valuation import ValuationEngine
-from telmus.core.labels import at, series, to_float
+from isoline.core.engines.flags import FlagsEngine
+from isoline.core.engines.health import HealthEngine
+from isoline.core.engines.valuation import ValuationEngine
+from isoline.core.labels import at, series, to_float
 
 DATES = ["2024-12-31", "2023-12-31", "2022-12-31"]
 
@@ -235,7 +235,7 @@ def test_valuation_cash_lookup_does_not_raise_on_series_truthiness() -> None:
 
 # ------------------------------------------------------------------------ Growth
 def test_growth_fcf_yield_and_cagr_hand_computed() -> None:
-    from telmus.core.engines.growth import GrowthEngine
+    from isoline.core.engines.growth import GrowthEngine
 
     inc = pd.DataFrame(
         {
@@ -254,7 +254,7 @@ def test_growth_fcf_yield_and_cagr_hand_computed() -> None:
 
 
 def test_margin_trend_unknown_when_a_year_is_missing_not_zero() -> None:
-    from telmus.core.engines.growth import GrowthEngine
+    from isoline.core.engines.growth import GrowthEngine
 
     inc = frame({"Total Revenue": [100, 100, 100], "Operating Income": [20, 20, None]})
     assert GrowthEngine()._margin_trend(inc) is None
@@ -264,12 +264,12 @@ def test_margin_trend_unknown_when_a_year_is_missing_not_zero() -> None:
 def test_scanner_end_to_end_with_mocked_provider() -> None:
     from unittest.mock import patch
 
-    from telmus.core.scanner import TelmusScanner
+    from isoline.core.scanner import IsolineScanner
 
     fin = company()
     fin["info"] = {"symbol": "ACME", "longName": "Acme Corp", "exchange": "NYQ", "marketCap": 3000.0}
-    with patch("telmus.core.scanner.load_financials", return_value=fin):
-        result = TelmusScanner().scan("ACME")
+    with patch("isoline.core.scanner.load_financials", return_value=fin):
+        result = IsolineScanner().scan("ACME")
     assert (result.ticker, result.company) == ("ACME", "Acme Corp")
     assert result.health.piotroski_f == 8
     assert result.health.altman_z == pytest.approx(4.645273, abs=1e-5)
@@ -283,19 +283,19 @@ def test_scanner_end_to_end_with_mocked_provider() -> None:
     assert result.quality is not None and result.quality.roic is None
     assert payload["notes"] == result.quality.notes  # health/flag engines had nothing to explain
     assert any("ROIC" in n for n in payload["notes"])
-    with patch("telmus.core.scanner.load_financials", return_value=fin):
-        cmp = TelmusScanner().compare("ACME", "ACME")
+    with patch("isoline.core.scanner.load_financials", return_value=fin):
+        cmp = IsolineScanner().compare("ACME", "ACME")
     assert cmp.result_a.ticker == cmp.result_b.ticker == "ACME"
 
 
 def test_scan_result_carries_notes_for_every_na() -> None:
     from unittest.mock import patch
 
-    from telmus.core.scanner import TelmusScanner
+    from isoline.core.scanner import IsolineScanner
 
     sparse = {"info": {"symbol": "X"}, "income_stmt": frame({"Total Revenue": [1, 1, 1]})}
-    with patch("telmus.core.scanner.load_financials", return_value=sparse):
-        result = TelmusScanner().scan("X")
+    with patch("isoline.core.scanner.load_financials", return_value=sparse):
+        result = IsolineScanner().scan("X")
     assert result.health.piotroski_f is None and result.beneish_m is None
     assert any("Piotroski" in n for n in result.notes)
     assert any("Beneish" in n for n in result.notes)
@@ -330,7 +330,7 @@ def quality_company() -> dict[str, object]:
 
 
 def test_quality_metrics_hand_computed() -> None:
-    from telmus.core.engines.quality import QualityEngine
+    from isoline.core.engines.quality import QualityEngine
 
     q = QualityEngine().run(quality_company())
     # DuPont with average balances: avg assets 1050, avg equity 560
@@ -354,7 +354,7 @@ def test_quality_metrics_hand_computed() -> None:
 
 
 def test_roic_not_reported_without_a_tax_rate_and_none_is_not_assumed() -> None:
-    from telmus.core.engines.quality import QualityEngine
+    from isoline.core.engines.quality import QualityEngine
 
     f = quality_company()
     f["income_stmt"] = f["income_stmt"].drop("Tax Provision")  # type: ignore[union-attr]
@@ -364,7 +364,7 @@ def test_roic_not_reported_without_a_tax_rate_and_none_is_not_assumed() -> None:
 
 
 def test_missing_inventory_is_not_treated_as_zero() -> None:
-    from telmus.core.engines.quality import QualityEngine
+    from isoline.core.engines.quality import QualityEngine
 
     f = quality_company()
     f["balance_sheet"] = f["balance_sheet"].drop("Inventory")  # type: ignore[union-attr]
@@ -375,7 +375,7 @@ def test_missing_inventory_is_not_treated_as_zero() -> None:
 
 
 def test_negative_equity_and_loss_making_edge_cases() -> None:
-    from telmus.core.engines.quality import QualityEngine
+    from isoline.core.engines.quality import QualityEngine
 
     f = quality_company()
     bs = f["balance_sheet"].copy()  # type: ignore[union-attr]
@@ -389,7 +389,7 @@ def test_negative_equity_and_loss_making_edge_cases() -> None:
 
 
 def test_quality_not_applicable_to_financials_and_empty_input() -> None:
-    from telmus.core.engines.quality import QualityEngine
+    from isoline.core.engines.quality import QualityEngine
 
     f = quality_company()
     f["info"] = {"sector": "Financial Services"}
@@ -403,9 +403,9 @@ def test_quality_not_applicable_to_financials_and_empty_input() -> None:
 def test_scan_result_includes_quality_in_json() -> None:
     from unittest.mock import patch
 
-    from telmus.core.scanner import TelmusScanner
+    from isoline.core.scanner import IsolineScanner
 
-    with patch("telmus.core.scanner.load_financials", return_value=quality_company()):
-        result = TelmusScanner().scan("Q")
+    with patch("isoline.core.scanner.load_financials", return_value=quality_company()):
+        result = IsolineScanner().scan("Q")
     assert result.quality is not None
     assert result.to_dict()["quality"]["roe"] == pytest.approx(120 / 560)

@@ -5,12 +5,12 @@ Status: **implemented** unless marked *planned*.
 ## How a release happens today
 
 1. Land changes on `main` through normal commits (CI must be green: ruff, mypy, pytest on 3 OSes x Python 3.10-3.13, plus the clean-venv install smoke test).
-2. Bump `__version__` in `telmus/__init__.py` (single source of truth) and add a `CHANGELOG.md` entry.
+2. Bump `__version__` in `isoline/__init__.py` (single source of truth) and add a `CHANGELOG.md` entry.
 3. Create a GitHub **release/tag** `vX.Y.Z` pointing at that commit.
 4. `publish.yml` runs:
    - **build** job: tag must equal the package version; the version must **not already exist on PyPI**; ruff, tests, `python -m build`, `twine check`.
    - **publish** job (environment `pypi`): uploads with Trusted Publishing (OIDC) when `PYPI_API_TOKEN` is unset, otherwise with that secret; then creates the GitHub release assets.
-   - **smoke-test** job: installs `telmus==X.Y.Z` from PyPI in a clean venv and runs `telmus --version` / `--help`.
+   - **smoke-test** job: installs `isoline==X.Y.Z` from PyPI in a clean venv and runs `isoline --version` / `--help`.
 
 ## Versioning
 
@@ -25,7 +25,7 @@ SemVer. Published versions are immutable: a bad release is fixed by publishing a
 
 ## One-time setup (needs the repository owner)
 
-- On PyPI: *Manage project -> Publishing -> Add a trusted publisher*: owner `shubhwade`, repo `telmus`, workflow `publish.yml`, environment `pypi`.
+- On PyPI: *Manage project -> Publishing -> Add a trusted publisher*: owner `shubhwade`, repo `isoline`, workflow `publish.yml`, environment `pypi`.
 - On GitHub: *Settings -> Environments -> pypi -> Required reviewers* = yourself. This is the approval gate: nothing reaches PyPI until you click approve.
 - Never put tokens in the repo or in chat. If one is exposed, revoke it on PyPI immediately.
 
@@ -35,7 +35,7 @@ Set the repository **variable** `RELEASES_DISABLED` to `true` (*Settings -> Secr
 
 ## Rolling back
 
-PyPI never lets a filename be re-used. Use *Yank release* on PyPI for the bad version (installs of unpinned `telmus` skip it), then ship the fixed patch release.
+PyPI never lets a filename be re-used. Use *Yank release* on PyPI for the bad version (installs of unpinned `isoline` skip it), then ship the fixed patch release.
 
 ## Planned (not implemented)
 

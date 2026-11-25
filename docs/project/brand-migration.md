@@ -1,7 +1,6 @@
 # Brand migration plan
 
-**Status: planning only. Nothing has been renamed, published or registered.** The product is
-still `telmus` everywhere. The new name is not final until the owner approves it.
+**Status:** the owner delegated the choice and **Isoline** was selected (2026-11-25). The rename is implemented on branch `rebrand/isoline` (version 0.6.0) and is **not** merged to `main`, not published, and no domain is registered. `main` still ships as `telmus`. Domain and trademark checks remain open.
 
 ## 1. Name search
 

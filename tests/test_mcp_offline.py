@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 
 pytest.importorskip("mcp")
-from telmus.mcp.server import _with_exchange, handle_tool_call  # noqa: E402
+from isoline.mcp.server import _with_exchange, handle_tool_call  # noqa: E402
 from tests.test_scores import company  # noqa: E402
 
 
@@ -25,10 +25,10 @@ def _fin(ticker: str) -> dict:
 
 
 def test_info_lists_quality_and_version() -> None:
-    import telmus
+    import isoline
 
     out = _call("info", {})
-    assert out["version"] == telmus.__version__ and "quality" in out["coverage"]
+    assert out["version"] == isoline.__version__ and "quality" in out["coverage"]
 
 
 def test_scan_and_scan_ticker_apply_exchange_hint() -> None:
@@ -38,7 +38,7 @@ def test_scan_and_scan_ticker_apply_exchange_hint() -> None:
         seen.append(t)
         return _fin(t)
 
-    with patch("telmus.core.scanner.load_financials", side_effect=fake):
+    with patch("isoline.core.scanner.load_financials", side_effect=fake):
         assert _call("scan", {"ticker": "INFY"})["result"]["ticker"] == "INFY"
         _call("scan_ticker", {"ticker": "INFY", "exchange": "nse"})
         _call("scan_ticker", {"ticker": "INFY.BO", "exchange": "NSE"})  # explicit suffix wins
@@ -55,7 +55,7 @@ def test_bad_inputs_are_errors() -> None:
 
 
 def test_screen_reports_skipped_tickers() -> None:
-    with patch("telmus.core.scanner.load_financials", side_effect=lambda t: _fin(t)):
+    with patch("isoline.core.scanner.load_financials", side_effect=lambda t: _fin(t)):
         out = _call("screen", {"sector": "IT", "min_piotroski": 0, "max_de": 100})
     assert "matches" in out and "skipped" in out
     with pytest.raises(ValueError, match="Unknown sector"):

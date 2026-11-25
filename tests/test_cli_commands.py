@@ -13,7 +13,7 @@ import pytest
 from typer.main import get_command
 from typer.testing import CliRunner
 
-from telmus.cli.app import app
+from isoline.cli.app import app
 from tests.test_scores import company, quality_company
 
 
@@ -32,8 +32,8 @@ def run(tmp_path, monkeypatch):
 
     def _run(*args: str):
         with (
-            patch("telmus.core.scanner.load_financials", side_effect=_fin),
-            patch("telmus.core.loaders.load_financials", side_effect=_fin),
+            patch("isoline.core.scanner.load_financials", side_effect=_fin),
+            patch("isoline.core.loaders.load_financials", side_effect=_fin),
             patch("webbrowser.open") as opened,
         ):
             result = CliRunner().invoke(app, list(args))

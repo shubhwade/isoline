@@ -5,8 +5,8 @@ import os
 import tempfile
 from unittest.mock import MagicMock, patch
 
-from telmus.core.result import GrowthResult, HealthResult, RedFlag, ScanResult, ValuationResult
-from telmus.exporters.powerbi import PowerBIExporter
+from isoline.core.result import GrowthResult, HealthResult, RedFlag, ScanResult, ValuationResult
+from isoline.exporters.powerbi import PowerBIExporter
 
 
 def mock_scan_result(ticker: str) -> ScanResult:
@@ -61,7 +61,7 @@ def mock_scan_result(ticker: str) -> ScanResult:
         )
 
 
-@patch("telmus.exporters.powerbi.TelmusScanner")
+@patch("isoline.exporters.powerbi.IsolineScanner")
 def test_powerbi_export_portfolio(mock_scanner_class: MagicMock) -> None:
     mock_scanner = mock_scanner_class.return_value
     mock_scanner.scan.side_effect = mock_scan_result
@@ -101,7 +101,7 @@ def test_powerbi_export_portfolio(mock_scanner_class: MagicMock) -> None:
         assert row_xyz[18] == "0"
 
 
-@patch("telmus.exporters.powerbi.TelmusScanner")
+@patch("isoline.exporters.powerbi.IsolineScanner")
 def test_powerbi_export_flags(mock_scanner_class: MagicMock) -> None:
     mock_scanner = mock_scanner_class.return_value
     mock_scanner.scan.side_effect = mock_scan_result

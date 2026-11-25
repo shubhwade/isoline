@@ -4,7 +4,7 @@ import logging
 
 import pytest
 
-from telmus.core.engines.health import HealthEngine
+from isoline.core.engines.health import HealthEngine
 from tests.fixtures.infy_mock import infy_financials
 
 
@@ -38,7 +38,7 @@ def test_debt_to_equity_non_negative() -> None:
 
 
 def test_missing_data_graceful_empty_dict(caplog: pytest.LogCaptureFixture) -> None:
-    logging.getLogger("telmus.core.engines.health").setLevel(logging.WARNING)
+    logging.getLogger("isoline.core.engines.health").setLevel(logging.WARNING)
     caplog.set_level(logging.WARNING)
     result = HealthEngine().run({})
     assert result.piotroski_f is None  # insufficient data is not a score of 0

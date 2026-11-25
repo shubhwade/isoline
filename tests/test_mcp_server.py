@@ -8,7 +8,7 @@ import json
 import pytest
 
 pytest.importorskip("mcp")
-from telmus.mcp.server import handle_tool_call
+from isoline.mcp.server import handle_tool_call
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def anyio_backend():
 async def test_all_tools() -> None:
     """Test all 5 MCP tools."""
     print("=" * 80)
-    print("TESTING telmus MCP SERVER - ALL 5 TOOLS")
+    print("TESTING isoline MCP SERVER - ALL 5 TOOLS")
     print("=" * 80)
 
     # Test 1: info

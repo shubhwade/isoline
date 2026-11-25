@@ -1,14 +1,14 @@
 # Python SDK
 
 ```bash
-pip install telmus
+pip install isoline
 ```
 
 ```python
-from telmus import scan, compare, TelmusScanner, ScanResult, CompareResult
+from isoline import scan, compare, IsolineScanner, ScanResult, CompareResult
 ```
 
-`import telmus` is lightweight; the SDK loads on first use. Everything here is tested offline in `tests/test_sdk.py`. Names not listed on this page are internal and may change.
+`import isoline` is lightweight; the SDK loads on first use. Everything here is tested offline in `tests/test_sdk.py`. Names not listed on this page are internal and may change.
 
 ## Functions
 
@@ -16,8 +16,8 @@ from telmus import scan, compare, TelmusScanner, ScanResult, CompareResult
 |---|---|
 | `scan(ticker)` | `ScanResult` |
 | `compare(ticker_a, ticker_b)` | `CompareResult` (`.ticker_a`, `.ticker_b`, `.result_a`, `.result_b`) |
-| `telmus.sdk.compare_to_dataframe(compare_result)` | `pandas.DataFrame` indexed by metric, one column per ticker |
-| `TelmusScanner().scan(t)` / `.compare(a, b)` | same as above; use when you want one reusable scanner |
+| `isoline.sdk.compare_to_dataframe(compare_result)` | `pandas.DataFrame` indexed by metric, one column per ticker |
+| `IsolineScanner().scan(t)` / `.compare(a, b)` | same as above; use when you want one reusable scanner |
 
 Tickers use Yahoo Finance format: `AAPL`, `INFY.NS` (NSE), `500209.BO` (BSE).
 
@@ -43,23 +43,23 @@ Methods: `result.to_dict()` and `result.to_json()` (stable shape, `schema_versio
 
 ## Errors
 
-All inherit `TelmusError` (a `ValueError`) and carry a `.hint`:
+All inherit `IsolineError` (a `ValueError`) and carry a `.hint`:
 `InvalidTickerError`, `NoDataError`, `ProviderUnavailableError`, `RateLimitError`.
 
 ```python
-from telmus import scan
-from telmus.sdk import TelmusError
+from isoline import scan
+from isoline.sdk import IsolineError
 
 try:
     r = scan("INFY.NS")
-except TelmusError as exc:
+except IsolineError as exc:
     print(exc, "->", exc.hint)
 ```
 
 ## Examples
 
 ```python
-from telmus import scan
+from isoline import scan
 
 r = scan("AAPL")
 print(r.health.piotroski_f, r.health.altman_z, r.quality.roic)
@@ -69,7 +69,7 @@ for note in r.notes:
 
 ```python
 import pandas as pd
-from telmus import scan
+from isoline import scan
 
 rows = []
 for t in ["INFY.NS", "TCS.NS", "WIPRO.NS"]:
@@ -85,7 +85,7 @@ print(pd.DataFrame(rows))
 
 ```python
 import json
-from telmus import scan
+from isoline import scan
 open("aapl.json", "w", encoding="utf-8").write(scan("AAPL").to_json())
 ```
 

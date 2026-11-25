@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from telmus.core import loaders
+from isoline.core import loaders
 
 
 @pytest.fixture(autouse=True)

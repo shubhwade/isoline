@@ -2,18 +2,18 @@
 
 Targets, not promises. PyPI download counts include CI runs, mirrors and re-installs, so they are
 **not unique users**. No bots, purchased traffic or misleading claims. Record the current number
-at pepy.tech/projects/telmus (and pypistats.org) before starting: that is month 0.
+at pepy.tech/projects/isoline (and pypistats.org) before starting: that is month 0.
 
 | Milestone | Target month | What has to be true |
 |---|---|---|
 | 15K | 3 | v0.4.x is the stable, easy install; first tutorials and a launch post are out |
-| 25K | 5 | Telmus is used in public notebooks / blog posts by people other than the author |
+| 25K | 5 | Isoline is used in public notebooks / blog posts by people other than the author |
 | 50K | 8 | Listed in awesome-lists and an MCP directory; some downstream tool depends on it |
 | 75K | 11 | Regular contributors; second wave of features (peer valuation, DCF) shipped |
 | 100K | 12 | Compounding: search traffic, recommendations, CI/dependency installs |
 
 ## Why people will install it (and recommend it)
-1. **It works first time.** `pip install telmus && telmus scan AAPL`, on every OS. This release fixes the crash that hit fresh installs.
+1. **It works first time.** `pip install isoline && isoline scan AAPL`, on every OS. This release fixes the crash that hit fresh installs.
 2. **It is correct and says so.** Published formulas with citations and hand-computed tests (docs/methodology.md). "Shows n/a rather than guessing" is a differentiator versus scraped-ratio tools.
 3. **It produces something shareable:** an Excel workbook and a print-ready HTML report from one command, plus an MCP server for AI coding tools.
 
@@ -28,7 +28,7 @@ at pepy.tech/projects/telmus (and pypistats.org) before starting: that is month 
 - Submit to awesome-python, awesome-quant, awesome-mcp-servers and MCP registries/directories; Python Weekly, PyCoder's Weekly, Console.dev newsletters.
 - YouTube demo (5 min) and a short for each tutorial; ask finance-Python creators for honest feedback, not endorsements.
 - Add a Jupyter/Colab notebook so people can try it without installing.
-- Add a `telmus.sdk` quick example to the README (library use drives installs in other projects' requirements).
+- Add a `isoline.sdk` quick example to the README (library use drives installs in other projects' requirements).
 
 ## Months 7-12: depth (to 100K)
 - Features that earn recommendations: peer/sector valuation from a documented data source, DCF template workbook, watchlist/portfolio reports, a second data provider (reduces Yahoo dependence).

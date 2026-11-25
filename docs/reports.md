@@ -1,6 +1,6 @@
 # Reports
 
-`telmus scan`, `compare` and `screen` can write two files. Pass `--no-report` to write nothing.
+`isoline scan`, `compare` and `screen` can write two files. Pass `--no-report` to write nothing.
 
 ## HTML report (`<TICKER>_dashboard.html`)
 

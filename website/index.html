@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>telmus - Financial analysis. One command.</title>
+    <title>isoline - Financial analysis. One command.</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -424,7 +424,7 @@
     <!-- NAVBAR -->
     <nav class="navbar" id="navbar">
         <div class="nav-logo-container">
-            <a href="#" class="nav-logo">telmus</a>
+            <a href="#" class="nav-logo">isoline</a>
             <span class="nav-version">v0.5.0</span>
         </div>
         <button class="mobile-menu-btn" onclick="toggleMenu()">
@@ -452,19 +452,19 @@
     <section class="hero" id="hero">
         <div class="hero-layout">
             <div class="hero-left">
-                <div class="hero-top-line">$ pip install telmus   —   v0.5.0   —   MIT License</div>
+                <div class="hero-top-line">$ pip install isoline   —   v0.5.0   —   MIT License</div>
                 <h1>
                     <span class="hero-line hero-line-1">Financial analysis.</span>
                     <span class="hero-line hero-line-2">One command.</span>
                 </h1>
                 <p class="hero-subtitle">
-                    telmus scans any stock, calculates Piotroski F-score, Altman Z-score,
+                    isoline scans any stock, calculates Piotroski F-score, Altman Z-score,
                     Beneish M-score, and generates an Excel workbook and a print-ready HTML report
                     — fast. No API key. No account. Just Python.
                 </p>
                 <div class="hero-buttons">
-                    <button class="btn-install copy-btn" onclick="copyText('pip install telmus', this)">
-                        $ pip install telmus
+                    <button class="btn-install copy-btn" onclick="copyText('pip install isoline', this)">
+                        $ pip install isoline
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
                     <a href="https://github.com/shubhwade/telmus" class="btn-github">View on GitHub &rarr;</a>
@@ -484,7 +484,7 @@
                     <div class="dot"></div>
                     <div class="dot"></div>
                 </div>
-                <div class="terminal-title">telmus — zsh</div>
+                <div class="terminal-title">isoline — zsh</div>
             </div>
             <div class="terminal-body" id="terminal-text"></div>
         </div>
@@ -535,7 +535,7 @@
             <div class="card fade-up-feat">
                 <div class="card-icon">MCP</div>
                 <h3>MCP Server</h3>
-                <p>Connect telmus to Claude, Cursor, or Windsurf as an MCP tool. Ask your AI IDE to analyse any stock in plain English.</p>
+                <p>Connect isoline to Claude, Cursor, or Windsurf as an MCP tool. Ask your AI IDE to analyse any stock in plain English.</p>
             </div>
         </div>
     </section>
@@ -551,7 +551,7 @@
                 <div class="step-content">
                     <h3>Install</h3>
                     <p>One command. Python 3.10+ required. No API key needed.</p>
-                    <div class="step-code"><span class="c-cmd">pip</span> install telmus</div>
+                    <div class="step-code"><span class="c-cmd">pip</span> install isoline</div>
                 </div>
             </div>
             <div class="step-row slide-in-row">
@@ -559,9 +559,9 @@
                 <div class="step-content">
                     <h3>Scan any stock</h3>
                     <p>Uses Yahoo Finance symbols: AAPL for US stocks, add .NS for NSE or .BO for BSE.</p>
-                    <div class="step-code"><span class="c-cmd">telmus</span> scan <span class="c-arg">AAPL</span>
-<span class="c-cmd">telmus</span> scan <span class="c-arg">INFY.NS</span>
-<span class="c-cmd">telmus</span> scan <span class="c-arg">RELIANCE.NS</span></div>
+                    <div class="step-code"><span class="c-cmd">isoline</span> scan <span class="c-arg">AAPL</span>
+<span class="c-cmd">isoline</span> scan <span class="c-arg">INFY.NS</span>
+<span class="c-cmd">isoline</span> scan <span class="c-arg">RELIANCE.NS</span></div>
                 </div>
             </div>
             <div class="step-row slide-in-row">
@@ -612,9 +612,9 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
                 </button>
-                <div class="cmd-block"><span class="c-cmd">telmus</span> scan <span class="c-arg">INFY.NS</span>
-<span class="c-cmd">telmus</span> scan <span class="c-arg">AAPL</span>
-<span class="c-cmd">telmus</span> scan <span class="c-arg">RELIANCE.NS</span> <span class="c-flag">--json</span></div></div>
+                <div class="cmd-block"><span class="c-cmd">isoline</span> scan <span class="c-arg">INFY.NS</span>
+<span class="c-cmd">isoline</span> scan <span class="c-arg">AAPL</span>
+<span class="c-cmd">isoline</span> scan <span class="c-arg">RELIANCE.NS</span> <span class="c-flag">--json</span></div></div>
                 <p>Runs full analysis: valuation, health, growth, quality and red-flag engines. Writes an Excel workbook and an HTML report.</p>
                 <div class="files-wrap">
                     <span class="file-chip">INFY_analysis.xlsx</span>
@@ -632,8 +632,8 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
                 </button>
-                <div class="cmd-block"><span class="c-cmd">telmus</span> compare <span class="c-arg">INFY.NS TCS.NS</span>
-<span class="c-cmd">telmus</span> compare <span class="c-arg">AAPL MSFT</span></div></div>
+                <div class="cmd-block"><span class="c-cmd">isoline</span> compare <span class="c-arg">INFY.NS TCS.NS</span>
+<span class="c-cmd">isoline</span> compare <span class="c-arg">AAPL MSFT</span></div></div>
                 <p>Side by side comparison of two stocks across all metrics. See which company wins on each metric with color coding.</p>
                 <div class="files-wrap">
                     <span class="file-chip">INFYvsTCS_comparison.xlsx</span>
@@ -651,9 +651,9 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
                 </button>
-                <div class="cmd-block"><span class="c-cmd">telmus</span> screen <span class="c-flag">--sector</span> <span class="c-arg">IT</span>
-<span class="c-cmd">telmus</span> screen <span class="c-flag">--sector</span> <span class="c-arg">Banking</span> <span class="c-flag">--min-piotroski</span> <span class="c-arg">6</span>
-<span class="c-cmd">telmus</span> screen <span class="c-flag">--sector</span> <span class="c-arg">IT</span> <span class="c-flag">--max-de</span> <span class="c-arg">1.5</span></div></div>
+                <div class="cmd-block"><span class="c-cmd">isoline</span> screen <span class="c-flag">--sector</span> <span class="c-arg">IT</span>
+<span class="c-cmd">isoline</span> screen <span class="c-flag">--sector</span> <span class="c-arg">Banking</span> <span class="c-flag">--min-piotroski</span> <span class="c-arg">6</span>
+<span class="c-cmd">isoline</span> screen <span class="c-flag">--sector</span> <span class="c-arg">IT</span> <span class="c-flag">--max-de</span> <span class="c-arg">1.5</span></div></div>
                 <p>Scan an entire sector at once with custom filters. Find the strongest stocks in any sector instantly.</p>
                 <div class="files-wrap">
                     <span class="file-chip">screen_results.xlsx</span>
@@ -671,8 +671,8 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
                 </button>
-                <div class="cmd-block"><span class="c-cmd">telmus</span> check <span class="c-arg">INFY.NS</span>
-<span class="c-cmd">telmus</span> check <span class="c-arg">AAPL</span></div></div>
+                <div class="cmd-block"><span class="c-cmd">isoline</span> check <span class="c-arg">INFY.NS</span>
+<span class="c-cmd">isoline</span> check <span class="c-arg">AAPL</span></div></div>
                 <p>Quick health check only. Just Piotroski F and Altman Z. Fastest way to check if a stock is worth deeper analysis.</p>
             </div>
 
@@ -686,7 +686,7 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
                 </button>
-                <div class="cmd-block"><span class="c-cmd">telmus</span> powerbi <span class="c-flag">--tickers</span> <span class="c-arg">INFY.NS TCS.NS WIPRO.NS</span> <span class="c-flag">--export</span> <span class="c-arg">portfolio.csv</span></div></div>
+                <div class="cmd-block"><span class="c-cmd">isoline</span> powerbi <span class="c-flag">--tickers</span> <span class="c-arg">INFY.NS TCS.NS WIPRO.NS</span> <span class="c-flag">--export</span> <span class="c-arg">portfolio.csv</span></div></div>
                 <p>Generates Power BI ready CSV for portfolio analysis. Also creates portfolio_report.html with pre-built charts.</p>
                 <div class="files-wrap">
                     <span class="file-chip">portfolio.csv</span>
@@ -704,12 +704,12 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
                 </button>
-                <div class="cmd-block"><span class="c-cmd">telmus</span> serve</div></div>
+                <div class="cmd-block"><span class="c-cmd">isoline</span> serve</div></div>
                 <p>Starts MCP server for Claude Desktop, Cursor, or Windsurf. Add to your AI IDE config and ask it to analyse stocks in plain English.</p>
                 <div class="cmd-block" style="margin-bottom: 0;">{
   <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"telmus"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"telmus"</span>,
+    <span class="c-cmd">"isoline"</span>: {
+      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
       <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
     }
   }
@@ -721,21 +721,21 @@
     <!-- MCP SERVER -->
     <section id="mcp">
         <div class="section-header">
-            <h2>Connect telmus to your AI IDE</h2>
-            <p>telmus turns Claude from an opinion machine into a financial analyst with live data</p>
+            <h2>Connect isoline to your AI IDE</h2>
+            <p>isoline turns Claude from an opinion machine into a financial analyst with live data</p>
         </div>
 
         <div class="mcp-grid">
             <div class="mcp-card">
                 <h3>Claude Desktop</h3>
                 <div class="mcp-code-block cmd-block" style="margin-bottom:0;">
-                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;telmus&quot;: {\n      &quot;command&quot;: &quot;telmus&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
+                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;isoline&quot;: {\n      &quot;command&quot;: &quot;isoline&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
 {
   <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"telmus"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"telmus"</span>,
+    <span class="c-cmd">"isoline"</span>: {
+      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
       <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
     }
   }
@@ -744,13 +744,13 @@
             <div class="mcp-card">
                 <h3>Cursor</h3>
                 <div class="mcp-code-block cmd-block" style="margin-bottom:0;">
-                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;telmus&quot;: {\n      &quot;command&quot;: &quot;telmus&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
+                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;isoline&quot;: {\n      &quot;command&quot;: &quot;isoline&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
 {
   <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"telmus"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"telmus"</span>,
+    <span class="c-cmd">"isoline"</span>: {
+      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
       <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
     }
   }
@@ -759,13 +759,13 @@
             <div class="mcp-card">
                 <h3>Windsurf</h3>
                 <div class="mcp-code-block cmd-block" style="margin-bottom:0;">
-                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;telmus&quot;: {\n      &quot;command&quot;: &quot;telmus&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
+                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;isoline&quot;: {\n      &quot;command&quot;: &quot;isoline&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
 {
   <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"telmus"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"telmus"</span>,
+    <span class="c-cmd">"isoline"</span>: {
+      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
       <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
     }
   }
@@ -789,17 +789,17 @@
     <section class="install-section nav-section" id="install">
         <div class="install-content">
             <div class="install-steps-inline">
-                <span class="i-step">pip install telmus</span>
+                <span class="i-step">pip install isoline</span>
                 <span class="i-arrow">&rarr;</span>
-                <span class="i-step">telmus scan AAPL</span>
+                <span class="i-step">isoline scan AAPL</span>
                 <span class="i-arrow">&rarr;</span>
                 <span class="i-step">Report opens in your browser</span>
             </div>
 
             <div>
                 <div class="big-install-cmd">
-                    <span class="bic-text">$ pip install telmus</span>
-                    <button class="copy-btn" onclick="copyText('pip install telmus', this)">
+                    <span class="bic-text">$ pip install isoline</span>
+                    <button class="copy-btn" onclick="copyText('pip install isoline', this)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
                 </div>
@@ -809,7 +809,7 @@
                 <a href="https://pypi.org/project/telmus/">PyPI Package</a>
                 <a href="https://shubhwade.github.io/telmus/">Documentation</a>
                 <a href="https://github.com/shubhwade/telmus">GitHub Repo</a>
-                <a href="https://pypistats.org/packages/telmus">Track Downloads</a>
+                <a href="https://pypistats.org/packages/isoline">Track Downloads</a>
             </div>
         </div>
     </section>
@@ -818,7 +818,7 @@
     <footer>
         <div class="footer-top">
             <div class="footer-brand">
-                <div class="f-logo">telmus</div>
+                <div class="f-logo">isoline</div>
                 <div class="f-by">Built by Shubh Wade</div>
             </div>
             <div class="f-links">
@@ -833,7 +833,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2026 telmus &middot; MIT License &middot; Not financial advice &middot; Data via Yahoo Finance
+            &copy; 2026 isoline &middot; MIT License &middot; Not financial advice &middot; Data via Yahoo Finance
         </div>
     </footer>
 
@@ -860,7 +860,7 @@
         });
 
         // Terminal Typing Animation
-        const terminalText = `<span class="term-prompt">$</span> <span class="term-arg">telmus scan ACME</span>
+        const terminalText = `<span class="term-prompt">$</span> <span class="term-arg">isoline scan ACME</span>
 
 <span class="term-sep">───────────</span> Acme Corp (synthetic sample, not a real company) <span class="term-sep">───────────</span>
 
@@ -882,7 +882,7 @@
         const terminalEl = document.getElementById('terminal-text');
         
         setTimeout(() => {
-            terminalEl.innerHTML = '<span class="term-prompt">$</span> <span class="term-arg">telmus scan ACME</span>\n<span style="color: #71717a;">...</span>';
+            terminalEl.innerHTML = '<span class="term-prompt">$</span> <span class="term-arg">isoline scan ACME</span>\n<span style="color: #71717a;">...</span>';
             
             setTimeout(() => {
                 terminalEl.innerHTML = '';
@@ -1185,7 +1185,7 @@
                 </div>
 
                 <div class="sc-footer-row">
-                    <span class="sc-footer-label">Generated by telmus</span>
+                    <span class="sc-footer-label">Generated by isoline</span>
                     <span class="sc-footer-label">${d.exchange} · Yahoo Finance</span>
                 </div>`;
 

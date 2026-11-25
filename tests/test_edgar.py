@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from telmus.core import edgar, loaders
-from telmus.core.errors import NoDataError, ProviderUnavailableError, RateLimitError
+from isoline.core import edgar, loaders
+from isoline.core.errors import NoDataError, ProviderUnavailableError, RateLimitError
 
 
 def _pt(end, val, start=None, form="10-K", filed="2024-02-01"):
@@ -83,7 +83,7 @@ def test_non_us_and_unknown_tickers_rejected():
 
 def test_user_agent_declares_contact(monkeypatch):
     monkeypatch.setenv("TELMUS_CONTACT", "me@example.com")
-    assert "me@example.com" in edgar.user_agent() and edgar.user_agent().startswith("telmus/")
+    assert "me@example.com" in edgar.user_agent() and edgar.user_agent().startswith("isoline/")
 
 
 def test_scan_falls_back_to_edgar_when_yahoo_fails(monkeypatch):
@@ -92,7 +92,7 @@ def test_scan_falls_back_to_edgar_when_yahoo_fails(monkeypatch):
                         lambda s: (_ for _ in ()).throw(RateLimitError("429")))
     real = edgar.load_edgar
     monkeypatch.setattr(edgar, "load_edgar", lambda s: real(s, _fetch))
-    from telmus import scan
+    from isoline import scan
     r = scan("ACME")
     assert r.company == "Acme Corp"
     assert any("SEC EDGAR" in n for n in r.notes)

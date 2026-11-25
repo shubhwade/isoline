@@ -1,7 +1,7 @@
 # Architecture
 
 ```
-telmus/
+isoline/
   cli/app.py          Typer CLI (scan, compare, screen, serve), error mapping, exit codes
   core/
     loaders.py        provider access (yfinance today) with retry/backoff -> dict of DataFrames
@@ -12,8 +12,8 @@ telmus/
     screening.py      sector screening shared by the CLI and the MCP server
     result.py         dataclasses; to_dict() is the stable JSON shape
   exporters/          report.py (self-contained HTML), html_dashboard.py (thin wrapper), excel, powerbi; _safe.py escapes all text
-  sdk/                public Python API (scan, compare, TelmusScanner)
-  mcp/server.py       optional MCP server (extra: telmus[mcp])
+  sdk/                public Python API (scan, compare, IsolineScanner)
+  mcp/server.py       optional MCP server (extra: isoline[mcp])
 ```
 
 Principles: engines are pure functions of data frames (testable offline); provider quirks live only in `loaders.py` and `labels.py`; every n/a carries a note; exporters never trust text.

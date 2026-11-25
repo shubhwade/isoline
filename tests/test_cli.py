@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from telmus.cli.app import app
-from telmus.core.result import GrowthResult, HealthResult, ScanResult, ValuationResult
+from isoline.cli.app import app
+from isoline.core.result import GrowthResult, HealthResult, ScanResult, ValuationResult
 
 runner = CliRunner()
 
@@ -32,7 +32,7 @@ def test_info_exits_zero() -> None:
     assert "Version" in result.output
 
 
-@patch("telmus.cli.app.TelmusScanner.scan")
+@patch("isoline.cli.app.IsolineScanner.scan")
 def test_scan_json_outputs_json(mock_scan) -> None:
     mock_scan.return_value = fake_scan_result()
     result = runner.invoke(app, ["scan", "INFY", "--json"])
@@ -41,7 +41,7 @@ def test_scan_json_outputs_json(mock_scan) -> None:
     assert parsed["ticker"] == "INFY"
 
 
-@patch("telmus.cli.app.TelmusScanner.scan")
+@patch("isoline.cli.app.IsolineScanner.scan")
 def test_check_exits_zero(mock_scan) -> None:
     mock_scan.return_value = fake_scan_result()
     result = runner.invoke(app, ["check", "INFY"])
@@ -49,7 +49,7 @@ def test_check_exits_zero(mock_scan) -> None:
     assert "Piotroski F-score" in result.output
 
 
-@patch("telmus.cli.app.TelmusScanner.scan")
+@patch("isoline.cli.app.IsolineScanner.scan")
 def test_scan_bad_ticker_handles_error(mock_scan) -> None:
     mock_scan.side_effect = ValueError("Unable to load financials")
     result = runner.invoke(app, ["scan", "BADTICKER"])

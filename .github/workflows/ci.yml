@@ -23,9 +23,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: python -m pip install -e ".[dev]"
-      - run: ruff check telmus tests
+      - run: ruff check isoline tests
       - run: mypy
-      - run: pytest --cov=telmus --cov-report=term-missing
+      - run: pytest --cov=isoline --cov-report=term-missing
 
   install-smoke:
     name: Clean install from built wheel
@@ -48,12 +48,12 @@ jobs:
           python -m venv "$RUNNER_TEMP/clean"
           if [ -d "$RUNNER_TEMP/clean"/Scripts ]; then BIN="$RUNNER_TEMP/clean"/Scripts; else BIN="$RUNNER_TEMP/clean"/bin; fi
           $BIN/python -m pip install dist/*.whl
-          $BIN/telmus --version
-          $BIN/telmus --help
-          $BIN/python -c "import telmus, telmus.cli.app"
+          $BIN/isoline --version
+          $BIN/isoline --help
+          $BIN/python -c "import isoline, isoline.cli.app"
       - name: Wheel with the optional MCP extra
         shell: bash
         run: |
           if [ -d "$RUNNER_TEMP/clean"/Scripts ]; then BIN="$RUNNER_TEMP/clean"/Scripts; else BIN="$RUNNER_TEMP/clean"/bin; fi
           $BIN/python -m pip install "$(ls dist/*.whl)[mcp]"
-          $BIN/python -c "import telmus.mcp.server"
+          $BIN/python -c "import isoline.mcp.server"

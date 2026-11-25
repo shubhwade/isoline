@@ -5,8 +5,8 @@
 Python 3.10 or newer.
 
 ```bash
-pip install telmus
-telmus --version
+pip install isoline
+isoline --version
 ```
 
 Use a virtual environment (`python -m venv .venv`) and avoid creating it inside a cloud-synced folder such as OneDrive, which can corrupt installs on Windows.
@@ -14,8 +14,8 @@ Use a virtual environment (`python -m venv .venv`) and avoid creating it inside 
 ## 2. Scan a stock
 
 ```bash
-telmus scan AAPL          # US
-telmus scan INFY.NS       # NSE (India); BSE uses .BO
+isoline scan AAPL          # US
+isoline scan INFY.NS       # NSE (India); BSE uses .BO
 ```
 
 Tickers use Yahoo Finance symbols. Non-US stocks need the exchange suffix.
@@ -49,14 +49,14 @@ Exact definitions: [Methodology](methodology.md). A flagged score is a prompt to
 ## 4. JSON and exports
 
 ```bash
-telmus scan AAPL --json
-telmus scan AAPL --export aapl.json      # .json, .csv or .xlsx
+isoline scan AAPL --json
+isoline scan AAPL --export aapl.json      # .json, .csv or .xlsx
 ```
 
 ## 5. Compare two stocks
 
 ```bash
-telmus compare AAPL MSFT
+isoline compare AAPL MSFT
 ```
 
 ## 6. Files written

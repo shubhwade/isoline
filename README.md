@@ -1,8 +1,8 @@
-# telmus
+# isoline
 
-[![PyPI version](https://img.shields.io/pypi/v/telmus)](https://pypi.org/project/telmus/)
-[![Downloads](https://static.pepy.tech/personalized-badge/telmus?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/telmus)
-[![Python](https://img.shields.io/pypi/pyversions/telmus)](https://pypi.org/project/telmus/)
+[![PyPI version](https://img.shields.io/pypi/v/isoline)](https://pypi.org/project/telmus/)
+[![Downloads](https://static.pepy.tech/personalized-badge/isoline?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/isoline)
+[![Python](https://img.shields.io/pypi/pyversions/isoline)](https://pypi.org/project/telmus/)
 [![CI](https://github.com/shubhwade/telmus/actions/workflows/ci.yml/badge.svg)](https://github.com/shubhwade/telmus/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -11,8 +11,8 @@ Altman Z″-score, Beneish M-score, key ratios and red flags for a listed compan
 workbook and a print-ready HTML report. An optional MCP server exposes the same analysis to AI coding tools.
 
 ```bash
-pip install telmus
-telmus scan AAPL
+pip install isoline
+isoline scan AAPL
 ```
 
 ## Install
@@ -20,29 +20,29 @@ telmus scan AAPL
 Works on Windows 10/11, macOS and Linux with **Python 3.10 or newer**.
 
 ```bash
-pip install telmus            # or, keeping it isolated:  pipx install telmus
-telmus --version
+pip install isoline            # or, keeping it isolated:  pipx install isoline
+isoline --version
 ```
 
 Optional MCP server for Claude Desktop, Cursor, Windsurf and similar tools:
 
 ```bash
-pip install "telmus[mcp]"
+pip install "isoline[mcp]"
 ```
 
-If `pip` is not found, use `python -m pip install telmus` (Windows: `py -m pip install telmus`).
-Upgrade with `pip install -U telmus`.
+If `pip` is not found, use `python -m pip install isoline` (Windows: `py -m pip install isoline`).
+Upgrade with `pip install -U isoline`.
 
 ## Quick start
 
 ```bash
-telmus scan AAPL                    # tables in the terminal + Excel and HTML reports
-telmus scan INFY.NS --no-report     # terminal only: no files written, no browser opened
-telmus scan MSFT --json             # machine-readable output
-telmus scan AAPL --export aapl.csv  # .json, .csv or .xlsx
-telmus compare AAPL MSFT            # side by side
-telmus check TSLA                   # just the health scores
-telmus --help
+isoline scan AAPL                    # tables in the terminal + Excel and HTML reports
+isoline scan INFY.NS --no-report     # terminal only: no files written, no browser opened
+isoline scan MSFT --json             # machine-readable output
+isoline scan AAPL --export aapl.csv  # .json, .csv or .xlsx
+isoline compare AAPL MSFT            # side by side
+isoline check TSLA                   # just the health scores
+isoline --help
 ```
 
 Tickers use Yahoo Finance symbols. Outside the US add the exchange suffix: `INFY.NS` (NSE),
@@ -92,18 +92,18 @@ get `n/a` for Altman and Beneish because those models do not apply to them.
 
 | Problem | Fix |
 |---|---|
-| `telmus: command not found` | Open a new terminal; with pip use `python -m telmus`, or install with `pipx` |
+| `isoline: command not found` | Open a new terminal; with pip use `python -m isoline`, or install with `pipx` |
 | `No financial data available` | Check the symbol on finance.yahoo.com and add the exchange suffix |
-| Rate limited / unreachable | Wait a few minutes; check proxy/VPN. Telmus retries 3 times automatically |
-| `telmus serve` says it needs an extra | `pip install "telmus[mcp]"` |
-| Anything else | `telmus --debug scan AAPL` and open an issue with the output |
+| Rate limited / unreachable | Wait a few minutes; check proxy/VPN. Isoline retries 3 times automatically |
+| `isoline serve` says it needs an extra | `pip install "isoline[mcp]"` |
+| Anything else | `isoline --debug scan AAPL` and open an issue with the output |
 
 The HTML report is fully self-contained (no scripts, fonts or CDN), so it opens and prints the same offline.
 
 ## MCP server (optional)
 
 ```json
-{ "mcpServers": { "telmus": { "command": "telmus", "args": ["serve"] } } }
+{ "mcpServers": { "isoline": { "command": "isoline", "args": ["serve"] } } }
 ```
 
 ## Data and limitations
@@ -116,10 +116,10 @@ comparison is not implemented. Scores are screening statistics, **not investment
 ## Development
 
 ```bash
-git clone https://github.com/shubhwade/telmus && cd telmus
+git clone https://github.com/shubhwade/telmus && cd isoline
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-ruff check telmus tests && mypy && pytest
+ruff check isoline tests && mypy && pytest
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Tests never use the live internet unless marked `network`.
@@ -127,7 +127,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Tests never use the live internet unless
 ### Repository layout
 
 ```text
-telmus/          the package (cli/, core/ engines, exporters/, mcp/, sdk/)
+isoline/          the package (cli/, core/ engines, exporters/, mcp/, sdk/)
 tests/           offline test suite
 docs/            documentation site (MkDocs): guides, methodology, project docs
 examples/        runnable examples (Streamlit app)

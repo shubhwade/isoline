@@ -1,8 +1,8 @@
 # MCP Server Guide
 
-telmus can run as an MCP server so AI assistants and agents can call financial analytics tools directly. This makes valuation, health, growth, and red-flag metrics available to Claude, Cursor, Windsurf, and other MCP-compatible clients.
+isoline can run as an MCP server so AI assistants and agents can call financial analytics tools directly. This makes valuation, health, growth, and red-flag metrics available to Claude, Cursor, Windsurf, and other MCP-compatible clients.
 
-## Why use telmus as an MCP server
+## Why use isoline as an MCP server
 
 - Get deterministic, documented financial metrics instead of model-generated numbers.
 - Let AI agents fetch company analysis automatically during conversations.
@@ -12,11 +12,11 @@ telmus can run as an MCP server so AI assistants and agents can call financial a
 ## Install and start
 
 ```bash
-pip install "telmus[mcp]"
-telmus serve
+pip install "isoline[mcp]"
+isoline serve
 ```
 
-`telmus serve` speaks MCP over **stdio**: it opens no network port and prints nothing on its own. You normally don't run it by hand; your MCP client launches it (see the client examples below). Without the extra installed, the command exits with a message telling you to install it.
+`isoline serve` speaks MCP over **stdio**: it opens no network port and prints nothing on its own. You normally don't run it by hand; your MCP client launches it (see the client examples below). Without the extra installed, the command exits with a message telling you to install it.
 
 ## Available MCP tools
 
@@ -37,8 +37,8 @@ Missing metrics are `null` with an explanation in each result's `notes`. `screen
 ```json
 {
   "mcpServers": {
-    "telmus": {
-      "command": "telmus",
+    "isoline": {
+      "command": "isoline",
       "args": ["serve"],
       "description": "Financial statement analysis - real ratios for any ticker"
     }
@@ -51,8 +51,8 @@ Missing metrics are `null` with an explanation in each result's `notes`. `screen
 ```json
 {
   "mcpServers": {
-    "telmus": {
-      "command": "telmus",
+    "isoline": {
+      "command": "isoline",
       "args": ["serve"],
       "description": "Financial statement analysis - real ratios for any ticker"
     }
@@ -65,8 +65,8 @@ Missing metrics are `null` with an explanation in each result's `notes`. `screen
 ```json
 {
   "mcpServers": {
-    "telmus": {
-      "command": "telmus",
+    "isoline": {
+      "command": "isoline",
       "args": ["serve"],
       "description": "Financial statement analysis - real ratios for any ticker"
     }
@@ -100,7 +100,7 @@ Ask the assistant to:
 
 ## Troubleshooting
 
-- `telmus serve` prints "needs the optional mcp extra": run `pip install "telmus[mcp]"`.
-- The client cannot start the server: make sure `telmus` is on the PATH of the app that launches it (on Windows/macOS GUI apps this can differ from your terminal; use the full path to `telmus` in `command`).
+- `isoline serve` prints "needs the optional mcp extra": run `pip install "isoline[mcp]"`.
+- The client cannot start the server: make sure `isoline` is on the PATH of the app that launches it (on Windows/macOS GUI apps this can differ from your terminal; use the full path to `isoline` in `command`).
 - A ticker is not found: add the exchange suffix (`INFY.NS`) or pass `exchange` to `scan_ticker`.
 - Data is from Yahoo Finance (unofficial). Output is screening statistics, not investment advice.

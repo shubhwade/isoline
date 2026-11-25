@@ -5,8 +5,8 @@ import tempfile
 
 from openpyxl import load_workbook
 
-from telmus.core.result import GrowthResult, HealthResult, RedFlag, ScanResult, ValuationResult
-from telmus.exporters.excel import ExcelExporter
+from isoline.core.result import GrowthResult, HealthResult, RedFlag, ScanResult, ValuationResult
+from isoline.exporters.excel import ExcelExporter
 
 
 def test_excel_export_creates_valid_file() -> None:

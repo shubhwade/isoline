@@ -10,6 +10,6 @@ Legend: **done** / **next** / **planned**. No dates are promised.
 | 0.5 Valuation | DCF with explicit, user-editable assumptions and sensitivity table; no hidden defaults | planned |
 | 0.6 Screening and portfolio | screen on any metric; portfolio-level aggregates | planned |
 | 0.7 Reports and web | redesigned HTML report, PDF export, Streamlit app polish, product site | planned |
-| 1.0 | stable public API (`telmus.sdk`), semver guarantees, docs, 100+ golden tests | planned |
+| 1.0 | stable public API (`isoline.sdk`), semver guarantees, docs, 100+ golden tests | planned |
 
 Growth plan: see the [growth plan](growth-roadmap.md) and `docs/internal/business-strategy.md`. Downloads targets are aspirations, not forecasts.

@@ -1,6 +1,6 @@
 # Power BI Integration Guide
 
-This guide explains how to use `telmus` to generate datasets optimized for **Microsoft Power BI**, import them, construct interactive financial dashboards, and automate data refreshes to monitor stock metrics over time.
+This guide explains how to use `isoline` to generate datasets optimized for **Microsoft Power BI**, import them, construct interactive financial dashboards, and automate data refreshes to monitor stock metrics over time.
 
 ---
 
@@ -14,18 +14,18 @@ This guide explains how to use `telmus` to generate datasets optimized for **Mic
 
 ## 2. Generating the Power BI CSV Files
 
-Use `telmus` to export fundamental stock data. `telmus` outputs null values as empty fields (`""`) rather than placeholder strings (like `"n/a"`), allowing Power BI to automatically parse them as numeric types (Decimal, Integer) rather than Text.
+Use `isoline` to export fundamental stock data. `isoline` outputs null values as empty fields (`""`) rather than placeholder strings (like `"n/a"`), allowing Power BI to automatically parse them as numeric types (Decimal, Integer) rather than Text.
 
 ### Standard Portfolio Export
 Run this command to export general valuation, health, and growth metrics:
 ```bash
-telmus powerbi --tickers INFY.NS TCS.NS WIPRO.NS HDFCBANK.NS RELIANCE.NS --export portfolio.csv
+isoline powerbi --tickers INFY.NS TCS.NS WIPRO.NS HDFCBANK.NS RELIANCE.NS --export portfolio.csv
 ```
 
 ### Red Flags Export (Granular tracking)
 Run this command to export flag-level details for each ticker (one row per flag per ticker):
 ```bash
-telmus powerbi --tickers INFY.NS TCS.NS WIPRO.NS --flags --export flags.csv
+isoline powerbi --tickers INFY.NS TCS.NS WIPRO.NS --flags --export flags.csv
 ```
 
 ---
@@ -106,11 +106,11 @@ Construct a premium financial dashboard using these six visuals:
 To track historical trends in Power BI, you must append weekly/monthly runs to the same dataset.
 
 ### Step 1: Scripting the Append
-Instead of overwriting the CSV, write a script that runs `telmus` and appends rows to your portfolio master CSV:
+Instead of overwriting the CSV, write a script that runs `isoline` and appends rows to your portfolio master CSV:
 ```powershell
 # PowerShell script (e.g., update_portfolio.ps1)
 # Fetch standard metrics for this week and append to master database
-telmus powerbi --tickers INFY.NS TCS.NS WIPRO.NS --export temp_week.csv
+isoline powerbi --tickers INFY.NS TCS.NS WIPRO.NS --export temp_week.csv
 
 # If master.csv doesn't exist, create it with headers, otherwise skip headers and append
 if (-Not (Test-Path master.csv)) {

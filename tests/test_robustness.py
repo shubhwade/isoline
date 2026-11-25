@@ -8,11 +8,11 @@ from unittest.mock import Mock, patch
 import pytest
 from typer.testing import CliRunner
 
-from telmus import __version__
-from telmus.cli.app import app
-from telmus.core import loaders
-from telmus.core.errors import NoDataError, ProviderUnavailableError, RateLimitError
-from telmus.exporters.html_dashboard import HtmlDashboardExporter
+from isoline import __version__
+from isoline.cli.app import app
+from isoline.core import loaders
+from isoline.core.errors import NoDataError, ProviderUnavailableError, RateLimitError
+from isoline.exporters.html_dashboard import HtmlDashboardExporter
 from tests.test_cli import fake_scan_result
 
 runner = CliRunner()
@@ -22,7 +22,7 @@ runner = CliRunner()
 def test_version_flag() -> None:
     out = runner.invoke(app, ["--version"])
     assert out.exit_code == 0
-    assert out.stdout.strip() == f"telmus {__version__}"
+    assert out.stdout.strip() == f"isoline {__version__}"
 
 
 def test_no_args_shows_help_with_examples() -> None:
@@ -31,7 +31,7 @@ def test_no_args_shows_help_with_examples() -> None:
 
 
 def test_invalid_ticker_exit_code_2_and_no_scan() -> None:
-    with patch("telmus.cli.app.TelmusScanner") as scanner:
+    with patch("isoline.cli.app.IsolineScanner") as scanner:
         out = runner.invoke(app, ["scan", "AAPL; rm -rf /"])
     assert out.exit_code == 2
     assert "not a valid ticker" in out.stdout
@@ -47,7 +47,7 @@ def test_invalid_ticker_exit_code_2_and_no_scan() -> None:
     ],
 )
 def test_data_errors_are_friendly_with_hint_and_no_traceback(error, code, hint) -> None:
-    with patch("telmus.cli.app.TelmusScanner") as scanner:
+    with patch("isoline.cli.app.IsolineScanner") as scanner:
         scanner.return_value.scan.side_effect = error
         out = runner.invoke(app, ["scan", "ZZZZ"])
     assert out.exit_code == code
@@ -56,20 +56,20 @@ def test_data_errors_are_friendly_with_hint_and_no_traceback(error, code, hint) 
 
 
 def test_unexpected_error_hides_traceback_unless_debug() -> None:
-    with patch("telmus.cli.app.TelmusScanner") as scanner:
+    with patch("isoline.cli.app.IsolineScanner") as scanner:
         scanner.return_value.scan.side_effect = RuntimeError("boom")
         plain = runner.invoke(app, ["scan", "AAPL"])
         debug = runner.invoke(app, ["--debug", "scan", "AAPL"])
     assert plain.exit_code == 1 and "Traceback" not in plain.stdout
     assert "--debug" in plain.stdout
     assert "Traceback" in debug.stdout
-    import telmus.cli.app as cli
+    import isoline.cli.app as cli
 
     cli._STATE["debug"] = False  # reset module state for other tests
 
 
 def test_scan_prints_disclaimer() -> None:
-    with patch("telmus.cli.app.TelmusScanner") as scanner:
+    with patch("isoline.cli.app.IsolineScanner") as scanner:
         scanner.return_value.scan.return_value = fake_scan_result()
         out = runner.invoke(app, ["scan", "INFY", "--no-report"])
     assert out.exit_code == 0
@@ -77,10 +77,10 @@ def test_scan_prints_disclaimer() -> None:
 
 
 def test_serve_without_mcp_installed_explains_the_extra() -> None:
-    with patch.dict(sys.modules, {"telmus.mcp.server": None}):
+    with patch.dict(sys.modules, {"isoline.mcp.server": None}):
         out = runner.invoke(app, ["serve"])
     assert out.exit_code == 1
-    assert "telmus[mcp]" in out.stdout
+    assert "isoline[mcp]" in out.stdout
 
 
 # ---------------------------------------------------------------------- loader
@@ -144,7 +144,7 @@ def test_html_report_escapes_untrusted_company_name(tmp_path) -> None:
 def test_no_report_writes_no_files_and_opens_no_browser(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     with (
-        patch("telmus.cli.app.TelmusScanner") as scanner,
+        patch("isoline.cli.app.IsolineScanner") as scanner,
         patch("webbrowser.open") as opener,
     ):
         scanner.return_value.scan.return_value = fake_scan_result()
@@ -157,7 +157,7 @@ def test_no_report_writes_no_files_and_opens_no_browser(tmp_path, monkeypatch) -
 def test_default_scan_writes_reports_and_can_skip_browser(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     with (
-        patch("telmus.cli.app.TelmusScanner") as scanner,
+        patch("isoline.cli.app.IsolineScanner") as scanner,
         patch("webbrowser.open") as opener,
     ):
         scanner.return_value.scan.return_value = fake_scan_result()
@@ -172,13 +172,13 @@ def test_scan_cli_and_html_show_quality(tmp_path, monkeypatch) -> None:
 
     from typer.testing import CliRunner
 
-    from telmus.cli.app import app
+    from isoline.cli.app import app
     from tests.test_scores import quality_company
 
     fin = quality_company()
     fin["info"] = {"symbol": "Q", "longName": "Quality Co", "exchange": "X", "marketCap": 5000.0}
     monkeypatch.chdir(tmp_path)
-    with patch("telmus.core.scanner.load_financials", return_value=fin):
+    with patch("isoline.core.scanner.load_financials", return_value=fin):
         out = CliRunner().invoke(app, ["scan", "Q", "--no-open"])
     assert out.exit_code == 0, out.output
     assert "Quality" in out.output and "ROE (DuPont)" in out.output
@@ -189,30 +189,30 @@ def test_scan_cli_and_html_show_quality(tmp_path, monkeypatch) -> None:
 def _empty_scan(ticker: str = "EMPTY"):
     from unittest.mock import patch
 
-    from telmus.core.scanner import TelmusScanner
+    from isoline.core.scanner import IsolineScanner
 
     fin = {"info": {"symbol": ticker, "longName": "Sparse Co", "exchange": "X"}}
-    with patch("telmus.core.scanner.load_financials", return_value=fin):
-        return TelmusScanner().scan(ticker)
+    with patch("isoline.core.scanner.load_financials", return_value=fin):
+        return IsolineScanner().scan(ticker)
 
 
 def test_html_reports_show_na_not_zero_and_current_version(tmp_path) -> None:
-    import telmus
-    from telmus.exporters.html_dashboard import HtmlDashboardExporter
+    import isoline
+    from isoline.exporters.html_dashboard import HtmlDashboardExporter
 
     a, b = _empty_scan("AAA"), _empty_scan("BBB")
     exp = HtmlDashboardExporter()
     scan_p, cmp_p, scr_p = (tmp_path / n for n in ("s.html", "c.html", "r.html"))
     exp.export_scan(a, str(scan_p))
-    from telmus.core.result import CompareResult
+    from isoline.core.result import CompareResult
 
     exp.export_compare(CompareResult("AAA", "BBB", a, b), str(cmp_p))
     exp.export_screen([a, b], str(scr_p))
     for path in (scan_p, cmp_p, scr_p):
         html = path.read_text(encoding="utf-8")
         assert "v0.2.6" not in html
-        assert f"telmus v{telmus.__version__}" in html
-        assert "{telmus_version}" not in html and "{__version__}" not in html
+        assert f"isoline v{isoline.__version__}" in html
+        assert "{isoline_version}" not in html and "{__version__}" not in html
     html = scan_p.read_text(encoding="utf-8")
     assert "n/a" in html and ">Weak<" not in html and ">Declining<" not in html
     assert "0.00" not in html and "0.0%" not in html  # missing data is never shown as zero
@@ -222,8 +222,8 @@ def test_screen_unknown_sector_is_an_error_and_failures_are_reported() -> None:
 
     import pytest
 
-    from telmus.core.errors import NoDataError, UnknownSectorError
-    from telmus.core.screening import UNIVERSES, screen_sector
+    from isoline.core.errors import NoDataError, UnknownSectorError
+    from isoline.core.screening import UNIVERSES, screen_sector
 
     with pytest.raises(UnknownSectorError, match="Unknown sector"):
         screen_sector("Pharma", 0, 10)
@@ -240,14 +240,14 @@ def test_screen_unknown_sector_is_an_error_and_failures_are_reported() -> None:
 def test_screen_cli_unknown_sector_exit_code() -> None:
     from typer.testing import CliRunner
 
-    from telmus.cli.app import app
+    from isoline.cli.app import app
 
     res = CliRunner().invoke(app, ["screen", "Pharma"])
     assert res.exit_code == 2 and "Available sectors" in " ".join(res.output.split())
 
 
 def test_powerbi_radar_uses_null_for_missing_not_zero_or_ten(tmp_path) -> None:
-    from telmus.exporters.powerbi import PowerBIExporter
+    from isoline.exporters.powerbi import PowerBIExporter
 
     out = tmp_path / "r.html"
     PowerBIExporter()._generate_html_report([_empty_scan("AAA")], str(out))
@@ -260,12 +260,12 @@ def test_check_prints_zero_scores_not_na_and_info_runs() -> None:
 
     from typer.testing import CliRunner
 
-    from telmus.cli.app import app
+    from isoline.cli.app import app
 
     scan = _empty_scan("ZZZ")
     scan.health.piotroski_f = 0
     scan.health.altman_z = 0.0
-    with patch("telmus.cli.app.TelmusScanner") as scanner:
+    with patch("isoline.cli.app.IsolineScanner") as scanner:
         scanner.return_value.scan.return_value = scan
         out = CliRunner().invoke(app, ["check", "ZZZ"])
     assert "Piotroski F-score: 0" in out.output and "Altman Z-score: 0.00" in out.output
@@ -273,8 +273,8 @@ def test_check_prints_zero_scores_not_na_and_info_runs() -> None:
 
 
 def test_percent_display_and_na_status_and_brief_grammar() -> None:
-    from telmus.cli.app import _format_metric, _pct, _render_section
-    from telmus.core.brief import generate_brief
+    from isoline.cli.app import _format_metric, _pct, _render_section
+    from isoline.core.brief import generate_brief
 
     assert _format_metric(_pct(0.1234)) == "12.3%" and _format_metric(_pct(None)) == "n/a"
     assert _format_metric(0.0) == "0.00" and _format_metric(0) == "0"

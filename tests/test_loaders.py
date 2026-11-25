@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from telmus.core.loaders import load_financials
+from isoline.core.loaders import load_financials
 
 
 class DummyTicker:
@@ -43,8 +43,8 @@ def test_load_financials_resolves_company_name_to_ticker() -> None:
     fake_yf = Mock()
     fake_yf.Ticker.side_effect = lambda symbol: DummyTicker(symbol)
 
-    with patch("telmus.core.loaders._import_yfinance", return_value=fake_yf), patch(
-        "telmus.core.loaders._resolve_ticker_by_name", return_value="AAPL"
+    with patch("isoline.core.loaders._import_yfinance", return_value=fake_yf), patch(
+        "isoline.core.loaders._resolve_ticker_by_name", return_value="AAPL"
     ):
         result = load_financials("APPLE")
 
@@ -58,8 +58,8 @@ def test_load_financials_raises_for_unknown_company_name() -> None:
     fake_yf = Mock()
     fake_yf.Ticker.return_value = DummyTicker("UNKNOWN")
 
-    with patch("telmus.core.loaders._import_yfinance", return_value=fake_yf), patch(
-        "telmus.core.loaders._resolve_ticker_by_name", return_value=None
+    with patch("isoline.core.loaders._import_yfinance", return_value=fake_yf), patch(
+        "isoline.core.loaders._resolve_ticker_by_name", return_value=None
     ), pytest.raises(ValueError, match="No financial data available"):
         load_financials("UNKNOWN")
 
@@ -72,7 +72,7 @@ def test_statements_are_fetched_concurrently() -> None:
 
     import pandas as pd
 
-    from telmus.core import loaders
+    from isoline.core import loaders
 
     class SlowTicker:
         def __init__(self, symbol: str) -> None:
@@ -100,7 +100,7 @@ def test_compare_runs_both_scans_concurrently() -> None:
     import time
     from unittest.mock import patch
 
-    from telmus.core.scanner import TelmusScanner
+    from isoline.core.scanner import IsolineScanner
     from tests.test_scores import company
 
     def slow(ticker: str) -> dict:
@@ -109,16 +109,16 @@ def test_compare_runs_both_scans_concurrently() -> None:
         fin["info"] = {"symbol": ticker, "longName": ticker, "exchange": "X"}
         return fin
 
-    with patch("telmus.core.scanner.load_financials", side_effect=slow):
+    with patch("isoline.core.scanner.load_financials", side_effect=slow):
         start = time.perf_counter()
-        result = TelmusScanner().compare("AAA", "BBB")
+        result = IsolineScanner().compare("AAA", "BBB")
         elapsed = time.perf_counter() - start
     assert (result.result_a.ticker, result.result_b.ticker) == ("AAA", "BBB")
     assert elapsed < 0.7
 
 
 def test_concurrent_scans_leave_stdout_intact() -> None:
-    """Regression: `telmus compare` crashed with 'I/O operation on closed file'.
+    """Regression: `isoline compare` crashed with 'I/O operation on closed file'.
 
     Two overlapping fetches used contextlib.redirect_stdout, which is process-wide, and
     left sys.stdout pointing at a closed buffer.
@@ -128,8 +128,8 @@ def test_concurrent_scans_leave_stdout_intact() -> None:
     import types
     from unittest.mock import patch
 
-    from telmus.core import loaders
-    from telmus.core.scanner import TelmusScanner
+    from isoline.core import loaders
+    from isoline.core.scanner import IsolineScanner
     from tests.test_scores import company
 
     data = company()
@@ -151,7 +151,7 @@ def test_concurrent_scans_leave_stdout_intact() -> None:
     before_out, before_err = sys.stdout, sys.stderr
     loaders.load_financials.cache_clear()
     with patch.object(loaders, "_import_yfinance", return_value=types.SimpleNamespace(Ticker=Slow)):
-        result = TelmusScanner().compare("AAA", "BBB")
+        result = IsolineScanner().compare("AAA", "BBB")
     loaders.load_financials.cache_clear()
     assert sys.stdout is before_out and sys.stderr is before_err
     assert not sys.stdout.closed

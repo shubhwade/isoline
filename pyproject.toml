@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "telmus"
+name = "isoline"
 dynamic = ["version"]
 description = "Financial statement analysis CLI: Piotroski F, Altman Z, Beneish M, ratios, Excel and HTML reports, optional MCP server"
 readme = "README.md"
@@ -40,7 +40,7 @@ Repository = "https://github.com/shubhwade/telmus"
 Changelog = "https://shubhwade.github.io/telmus/changelog/"
 
 [project.scripts]
-telmus = "telmus.cli.app:app"
+isoline = "isoline.cli.app:app"
 
 [project.optional-dependencies]
 mcp = ["mcp>=1.20,<2"]
@@ -59,13 +59,13 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["telmus"]
+packages = ["isoline"]
 
 [tool.hatch.version]
-path = "telmus/__init__.py"
+path = "isoline/__init__.py"
 
 [tool.hatch.build.targets.sdist]
-include = ["telmus", "tests", "README.md", "LICENSE", "CHANGELOG.md", "pyproject.toml"]
+include = ["isoline", "tests", "README.md", "LICENSE", "CHANGELOG.md", "pyproject.toml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -84,4 +84,4 @@ ignore = ["E501", "B008"]
 python_version = "3.10"
 ignore_missing_imports = true
 warn_unused_ignores = true
-files = ["telmus/core", "telmus/sdk", "telmus/__init__.py"]
+files = ["isoline/core", "isoline/sdk", "isoline/__init__.py"]

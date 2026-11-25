@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from telmus.core.engines.valuation import ValuationEngine
+from isoline.core.engines.valuation import ValuationEngine
 
 
 def test_valuation_with_infy_mock() -> None:

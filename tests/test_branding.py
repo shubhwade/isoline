@@ -1,5 +1,5 @@
-from telmus import __version__
-from telmus.branding import BRAND
+from isoline import __version__
+from isoline.branding import BRAND
 
 
 def test_brand_matches_package_metadata():
@@ -15,6 +15,6 @@ def test_brand_matches_package_metadata():
 
 
 def test_report_footer_uses_brand():
-    from telmus.exporters import report
+    from isoline.exporters import report
 
     assert BRAND.command in report.__dict__["BRAND"].command

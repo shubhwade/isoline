@@ -1,6 +1,6 @@
 # Methodology
 
-Telmus reads annual statements from Yahoo Finance and reports **screening statistics**, not
+Isoline reads annual statements from Yahoo Finance and reports **screening statistics**, not
 investment advice. Rules that apply everywhere:
 
 * A missing input gives `n/a`, never `0`. A genuine zero stays zero.
@@ -72,7 +72,7 @@ Annual data only; no restatement tracking; no currency conversion (ratios are un
 values are in the reporting currency); fiscal years are not calendar-aligned across companies;
 sector peer valuation is not implemented; data quality is bounded by Yahoo Finance.
 
-## Quality metrics (v0.3.3, `telmus/core/engines/quality.py`)
+## Quality metrics (v0.3.3, `isoline/core/engines/quality.py`)
 
 All flow items are for the latest fiscal year; return denominators use the average of year-end and prior year-end balances. Missing inputs give `n/a` plus a note, never zero, and no tax rate is assumed.
 

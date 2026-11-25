@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import streamlit as st
 
-from telmus.core.scanner import TelmusScanner
+from isoline.core.scanner import IsolineScanner
 
 
 def main() -> None:
-    st.title("telmus")
+    st.title("isoline")
     st.caption("financial statement analysis · real data · no API key")
 
     ticker = st.text_input("Ticker", placeholder="INFY, TCS, AAPL, MSFT")
     if st.button("Analyse") and ticker:
         try:
             with st.spinner("scanning..."):
-                result = TelmusScanner().scan(ticker.strip().upper())
+                result = IsolineScanner().scan(ticker.strip().upper())
 
             cols = st.columns(3)
             cols[0].metric("Piotroski F-score", result.health.piotroski_f)
@@ -36,7 +36,7 @@ def main() -> None:
         except Exception:
             st.error("Could not fetch data for ticker. Check the symbol and try again.")
 
-    st.caption("Data via yfinance · telmus v0.1.0 · MIT License")
+    st.caption("Data via yfinance · isoline v0.1.0 · MIT License")
 
 
 if __name__ == "__main__":
