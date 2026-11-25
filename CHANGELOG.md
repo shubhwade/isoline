@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.4
+### Fixed
+- **`telmus compare` crashed** with `ValueError: I/O operation on closed file`. The two tickers are scanned concurrently and each scan silenced provider output with `contextlib.redirect_stdout`, which is process-wide; overlapping scans restored each other's streams in the wrong order and left `sys.stdout` closed. Output is now silenced by a ref-counted guard that restores the original streams exactly once. Regression test added.
+- **compare**: the terminal table, CSV export and HTML report now share one definition (`telmus/core/comparison.py`). Valuation multiples are shown but never ranked; a missing value never wins; a real 0 is kept in CSV (only missing values are empty).
+- The hidden `comp` alias now accepts `--export/--report/--no-report/--open/--no-open`; company names with spaces produce valid file names; `scan --json` prints raw JSON (no wrapping or markup).
+- New end-to-end test file covering every command with a mocked provider.
+
 ## v0.4.3
 ### Changed
 - **Repository layout.** The root now holds only standard files (README, LICENSE, CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, pyproject, mkdocs.yml). Project docs moved to `docs/project/` (architecture, data sources, release process, roadmap, growth plan) and internal notes to `docs/internal/` (kept out of the published site). The Streamlit app moved from `dashboard/` to `examples/`. Removed `scripts/capture.py` (a one-off screenshot helper with hard-coded personal paths) and an unused logo file. `.gitignore` reorganised and now ignores `.pypirc`.

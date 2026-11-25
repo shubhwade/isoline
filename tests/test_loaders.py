@@ -115,3 +115,45 @@ def test_compare_runs_both_scans_concurrently() -> None:
         elapsed = time.perf_counter() - start
     assert (result.result_a.ticker, result.result_b.ticker) == ("AAA", "BBB")
     assert elapsed < 0.7
+
+
+def test_concurrent_scans_leave_stdout_intact() -> None:
+    """Regression: `telmus compare` crashed with 'I/O operation on closed file'.
+
+    Two overlapping fetches used contextlib.redirect_stdout, which is process-wide, and
+    left sys.stdout pointing at a closed buffer.
+    """
+    import sys
+    import time
+    import types
+    from unittest.mock import patch
+
+    from telmus.core import loaders
+    from telmus.core.scanner import TelmusScanner
+    from tests.test_scores import company
+
+    data = company()
+
+    class Slow:
+        def __init__(self, symbol: str) -> None:
+            self.symbol = symbol
+
+        def _slow(self, value):
+            time.sleep(0.15)
+            print("noisy provider output")  # must be swallowed, never reach the terminal
+            return value
+
+        info = property(lambda s: s._slow({"symbol": s.symbol, "longName": s.symbol, "exchange": "X"}))
+        financials = property(lambda s: s._slow(data["income_stmt"]))
+        balance_sheet = property(lambda s: s._slow(data["balance_sheet"]))
+        cashflow = property(lambda s: s._slow(data["cashflow"]))
+
+    before_out, before_err = sys.stdout, sys.stderr
+    loaders.load_financials.cache_clear()
+    with patch.object(loaders, "_import_yfinance", return_value=types.SimpleNamespace(Ticker=Slow)):
+        result = TelmusScanner().compare("AAA", "BBB")
+    loaders.load_financials.cache_clear()
+    assert sys.stdout is before_out and sys.stderr is before_err
+    assert not sys.stdout.closed
+    assert (result.result_a.ticker, result.result_b.ticker) == ("AAA", "BBB")
+    assert loaders._quiet_depth == 0 and loaders._quiet_saved is None

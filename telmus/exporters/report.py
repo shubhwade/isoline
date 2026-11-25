@@ -14,9 +14,10 @@ from __future__ import annotations
 
 import datetime
 import math
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 
 from telmus import __version__
+from telmus.core.comparison import SECTIONS, format_value, stronger
 from telmus.core.result import CompareResult, ScanResult
 
 DISCLAIMER = (
@@ -473,65 +474,23 @@ def scan_report(r: ScanResult) -> str:
 
 
 # ----------------------------------------------------------------------------- compare
-# metric label, getter, formatter, direction (+1 higher is better, -1 lower is better, 0 none)
-_Metric = tuple[str, Callable[[ScanResult], float | None], Callable[[float | None], str], int]
-
-_COMPARE_SECTIONS: list[tuple[str, list[_Metric]]] = [
-    (
-        "Valuation (no winner is implied)",
-        [
-            ("P/E ratio", lambda r: r.valuation.pe_ratio, _num, 0),
-            ("P/B ratio", lambda r: r.valuation.pb_ratio, _num, 0),
-            ("EV / EBITDA", lambda r: r.valuation.ev_ebitda, _num, 0),
-        ],
-    ),
-    (
-        "Financial health",
-        [
-            ("Piotroski F-score", lambda r: r.health.piotroski_f, lambda x: _num(x, 0), 1),
-            ("Altman Z″", lambda r: r.health.altman_z, _num, 1),
-            ("Debt / equity", lambda r: r.health.debt_to_equity, _num, -1),
-            ("Current ratio", lambda r: r.health.current_ratio, _num, 1),
-            ("Interest coverage", lambda r: r.health.interest_coverage, _num, 1),
-            ("Beneish M-score", lambda r: r.beneish_m, _num, -1),
-        ],
-    ),
-    (
-        "Growth",
-        [
-            ("Revenue CAGR, 3 years", lambda r: r.growth.revenue_cagr_3y, _pct, 1),
-            ("Net income CAGR, 3 years", lambda r: r.growth.pat_cagr_3y, _pct, 1),
-            ("Free cash flow yield", lambda r: r.growth.fcf_yield, _pct, 1),
-        ],
-    ),
-    (
-        "Profitability and cash quality",
-        [
-            ("Return on equity", lambda r: r.quality.roe if r.quality else None, _pct, 1),
-            ("Return on invested capital", lambda r: r.quality.roic if r.quality else None, _pct, 1),
-            ("Free cash flow margin", lambda r: r.quality.fcf_margin if r.quality else None, _pct, 1),
-            ("Cash conversion cycle", lambda r: r.quality.cash_conversion_cycle_days if r.quality else None, _days, -1),
-        ],
-    ),
-]
-
 
 def compare_report(c: CompareResult) -> str:
     a, b = c.result_a, c.result_b
     sections = []
     wins = {"a": 0, "b": 0}
-    for title, metrics in _COMPARE_SECTIONS:
+    for title, metrics in SECTIONS:
         rows = []
-        for label, get, fmt, direction in metrics:
-            va, vb = get(a), get(b)
+        for m in metrics:
+            va, vb = m.get(a), m.get(b)
+            win = stronger(va, vb, m.direction)
             better = ""
-            if direction and va is not None and vb is not None and va != vb:
-                a_better = (va > vb) == (direction > 0)
-                better = _tag(a.ticker if a_better else b.ticker, "good")
-                wins["a" if a_better else "b"] += 1
+            if win:
+                wins[win] += 1
+                better = _tag(a.ticker if win == "a" else b.ticker, "good")
             rows.append(
-                f'<tr><td>{label}</td><td class="num">{fmt(va)}</td><td class="num">{fmt(vb)}</td>'
-                f"<td>{better}</td></tr>"
+                f'<tr><td>{m.label}</td><td class="num">{format_value(va, m.kind)}</td>'
+                f'<td class="num">{format_value(vb, m.kind)}</td><td>{better}</td></tr>'
             )
         sections.append(
             f"<h2>{title}</h2>"

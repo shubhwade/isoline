@@ -5,6 +5,8 @@ import functools
 import importlib
 import io
 import logging
+import sys
+import threading
 import time
 from typing import Any
 
@@ -73,6 +75,39 @@ def _is_valid_financial_data(
     return has_income or has_balance or has_cashflow
 
 
+_quiet_lock = threading.Lock()
+_quiet_depth = 0
+_quiet_saved: tuple[Any, Any, io.StringIO] | None = None
+
+
+@contextlib.contextmanager
+def _quiet():
+    """Silence provider chatter on stdout/stderr, safely under concurrency.
+
+    ``contextlib.redirect_stdout`` is process-wide and not re-entrant across threads:
+    two overlapping scans each saved "the current stdout" (the other's buffer) and
+    restored it in the wrong order, leaving sys.stdout pointing at a closed buffer
+    ("I/O operation on closed file" in `telmus compare`). Here the first thread in
+    swaps the streams and the last thread out restores the originals.
+    """
+    global _quiet_depth, _quiet_saved
+    with _quiet_lock:
+        if _quiet_depth == 0:
+            sink = io.StringIO()
+            _quiet_saved = (sys.stdout, sys.stderr, sink)
+            sys.stdout = sys.stderr = sink
+        _quiet_depth += 1
+    try:
+        yield
+    finally:
+        with _quiet_lock:
+            _quiet_depth -= 1
+            if _quiet_depth == 0 and _quiet_saved is not None:
+                sys.stdout, sys.stderr, sink = _quiet_saved
+                sink.close()
+                _quiet_saved = None
+
+
 def _load_data(symbol: str) -> tuple[dict[str, object], object, object, object, object]:
     """Fetch info and the three statements concurrently (they are independent HTTP calls).
 
@@ -82,11 +117,7 @@ def _load_data(symbol: str) -> tuple[dict[str, object], object, object, object, 
     from concurrent.futures import ThreadPoolExecutor
 
     yf = _import_yfinance()
-    with (
-        io.StringIO() as dump,
-        contextlib.redirect_stdout(dump),
-        contextlib.redirect_stderr(dump),
-    ):
+    with _quiet():
         ticker_obj = yf.Ticker(symbol)
 
         def fetch(attr: str) -> object:

@@ -14,6 +14,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from telmus import __version__
+from telmus.core.comparison import SECTIONS, all_metrics, format_value, stronger
 from telmus.core.errors import TelmusError
 from telmus.core.result import ScanResult
 from telmus.core.scanner import TelmusScanner
@@ -87,6 +88,18 @@ def _validate_ticker(raw: str) -> str:
         )
         raise typer.Exit(code=2)
     return ticker
+
+
+def _file_stem(ticker: str) -> str:
+    """A ticker as a safe file-name part (INFY.NS -> INFY, 'Tata Motors' -> Tata_Motors)."""
+    stem = re.sub(r"\.(NS|BO)$", "", ticker.strip(), flags=re.I)
+    return re.sub(r"[^A-Za-z0-9._-]+", "_", stem).strip("_") or "report"
+
+
+def _print_notes(*results: ScanResult) -> None:
+    for r in results:
+        for note in r.notes[:4]:
+            console.print(f"[dim]{escape(r.ticker)}: {escape(note)}[/dim]")
 
 
 def _fail(exc: BaseException) -> typing.NoReturn:
@@ -310,7 +323,7 @@ def scan(
         scanner = TelmusScanner()
         result = scanner.scan(ticker)
         if json_output:
-            console.print(result.to_json())
+            typer.echo(result.to_json())  # raw: Rich would wrap lines and eat [brackets]
         else:
             _print_scan(result)
         if export:
@@ -471,11 +484,12 @@ def scan(
 def comp(
     ticker_a: str,
     ticker_b: str,
-    export: str | None = typer.Option(
-        None, "--export", help="Save comparison to file (.xlsx, .csv, or .json)."
-    ),
+    export: str | None = typer.Option(None, "--export"),
+    report: bool = typer.Option(True, "--report/--no-report"),
+    open_browser: bool = typer.Option(True, "--open/--no-open"),
 ) -> None:
-    compare(ticker_a, ticker_b, export, True, True)
+    """Alias for `compare`."""
+    compare(ticker_a, ticker_b, export, report, open_browser)
 
 
 @app.command()
@@ -501,67 +515,28 @@ def compare(
     try:
         scanner = TelmusScanner()
         comparison = scanner.compare(ticker_a, ticker_b)
+        res_a, res_b = comparison.result_a, comparison.result_b
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("Metric")
-        table.add_column(comparison.result_a.ticker)
-        table.add_column(comparison.result_b.ticker)
-
-        def row(
-            metric: str, a_value: typing.Any | None, b_value: typing.Any | None
-        ) -> None:
-            a_text = _format_metric(a_value)
-            b_text = _format_metric(b_value)
-            if a_value is None or b_value is None:
-                table.add_row(metric, a_text, b_text)
-                return
-            try:
-                a_num = float(a_value)
-                b_num = float(b_value)
-                if a_num > b_num:
-                    a_text = f"[green]{a_text}[/green]"
-                elif b_num > a_num:
-                    b_text = f"[green]{b_text}[/green]"
-            except Exception:
-                pass
-            table.add_row(metric, a_text, b_text)
-
-        row(
-            "P/E ratio",
-            comparison.result_a.valuation.pe_ratio,
-            comparison.result_b.valuation.pe_ratio,
-        )
-        row(
-            "P/B ratio",
-            comparison.result_a.valuation.pb_ratio,
-            comparison.result_b.valuation.pb_ratio,
-        )
-        row(
-            "EV/EBITDA",
-            comparison.result_a.valuation.ev_ebitda,
-            comparison.result_b.valuation.ev_ebitda,
-        )
-        row(
-            "Piotroski F-score",
-            comparison.result_a.health.piotroski_f,
-            comparison.result_b.health.piotroski_f,
-        )
-        row(
-            "Altman Z-score",
-            comparison.result_a.health.altman_z,
-            comparison.result_b.health.altman_z,
-        )
-        row(
-            "Revenue CAGR 3y",
-            comparison.result_a.growth.revenue_cagr_3y,
-            comparison.result_b.growth.revenue_cagr_3y,
-        )
-        row(
-            "FCF yield",
-            comparison.result_a.growth.fcf_yield,
-            comparison.result_b.growth.fcf_yield,
-        )
-
+        table.add_column(res_a.ticker, justify="right")
+        table.add_column(res_b.ticker, justify="right")
+        for title, metrics in SECTIONS:
+            table.add_section()
+            table.add_row(f"[bold]{title}[/bold]", "", "")
+            for m in metrics:
+                va, vb = m.get(res_a), m.get(res_b)
+                ta, tb = format_value(va, m.kind), format_value(vb, m.kind)
+                win = stronger(va, vb, m.direction)
+                if win == "a":
+                    ta = f"[green]{ta}[/green]"
+                elif win == "b":
+                    tb = f"[green]{tb}[/green]"
+                table.add_row(m.label, ta, tb)
         console.print(table)
+        console.print("[dim]Green marks the stronger value where a direction is meaningful; "
+                      "valuation multiples are not ranked.[/dim]")
+        _print_notes(res_a, res_b)
+
         if export:
             if export.endswith(".xlsx"):
                 from telmus.exporters.excel import ExcelExporter
@@ -572,146 +547,18 @@ def compare(
 
                 with open(export, "w", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
-                    writer.writerow(
-                        [
-                            "Metric",
-                            comparison.result_a.ticker,
-                            comparison.result_b.ticker,
-                            "Winner",
-                        ]
-                    )
-
-                    def get_winner(metric_name, val_a, val_b):
-                        if val_a is None and val_b is None:
-                            return "Draw"
-                        if val_a is None:
-                            return comparison.result_b.ticker
-                        if val_b is None:
-                            return comparison.result_a.ticker
-                        try:
-                            a = float(val_a)
-                            b = float(val_b)
-                        except (TypeError, ValueError):
-                            return "Draw"
-
-                        lower_better = [
-                            "P/E ratio",
-                            "P/B ratio",
-                            "EV/EBITDA",
-                            "Debt / Equity",
-                        ]
-                        is_lower_better = any(
-                            lb.lower() in metric_name.lower() for lb in lower_better
+                    writer.writerow(["Metric", res_a.ticker, res_b.ticker, "Stronger"])
+                    for m in all_metrics():
+                        va, vb = m.get(res_a), m.get(res_b)
+                        win = stronger(va, vb, m.direction)
+                        writer.writerow(
+                            [
+                                m.label,
+                                "" if va is None else va,  # empty cell = n/a; a real 0 stays 0
+                                "" if vb is None else vb,
+                                {"a": res_a.ticker, "b": res_b.ticker}.get(win or "", ""),
+                            ]
                         )
-
-                        if a == b:
-                            return "Tie"
-
-                        if is_lower_better:
-                            if (
-                                "ratio" in metric_name.lower()
-                                or "ebitda" in metric_name.lower()
-                            ):
-                                if a < 0 and b >= 0:
-                                    return comparison.result_b.ticker
-                                if b < 0 and a >= 0:
-                                    return comparison.result_a.ticker
-                            return (
-                                comparison.result_a.ticker
-                                if a < b
-                                else comparison.result_b.ticker
-                            )
-                        else:
-                            return (
-                                comparison.result_a.ticker
-                                if a > b
-                                else comparison.result_b.ticker
-                            )
-
-                    writer.writerow(
-                        [
-                            "P/E ratio",
-                            comparison.result_a.valuation.pe_ratio or "n/a",
-                            comparison.result_b.valuation.pe_ratio or "n/a",
-                            get_winner(
-                                "P/E ratio",
-                                comparison.result_a.valuation.pe_ratio,
-                                comparison.result_b.valuation.pe_ratio,
-                            ),
-                        ]
-                    )
-                    writer.writerow(
-                        [
-                            "P/B ratio",
-                            comparison.result_a.valuation.pb_ratio or "n/a",
-                            comparison.result_b.valuation.pb_ratio or "n/a",
-                            get_winner(
-                                "P/B ratio",
-                                comparison.result_a.valuation.pb_ratio,
-                                comparison.result_b.valuation.pb_ratio,
-                            ),
-                        ]
-                    )
-                    writer.writerow(
-                        [
-                            "EV/EBITDA",
-                            comparison.result_a.valuation.ev_ebitda or "n/a",
-                            comparison.result_b.valuation.ev_ebitda or "n/a",
-                            get_winner(
-                                "EV/EBITDA",
-                                comparison.result_a.valuation.ev_ebitda,
-                                comparison.result_b.valuation.ev_ebitda,
-                            ),
-                        ]
-                    )
-                    writer.writerow(
-                        [
-                            "Piotroski F-score",
-                            comparison.result_a.health.piotroski_f or "n/a",
-                            comparison.result_b.health.piotroski_f or "n/a",
-                            get_winner(
-                                "Piotroski F-score",
-                                comparison.result_a.health.piotroski_f,
-                                comparison.result_b.health.piotroski_f,
-                            ),
-                        ]
-                    )
-                    writer.writerow(
-                        [
-                            "Altman Z-score",
-                            comparison.result_a.health.altman_z or "n/a",
-                            comparison.result_b.health.altman_z or "n/a",
-                            get_winner(
-                                "Altman Z-score",
-                                comparison.result_a.health.altman_z,
-                                comparison.result_b.health.altman_z,
-                            ),
-                        ]
-                    )
-                    writer.writerow(
-                        [
-                            "Revenue CAGR 3y",
-                            comparison.result_a.growth.revenue_cagr_3y or "n/a",
-                            comparison.result_b.growth.revenue_cagr_3y or "n/a",
-                            get_winner(
-                                "Revenue CAGR 3y",
-                                comparison.result_a.growth.revenue_cagr_3y,
-                                comparison.result_b.growth.revenue_cagr_3y,
-                            ),
-                        ]
-                    )
-                    writer.writerow(
-                        [
-                            "FCF yield",
-                            comparison.result_a.growth.fcf_yield or "n/a",
-                            comparison.result_b.growth.fcf_yield or "n/a",
-                            get_winner(
-                                "FCF yield",
-                                comparison.result_a.growth.fcf_yield,
-                                comparison.result_b.growth.fcf_yield,
-                            ),
-                        ]
-                    )
             else:
                 with open(export, "w", encoding="utf-8") as handle:
                     handle.write(comparison.to_json())
@@ -720,17 +567,14 @@ def compare(
         if not report:
             return
         # Auto-generate dashboards
-        name = (
-            f"{ticker_a.replace('.NS', '').replace('.BO', '')}"
-            f"vs{ticker_b.replace('.NS', '').replace('.BO', '')}"
-        )
+        name = f"{_file_stem(ticker_a)}vs{_file_stem(ticker_b)}"
 
         from telmus.exporters.excel import ExcelExporter
         from telmus.exporters.html_dashboard import HtmlDashboardExporter
 
         ExcelExporter().export_compare(comparison, f"{name}_comparison.xlsx")
         HtmlDashboardExporter().export_compare(comparison, f"{name}_dashboard.html")
-        print(f"Saved: {name}_comparison.xlsx and {name}_dashboard.html")
+        console.print(f"Saved: {name}_comparison.xlsx and {name}_dashboard.html")
 
         if open_browser:
             import webbrowser
