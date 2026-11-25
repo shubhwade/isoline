@@ -8,6 +8,8 @@ Piotroski, Altman and Beneish scores, quality metrics and print-ready reports fo
 <p align="center">
   <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/v/isoline?color=1B2A4A" alt="PyPI version"></a>
   <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/pyversions/isoline?color=1B2A4A" alt="Python versions"></a>
+  <a href="https://pepy.tech/projects/isoline"><img src="https://static.pepy.tech/personalized-badge/isoline?period=total&units=INTERNATIONAL_SYSTEM&left_color=1B2A4A&right_color=B4690E&left_text=isoline%20downloads" alt="isoline downloads"></a>
+  <a href="https://pepy.tech/projects/telmus"><img src="https://static.pepy.tech/personalized-badge/telmus?period=total&units=INTERNATIONAL_SYSTEM&left_color=1B2A4A&right_color=6B7280&left_text=telmus%20(legacy)%20downloads" alt="legacy telmus downloads"></a>
   <a href="https://github.com/shubhwade/isoline/actions/workflows/ci.yml"><img src="https://github.com/shubhwade/isoline/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/shubhwade/isoline/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-1B2A4A" alt="MIT license"></a>
   <a href="https://shubhwade.github.io/isoline/"><img src="https://img.shields.io/badge/docs-isoline-B4690E" alt="Documentation"></a>
