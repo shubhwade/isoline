@@ -63,7 +63,7 @@ class TelmusScanner:
             highest_concern=flags.highest_concern,
             analyst_brief=brief,
             beneish_m=flags.beneish_m,
-            notes=[*health.notes, *flags.notes, *quality.notes],
+            notes=[*financials.get("notes", []), *health.notes, *flags.notes, *quality.notes],
             quality=quality,
             history=HistoryEngine().run(financials),
         )

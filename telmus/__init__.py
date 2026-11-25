@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import typing
 
-__version__ = "0.4.4"
+__version__ = "0.5.0"
 
 __all__ = ["CompareResult", "ScanResult", "TelmusScanner", "__version__", "compare", "scan"]
 

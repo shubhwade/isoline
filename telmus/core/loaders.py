@@ -5,6 +5,7 @@ import functools
 import importlib
 import io
 import logging
+import os
 import sys
 import threading
 import time
@@ -177,6 +178,24 @@ def _load_data_with_retry(symbol: str):
     raise last
 
 
+def _fallback(ticker: str, primary: TelmusError) -> dict[str, Any]:
+    """Try the SEC when Yahoo fails for a US ticker; otherwise re-raise the Yahoo error."""
+    from telmus.core import edgar
+
+    if os.environ.get("TELMUS_NO_FALLBACK") or not edgar.is_us_symbol(ticker):
+        raise primary
+    try:
+        bundle = edgar.load_edgar(ticker)
+    except TelmusError as exc:
+        logger.debug("EDGAR fallback failed for %s: %s", ticker, exc)
+        raise primary from exc
+    bundle["notes"] = [
+        f"Yahoo Finance was unavailable ({primary}); figures come from SEC EDGAR annual "
+        "filings. No live price, so valuation multiples are n/a."
+    ]
+    return bundle
+
+
 @functools.lru_cache(maxsize=128)
 def load_financials(ticker: str) -> dict[str, Any]:
     """Load financial data for a ticker from yfinance.
@@ -213,9 +232,10 @@ def load_financials(ticker: str) -> dict[str, Any]:
             "balance_sheet": balance_sheet,
             "cashflow": cashflow,
             "fast_info": fast_info,
+            "source": "Yahoo Finance (via yfinance)",
         }
-    except TelmusError:
-        raise
+    except TelmusError as primary:
+        return _fallback(ticker, primary)
     except Exception as exc:
         logger.debug("Failed to load financials for %s: %s", ticker, exc, exc_info=True)
         raise ValueError(

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0
+### Added
+- **SEC EDGAR fallback.** When Yahoo Finance is rate-limited, unreachable or has no statements for a US ticker, Telmus now reads the official annual XBRL facts from SEC EDGAR (free, no key, polite rate limiting, declared User-Agent via `TELMUS_CONTACT`). Results are labelled with their source in the notes; there is no live price from this source, so valuation multiples are `n/a`. Non-US tickers do not fall back. `TELMUS_NO_FALLBACK=1` disables it. Tested offline against a fixture; not yet verified live.
+- Data sources page rewritten with researched limits of the other free APIs (FMP, Alpha Vantage, Finnhub) and why they are not bundled.
+
 ## v0.4.4
 ### Fixed
 - **`telmus compare` crashed** with `ValueError: I/O operation on closed file`. The two tickers are scanned concurrently and each scan silenced provider output with `contextlib.redirect_stdout`, which is process-wide; overlapping scans restored each other's streams in the wrong order and left `sys.stdout` closed. Output is now silenced by a ref-counted guard that restores the original streams exactly once. Regression test added.
