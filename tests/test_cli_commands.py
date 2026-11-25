@@ -141,3 +141,19 @@ def test_excel_compare_workbook_is_readable(run, tmp_path) -> None:
     wb = openpyxl.load_workbook(tmp_path / "AAAvsBBB_comparison.xlsx")
     assert wb.sheetnames
     assert os.path.getsize(tmp_path / "AAAvsBBB_comparison.xlsx") > 1000
+
+
+def test_value_command_prints_assumptions_and_scenarios(run) -> None:
+    result = run("value", "ACME", "--discount", "0.10", "--growth", "0.05", "--terminal", "0.02")
+    assert result.exit_code == 0, result.output
+    for text in ("DCF assumptions", "Scenarios", "Sensitivity", "not a price target"):
+        assert text in result.output
+
+
+def test_value_json_is_valid_and_rejects_bad_rates(run) -> None:
+    import json
+
+    ok = run("value", "ACME", "--json", "--discount", "0.10", "--growth", "0.05")
+    assert ok.exit_code == 0 and json.loads(ok.output)["assumptions"]["discount_rate"] == 0.10
+    bad = run("value", "ACME", "--discount", "0.02", "--terminal", "0.03", "--growth", "0.05")
+    assert bad.exit_code == 0 and "not computed" in bad.output

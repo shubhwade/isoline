@@ -25,6 +25,15 @@ Prints Valuation, Health, Growth and Quality tables, a rule-based summary and a 
 isoline compare AAPL MSFT [--export out.xlsx|.csv|.json] [--no-report] [--no-open]
 ```
 
+## value
+
+```bash
+isoline value AAPL --discount 0.09 --growth 0.07
+isoline value MSFT --json
+```
+
+DCF estimate with scenarios and a sensitivity grid. See [Valuation](valuation.md) for the method and assumptions.
+
 ## screen
 
 ```bash

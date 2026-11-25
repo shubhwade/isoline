@@ -58,6 +58,7 @@ nav:
     - CLI: cli.md
     - Python SDK: sdk.md
     - MCP server: mcp.md
+    - Valuation (DCF): valuation.md
     - Reports: reports.md
     - Power BI: powerbi.md
   - Methodology:

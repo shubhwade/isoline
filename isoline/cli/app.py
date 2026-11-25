@@ -586,6 +586,92 @@ def compare(
 
 
 @app.command()
+def value(
+    ticker: str,
+    discount: float | None = typer.Option(None, "--discount", help="Discount rate (cost of equity), e.g. 0.11. Default 0.10 is an assumption."),
+    growth: float | None = typer.Option(None, "--growth", help="Year-1 growth of free cash flow, e.g. 0.08. Default: 3-year revenue CAGR, capped at 15%."),
+    terminal: float | None = typer.Option(None, "--terminal", help="Terminal growth, e.g. 0.025 (default 0.025)."),
+    years: int = typer.Option(5, "--years", help="Explicit forecast years (1-15)."),
+    json_output: bool = typer.Option(False, "--json", help="Print raw JSON output."),
+) -> None:
+    """Discounted-cash-flow estimate with bear/base/bull scenarios and a sensitivity grid.
+
+    Every assumption is shown. The output is illustrative, not a price target or advice.
+
+    Example: isoline value AAPL --discount 0.09 --growth 0.07
+    """
+    import json as _json
+
+    from isoline.core.dcf import run_dcf
+    from isoline.core.loaders import load_financials
+
+    ticker = _validate_ticker(ticker)
+    try:
+        fin = load_financials(ticker)
+        res = run_dcf(fin, ticker, discount, growth, terminal, years)
+    except Exception as exc:  # noqa: BLE001
+        _fail(exc)
+    if json_output:
+        typer.echo(_json.dumps(res.to_dict(), indent=2, default=str))
+        return
+    _print_value(res)
+
+
+def _fmt_money(v: float | None) -> str:
+    if v is None:
+        return "n/a"
+    for div, suffix in ((1e12, "T"), (1e9, "B"), (1e6, "M")):
+        if abs(v) >= div:
+            return f"{v / div:,.2f}{suffix}"
+    return f"{v:,.2f}"
+
+
+def _print_value(res: typing.Any) -> None:
+    ccy = res.currency or ""
+    a = res.assumptions
+    if a is None:
+        console.print(f"[bold]{escape(res.ticker)}[/]  DCF not computed")
+    else:
+        t = Table(title=f"DCF assumptions: {res.ticker}", show_header=True, header_style="bold")
+        t.add_column("Assumption")
+        t.add_column("Value", justify="right")
+        t.add_column("Basis")
+        t.add_row("Base free cash flow", f"{ccy} {_fmt_money(a.base_fcf)}", a.base_fcf_note)
+        t.add_row("Year-1 growth", f"{a.growth:.1%}", a.growth_source)
+        t.add_row("Terminal growth", f"{a.terminal_growth:.1%}", "assumption")
+        t.add_row("Discount rate", f"{a.discount_rate:.1%}", "assumption")
+        t.add_row("Explicit years", str(a.years), "growth fades linearly to terminal")
+        console.print(t)
+        r = Table(title="Estimate (illustrative)", show_header=True, header_style="bold")
+        r.add_column("Item")
+        r.add_column("Value", justify="right")
+        r.add_row("Equity value", f"{ccy} {_fmt_money(res.equity_value)}")
+        r.add_row("Per share", "n/a" if res.per_share is None else f"{res.per_share:,.2f}")
+        r.add_row("Market price", "n/a" if res.price is None else f"{res.price:,.2f}")
+        r.add_row("Margin of safety", "n/a" if res.margin_of_safety is None else f"{res.margin_of_safety:.1%}")
+        r.add_row("Value from terminal", "n/a" if res.terminal_share is None else f"{res.terminal_share:.0%}")
+        console.print(r)
+        sc = Table(title="Scenarios", show_header=True, header_style="bold")
+        for col in ("Scenario", "Growth", "Discount", "Per share"):
+            sc.add_column(col, justify="right" if col != "Scenario" else "left")
+        for s_ in res.scenarios:
+            sc.add_row(s_.name, f"{s_.growth:.1%}", f"{s_.discount_rate:.1%}", "n/a" if s_.per_share is None else f"{s_.per_share:,.2f}")
+        console.print(sc)
+        sens = res.sensitivity
+        if sens:
+            g = Table(title=f"Sensitivity ({sens['unit']}): terminal growth (rows) vs discount rate (columns)", header_style="bold")
+            g.add_column("")
+            for rate in sens["discount_rates"]:
+                g.add_column(f"{rate:.1%}", justify="right")
+            for tgv, row in zip(sens["terminal_growths"], sens["values"], strict=True):
+                g.add_row(f"{tgv:.1%}", *["n/a" if v is None else (f"{v:,.2f}" if v < 1e6 else _fmt_money(v)) for v in row])
+            console.print(g)
+    for note in res.notes:
+        console.print(f"[dim]Note: {escape(note)}[/dim]")
+    console.print("[dim]Illustrative estimate from stated assumptions; not a price target or investment advice.[/dim]")
+
+
+@app.command()
 def screen(
     sector: str = typer.Argument("IT", help="Sector to screen."),
     min_piotroski: int = typer.Option(6, help="Minimum Piotroski score."),

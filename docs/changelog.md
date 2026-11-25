@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.0
+### Added
+- **`isoline value TICKER`**: discounted-cash-flow estimate (free cash flow to equity, Gordon-growth terminal value, growth fading to terminal) with bear/base/bull scenarios, a discount-rate x terminal-growth sensitivity grid, margin of safety and a `--json` mode. All assumptions are printed; defaults are labelled; nothing is computed from a non-positive cash flow. Documented on the new Valuation page with sources; the arithmetic is covered by hand-checked tests.
+
 ## v0.6.2
 ### Changed
 - **Logo redrawn** as a plain geometric mark: a lowercase "i" whose dot sits on a level line (an isoline). The earlier wave motif looked generic.
