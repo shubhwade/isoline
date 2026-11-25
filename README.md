@@ -1,19 +1,49 @@
-# isoline
+<p align="center">
+  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/wordmark.svg" alt="Isoline" width="320">
+</p>
 
-[![PyPI version](https://img.shields.io/pypi/v/isoline)](https://pypi.org/project/isoline/)
-[![Downloads](https://static.pepy.tech/personalized-badge/isoline?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/isoline)
-[![Python](https://img.shields.io/pypi/pyversions/isoline)](https://pypi.org/project/isoline/)
-[![CI](https://github.com/shubhwade/isoline/actions/workflows/ci.yml/badge.svg)](https://github.com/shubhwade/isoline/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+<p align="center"><b>Financial statements, measured precisely.</b><br>
+Piotroski, Altman and Beneish scores, quality metrics and print-ready reports for any listed company, from your terminal.</p>
 
-**Financial-statement analysis from your terminal.** One command gives you the Piotroski F-score,
-Altman Z″-score, Beneish M-score, key ratios and red flags for a listed company, plus an Excel
-workbook and a print-ready HTML report. An optional MCP server exposes the same analysis to AI coding tools.
+<p align="center">
+  <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/v/isoline?color=1B2A4A" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/pyversions/isoline?color=1B2A4A" alt="Python versions"></a>
+  <a href="https://github.com/shubhwade/isoline/actions/workflows/ci.yml"><img src="https://github.com/shubhwade/isoline/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/shubhwade/isoline/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-1B2A4A" alt="MIT license"></a>
+  <a href="https://shubhwade.github.io/isoline/"><img src="https://img.shields.io/badge/docs-isoline-B4690E" alt="Documentation"></a>
+</p>
 
 ```bash
 pip install isoline
 isoline scan AAPL
 ```
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-terminal.png" alt="isoline scan in the terminal" width="640">
+</p>
+
+<p align="center"><sub>Real output of the real engines on a <b>synthetic sample company</b>, so no real firm's figures are implied.</sub></p>
+
+## What you get
+
+| | |
+|---|---|
+| **Scores** | Piotroski F (9 signals), Altman Z-double-prime, Beneish M (8 variables) |
+| **Quality** | DuPont ROE, ROIC, FCF margin, accruals, cash conversion cycle, dilution |
+| **Reports** | Formal HTML report with two charts, Excel workbook, JSON and CSV export |
+| **Compare and screen** | Side-by-side comparison; sector screens with reasons for every skipped ticker |
+| **Integrations** | Python SDK, Power BI export, optional MCP server for AI coding tools |
+| **Honest data** | Missing inputs show `n/a` with a note, never a zero. Yahoo Finance first, SEC EDGAR fallback for US tickers |
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png" alt="Isoline HTML report" width="640">
+</p>
+
+<p align="center"><sub>The HTML report (synthetic sample). Self-contained, no scripts or web fonts, prints cleanly.</sub></p>
+
+> **Formerly Telmus.** Isoline is the new name of the `telmus` project. `pip install -U telmus`
+> installs this package and keeps the old command working. Earlier `telmus` releases and their
+> history remain on PyPI.
 
 ## Install
 

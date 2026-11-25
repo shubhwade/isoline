@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.1
+### Changed
+- **PyPI and GitHub page.** New README with logo, real terminal and report images (rendered from a labelled synthetic company by `examples/make_sample_assets.py`), and a "formerly Telmus" notice.
+### Fixed
+- **Report charts:** the value axis stopped at the last tick below the data, so the tallest bars could extend past the top of the chart. The axis now always covers the largest value. Test added.
+
 ## v0.6.0 (Isoline)
 ### Changed
 - **Renamed from Telmus to Isoline.** New PyPI project `isoline`, command `isoline`, `import isoline`. Behaviour and formulas are unchanged. Environment variables are now `ISOLINE_*`; the old `TELMUS_*` names still work. The earlier `telmus` releases stay on PyPI; a final `telmus` release (see `legacy/telmus-shim`) installs `isoline` and keeps the old command and import working with a deprecation notice. Download counts of `telmus` do not transfer to `isoline`.

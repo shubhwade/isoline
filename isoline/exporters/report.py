@@ -230,8 +230,10 @@ def _ticks(lo: float, hi: float, n: int = 5) -> list[float]:
     start = math.floor(lo / step) * step
     out = []
     t = start
-    while t <= hi + step * 0.001:
+    while True:  # include the first tick at or above hi, so no bar can exceed the axis
         out.append(round(t, 10))
+        if t >= hi - step * 0.001:
+            break
         t += step
     return out
 

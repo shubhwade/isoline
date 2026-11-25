@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 96" width="420" height="96" role="img" aria-label="Isoline">
+  <g transform="translate(0 0) scale(.75)">
+    <rect width="128" height="128" rx="22" fill="#1B2A4A"/>
+    <g fill="none" stroke-linecap="round" stroke-width="7">
+      <path d="M22 44 C44 30 62 58 84 44 S104 36 106 38" stroke="#F4F1EA"/>
+      <path d="M22 66 C44 52 62 80 84 66 S104 58 106 60" stroke="#B4690E"/>
+      <path d="M22 88 C44 74 62 102 84 88 S104 80 106 82" stroke="#F4F1EA" opacity=".55"/>
+    </g>
+  </g>
+  <text x="116" y="64" font-family="Georgia, 'Times New Roman', serif" font-size="56" font-weight="700" fill="#1B2A4A" letter-spacing="1">Isoline</text>
+</svg>

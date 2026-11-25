@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "isoline"
 dynamic = ["version"]
-description = "Financial statement analysis CLI: Piotroski F, Altman Z, Beneish M, ratios, Excel and HTML reports, optional MCP server"
+description = "Financial statements, measured precisely: Piotroski, Altman and Beneish scores, quality metrics, compare, screen and reports"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"

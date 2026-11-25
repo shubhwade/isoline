@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import typing
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 __all__ = ["CompareResult", "ScanResult", "IsolineScanner", "__version__", "compare", "scan"]
 

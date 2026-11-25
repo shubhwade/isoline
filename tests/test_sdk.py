@@ -215,3 +215,11 @@ def test_repository_root_stays_tidy() -> None:
     root = pathlib.Path(__file__).resolve().parent.parent
     allowed_md = {"README.md", "CHANGELOG.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md"}
     assert {p.name for p in root.glob("*.md")} <= allowed_md
+
+
+def test_chart_axis_covers_largest_value() -> None:
+    from isoline.exporters.report import _ticks
+
+    for lo, hi in [(0, 1.48), (0, 0.2), (-0.3, 1.2), (0, 7), (0, 1)]:
+        ticks = _ticks(lo, hi)
+        assert ticks[0] <= lo and ticks[-1] >= hi
