@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400&display=swap");
+
 :root {
   --md-text-font: "Inter", sans-serif;
   --md-code-font: "JetBrains Mono", monospace;
@@ -57,4 +59,29 @@ tt {
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+/* Brand palette: navy ink, warm paper, amber accent (matches the website and logo). */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #13213D;
+  --md-primary-fg-color--light: #2A3A5C;
+  --md-primary-fg-color--dark: #0B1528;
+  --md-accent-fg-color: #B4690E;
+  --md-default-bg-color: #FBF9F4;
+  --md-typeset-a-color: #9A5A0C;
+  --md-code-bg-color: #F1EDE4;
+}
+[data-md-color-scheme="slate"] {
+  --md-hue: 220;
+  --md-primary-fg-color: #0E1626;
+  --md-primary-fg-color--light: #1A2740;
+  --md-primary-fg-color--dark: #0A111D;
+  --md-accent-fg-color: #E59A3C;
+  --md-default-bg-color: #0E1626;
+  --md-typeset-a-color: #E59A3C;
+}
+.md-header__button.md-logo img { height: 1.6rem; border-radius: 6px; }
+.md-typeset h1, .md-typeset h2 {
+  font-family: "Newsreader", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
 }

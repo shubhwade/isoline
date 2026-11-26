@@ -1,1217 +1,750 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>isoline - Financial analysis. One command.</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            /* COLOUR SYSTEM */
-            --bg-color: #09090b;
-            --surface-1: #111113;
-            --surface-2: #18181b;
-            --border-default: #27272a;
-            --border-subtle: #3f3f46;
-            --accent: #e4e4e7;
-            --accent-hover: #ffffff;
-            --text-primary: #fafafa;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --indicator-positive: #4ade80;
-            --indicator-warning: #facc15;
-            --indicator-danger: #f87171;
-            --code-string: #86efac;
-            --code-keyword: #93c5fd;
-            --code-number: #fca5a5;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Isoline: financial statements, measured precisely</title>
+<meta name="description" content="Open-source Python CLI for financial statement analysis. Piotroski F, Altman Z″ and Beneish M scores, quality metrics, DCF valuation and print-ready reports for any listed company.">
+<meta name="theme-color" content="#F4F1EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1626" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Isoline: financial statements, measured precisely">
+<meta property="og:description" content="Piotroski, Altman and Beneish scores, quality metrics, DCF and print-ready reports from one command. Open source, no API key.">
+<meta property="og:image" content="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32" role="img" aria-label="Isoline"%3E%3Cdefs%3E%3CclipPath id="c"%3E%3Crect width="128" height="128" rx="28"/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path="url%28%23c%29"%3E%3Crect width="128" height="128" rx="28" fill="%2313213D"/%3E%3Cg fill="none" stroke-linejoin="round"%3E%3Cpath d="M110.16 66.00C110.38 68.13 110.38 70.34 110.13 72.49C109.89 74.65 109.39 76.83 108.68 78.92C107.98 81.02 107.04 83.09 105.93 85.07C104.82 87.04 103.50 88.97 102.03 90.78C100.56 92.58 98.90 94.32 97.09 95.89C95.28 97.46 93.29 98.94 91.17 100.20C89.05 101.45 86.74 102.56 84.38 103.42C82.02 104.27 79.49 104.91 76.99 105.31C74.50 105.72 71.91 105.86 69.41 105.84C66.91 105.83 64.41 105.56 62.00 105.21C59.59 104.87 57.26 104.34 54.97 103.79C52.69 103.23 50.49 102.58 48.31 101.90C46.12 101.22 43.98 100.50 41.85 99.69C39.72 98.88 37.58 98.04 35.52 97.05C33.45 96.06 31.37 94.99 29.43 93.74C27.50 92.49 25.61 91.10 23.93 89.56C22.25 88.02 20.69 86.31 19.37 84.50C18.05 82.70 16.92 80.73 16.01 78.73C15.10 76.73 14.41 74.61 13.92 72.49C13.43 70.37 13.14 68.17 13.06 66.00C12.97 63.83 13.08 61.61 13.40 59.44C13.73 57.28 14.25 55.09 15.02 53.00C15.78 50.91 16.78 48.83 17.99 46.90C19.20 44.97 20.68 43.11 22.30 41.43C23.93 39.75 25.80 38.20 27.75 36.83C29.70 35.45 31.84 34.24 33.99 33.16C36.15 32.08 38.41 31.17 40.67 30.35C42.94 29.52 45.26 28.83 47.59 28.23C49.93 27.63 52.30 27.12 54.70 26.75C57.10 26.38 59.55 26.10 62.00 26.01C64.45 25.93 66.95 25.98 69.39 26.26C71.82 26.54 74.29 27.02 76.61 27.69C78.94 28.37 81.22 29.29 83.33 30.33C85.45 31.38 87.45 32.64 89.31 33.97C91.18 35.30 92.89 36.79 94.50 38.31C96.12 39.83 97.60 41.44 99.01 43.09C100.42 44.75 101.74 46.45 102.96 48.22C104.17 50.00 105.32 51.83 106.30 53.74C107.27 55.65 108.16 57.64 108.81 59.68C109.45 61.73 109.94 63.87 110.16 66.00Z" stroke="%23F4F1EA" stroke-width="7" opacity="0.72"/%3E%3Cpath d="M93.26 61.00C93.35 62.21 93.32 63.45 93.15 64.66C92.99 65.88 92.69 67.10 92.28 68.27C91.87 69.45 91.33 70.61 90.70 71.72C90.07 72.83 89.32 73.91 88.49 74.92C87.65 75.93 86.72 76.90 85.70 77.78C84.68 78.66 83.56 79.49 82.37 80.20C81.19 80.91 79.90 81.54 78.58 82.04C77.27 82.54 75.86 82.93 74.47 83.20C73.07 83.47 71.62 83.61 70.21 83.66C68.80 83.71 67.38 83.63 66.00 83.49C64.62 83.35 63.27 83.10 61.94 82.83C60.62 82.55 59.33 82.20 58.06 81.82C56.79 81.44 55.54 81.01 54.32 80.53C53.10 80.05 51.88 79.52 50.72 78.92C49.55 78.32 48.40 77.65 47.33 76.91C46.26 76.16 45.23 75.33 44.31 74.43C43.39 73.52 42.54 72.53 41.83 71.49C41.11 70.45 40.49 69.34 40.00 68.20C39.51 67.06 39.13 65.86 38.87 64.66C38.60 63.46 38.46 62.22 38.42 61.00C38.39 59.78 38.46 58.53 38.66 57.31C38.85 56.09 39.16 54.87 39.60 53.69C40.03 52.52 40.59 51.35 41.27 50.26C41.94 49.18 42.75 48.12 43.65 47.17C44.54 46.21 45.57 45.31 46.65 44.51C47.72 43.71 48.90 43.00 50.10 42.36C51.30 41.72 52.56 41.16 53.84 40.68C55.12 40.19 56.44 39.77 57.77 39.42C59.10 39.07 60.46 38.78 61.83 38.58C63.20 38.38 64.60 38.23 66.00 38.20C67.40 38.17 68.82 38.21 70.21 38.38C71.59 38.55 72.99 38.82 74.31 39.20C75.64 39.59 76.94 40.09 78.16 40.67C79.38 41.25 80.54 41.94 81.62 42.69C82.70 43.43 83.71 44.26 84.65 45.12C85.59 45.98 86.45 46.89 87.26 47.84C88.07 48.79 88.82 49.78 89.50 50.80C90.17 51.83 90.80 52.89 91.32 53.99C91.84 55.09 92.29 56.24 92.62 57.41C92.94 58.58 93.17 59.79 93.26 61.00Z" stroke="%23F4F1EA" stroke-width="7" opacity="1.0"/%3E%3C/g%3E%3Ccircle cx="70.0" cy="56.0" r="9" fill="%23C8781A"/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F1EA;
+  --bg-2: #EDE8DD;
+  --surface: #FBF9F4;
+  --ink: #13213D;
+  --ink-2: #4B5468;
+  --ink-3: #7A8091;
+  --rule: #DCD5C6;
+  --rule-2: #C9C0AD;
+  --accent: #B4690E;
+  --accent-soft: rgba(180, 105, 14, .1);
+  --pos: #2E7A4E;
+  --neg: #B03A2E;
+  --term-bg: #0F1828;
+  --term-ink: #D9DEE7;
+  --term-dim: #6F7B90;
+  --term-rule: #2A3650;
+  --contour: rgba(19, 33, 61, .085);
+  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --max: 1160px;
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1626; --bg-2: #121C2F; --surface: #142036;
+    --ink: #ECE7DC; --ink-2: #A9B1C1; --ink-3: #7C8699;
+    --rule: #233049; --rule-2: #31405E;
+    --accent: #E59A3C; --accent-soft: rgba(229, 154, 60, .12);
+    --pos: #6CC08F; --neg: #E77B6E;
+    --term-bg: #0A111D; --term-rule: #22304A;
+    --contour: rgba(236, 231, 220, .06);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1626; --bg-2: #121C2F; --surface: #142036;
+  --ink: #ECE7DC; --ink-2: #A9B1C1; --ink-3: #7C8699;
+  --rule: #233049; --rule-2: #31405E;
+  --accent: #E59A3C; --accent-soft: rgba(229, 154, 60, .12);
+  --pos: #6CC08F; --neg: #E77B6E;
+  --term-bg: #0A111D; --term-rule: #22304A;
+  --contour: rgba(236, 231, 220, .06);
+  color-scheme: dark;
+}
 
-            --font-mono: 'JetBrains Mono', monospace;
-            --font-sans: 'Inter', sans-serif;
-            --radius: 8px;
-        }
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 16px/1.65 var(--sans);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+a { color: inherit; }
+img { max-width: 100%; display: block; }
+code, pre, kbd { font-family: var(--mono); }
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: var(--font-sans);
-            line-height: 1.7;
-            font-size: 1rem;
-            font-weight: 400;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-            text-align: left;
-        }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
+.eyebrow {
+  font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--accent); display: inline-flex; align-items: center; gap: 10px;
+}
+.eyebrow::before { content: ""; width: 18px; height: 1px; background: currentColor; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -.015em; margin: 0; color: var(--ink); }
+h2 { font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1.08; }
+h3 { font-size: 1.45rem; line-height: 1.2; }
+em { font-style: italic; }
+.lede { color: var(--ink-2); font-size: 1.08rem; max-width: 36rem; }
 
-        h1, h2, h3, h4 { font-family: var(--font-mono); }
-        h1 { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 700; line-height: 1.1; }
-        h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 600; }
-        
-        a { color: var(--text-secondary); text-decoration: none; transition: color 150ms; }
-        a:hover { color: var(--text-primary); }
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid transparent; transition: border-color .2s;
+}
+.nav.scrolled { border-bottom-color: var(--rule); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 24px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 600 18px/1 var(--sans); letter-spacing: -.02em; }
+.brand svg { width: 28px; height: 28px; border-radius: 7px; box-shadow: 0 0 0 1px var(--rule-2); }
+.brand .tittle { color: var(--accent); }
+.ver { font: 500 11px/1 var(--mono); color: var(--ink-3); border: 1px solid var(--rule); border-radius: 999px; padding: 4px 8px; margin-left: 4px; }
+.nav-links { display: flex; align-items: center; gap: 28px; font-size: 14px; }
+.nav-links a { text-decoration: none; color: var(--ink-2); transition: color .15s; }
+.nav-links a:hover { color: var(--ink); }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px;
+  border-radius: 8px; font: 500 14px/1 var(--sans); text-decoration: none; cursor: pointer;
+  border: 1px solid var(--rule-2); background: transparent; color: var(--ink);
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.btn:hover { border-color: var(--ink-3); background: var(--surface); }
+.btn:active { transform: translateY(1px); }
+.btn-solid { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn-solid:hover { background: var(--ink); opacity: .9; border-color: var(--ink); }
+.btn svg { width: 16px; height: 16px; }
+.theme-toggle { width: 40px; padding: 0; justify-content: center; }
+.menu-btn { display: none; }
 
-        /* NAVBAR */
-        .navbar {
-            position: fixed; top: 0; left: 0; right: 0; height: 52px;
-            padding: 0 6%; display: flex; justify-content: space-between; align-items: center;
-            z-index: 1000; transition: all 200ms ease; border-bottom: 1px solid transparent;
-        }
-        .navbar.scrolled {
-            background: rgba(9, 9, 11, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-default);
-        }
-        .nav-logo-container { display: flex; align-items: center; gap: 8px; }
-        .nav-logo { font-family: var(--font-mono); font-size: 1.25rem; color: #fff; font-weight: 700; }
-        .nav-version { 
-            background: var(--surface-2); border: 1px solid var(--border-default); color: var(--text-muted); 
-            font-family: var(--font-sans); font-size: 11px; font-weight: 400; 
-            padding: 2px 6px; border-radius: 4px; vertical-align: middle; letter-spacing: 0;
-        }
-        .nav-links { display: flex; gap: 28px; align-items: center; }
-        .nav-links a { 
-            font-family: var(--font-sans); font-size: 13px; font-weight: 400; 
-            letter-spacing: 0.03em; text-transform: none; color: var(--text-secondary); 
-            display: flex; align-items: center; transition: color 150ms;
-        }
-        .nav-links a:hover, .nav-links a.active { color: #fafafa; }
-        
-        .icon-external { width: 12px; height: 12px; color: #52525b; margin-left: 3px; }
-        
-        .mobile-menu-btn {
-            display: none; background: none; border: none; color: var(--text-secondary); 
-            cursor: pointer; padding: 4px;
-        }
-        .mobile-dropdown {
-            display: none; position: absolute; top: 52px; left: 5%; right: 5%;
-            background: var(--surface-1); border: 1px solid var(--border-default); 
-            border-radius: var(--radius); padding: 8px; flex-direction: column;
-        }
-        .mobile-dropdown.active { display: flex; }
-        .mobile-dropdown a { 
-            display: flex; align-items: center; height: 40px; padding: 0 16px; 
-            font-size: 13px; color: var(--text-secondary);
-        }
-        .mobile-dropdown a:hover { color: #fff; }
+/* HERO */
+.hero { position: relative; padding: 72px 0 96px; overflow: hidden; }
+#contours { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero::after {
+  content: ""; position: absolute; inset: auto 0 0 0; height: 160px; pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+}
+.hero .wrap { position: relative; z-index: 1; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: 56px; align-items: center; }
+.hero h1 { font-size: clamp(2.8rem, 6.2vw, 5rem); line-height: .98; letter-spacing: -.03em; margin: 22px 0 24px; }
+.hero h1 em { color: var(--accent); }
+.hero .lede { font-size: 1.15rem; margin-bottom: 32px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.install {
+  display: inline-flex; align-items: center; gap: 14px; height: 48px; padding: 0 8px 0 18px;
+  background: var(--surface); border: 1px solid var(--rule-2); border-radius: 10px;
+  font: 500 15px/1 var(--mono); color: var(--ink); cursor: pointer;
+  box-shadow: 0 1px 0 rgba(19, 33, 61, .04), 0 8px 24px -12px rgba(19, 33, 61, .18);
+  transition: border-color .15s;
+}
+.install:hover { border-color: var(--ink-3); }
+.install .dollar { color: var(--ink-3); user-select: none; }
+.install .copy { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; color: var(--ink-3); transition: background .15s, color .15s; }
+.install:hover .copy { background: var(--bg-2); color: var(--ink); }
+.install svg { width: 16px; height: 16px; }
+.btn-lg { height: 48px; padding: 0 20px; font-size: 15px; border-radius: 10px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 28px; font-size: 13px; color: var(--ink-3); }
+.facts span { display: inline-flex; align-items: center; gap: 8px; }
+.facts span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--rule-2); }
 
-        /* BUTTONS */
-        .btn-install {
-            background: var(--surface-2); border: 1px solid var(--border-subtle); color: var(--text-primary);
-            font-family: var(--font-mono); font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: var(--radius);
-            display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: border-color 0.2s;
-        }
-        .btn-install:hover { border-color: var(--text-muted); }
-        .btn-github {
-            background: var(--text-primary); color: var(--bg-color); border: none;
-            font-family: var(--font-sans); font-size: 0.9rem; font-weight: 500; padding: 0.5rem 1.25rem; border-radius: var(--radius);
-            display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s;
-        }
-        .btn-github:hover { background: #ffffff; color: #000;}
+/* TERMINAL */
+.term {
+  background: var(--term-bg); color: var(--term-ink); border-radius: 12px;
+  box-shadow: 0 0 0 1px rgba(19, 33, 61, .12), 0 30px 60px -20px rgba(15, 24, 40, .45), 0 12px 24px -12px rgba(15, 24, 40, .3);
+  overflow: hidden; font: 400 12.5px/1.62 var(--mono);
+}
+.term-bar { display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-bottom: 1px solid var(--term-rule); }
+.term-bar i { width: 11px; height: 11px; border-radius: 50%; background: #2C3851; }
+.term-bar span { margin-left: auto; margin-right: auto; transform: translateX(-24px); font: 500 12px/1 var(--sans); color: var(--term-dim); }
+.term pre { margin: 0; padding: 18px 20px 20px; white-space: pre; overflow-x: auto; scrollbar-width: thin; }
+.t-dim { color: var(--term-dim); }
+.t-p { color: #7FA7D9; }
+.t-acc { color: #E8A04A; }
+.t-ok { color: #74C69A; }
+.t-hd { color: #9AA6BA; }
+.t-b { color: #F3F1EC; font-weight: 500; }
+.t-bar { color: #5B86C4; }
+.term .line { opacity: 1; }
+.js .term .line { opacity: 0; transform: translateY(3px); transition: opacity .35s ease, transform .35s ease; }
+.js .term .line.on { opacity: 1; transform: none; }
+.caret { display: inline-block; width: 7px; height: 14px; background: var(--term-ink); vertical-align: -2px; animation: blink 1.05s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.term-note { margin-top: 12px; font-size: 12.5px; color: var(--ink-3); text-align: right; }
 
-        /* COPY BUTTON INTERACTION */
-        .copy-btn { 
-            background: none; border: none; cursor: pointer; display: flex; align-items: center; 
-            color: var(--text-muted); transition: color 0.2s, transform 100ms;
-        }
-        .copy-btn:hover { color: var(--text-primary); }
-        .copy-btn:active { transform: scale(0.92); }
+/* SCORE STRIP */
+.strip { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--surface); }
+.strip .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
+.stat { padding: 30px 24px; border-left: 1px solid var(--rule); }
+.stat:first-child { border-left: 0; padding-left: 0; }
+.stat b { display: block; font: 400 2.4rem/1 var(--serif); letter-spacing: -.02em; color: var(--ink); }
+.stat b sup { font-size: .5em; color: var(--accent); margin-left: 2px; }
+.stat span { display: block; margin-top: 10px; font-size: 13.5px; color: var(--ink-2); }
 
-        /* HERO */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 6rem 6% 4rem 6%;
-            position: relative;
-        }
-        .hero-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-            width: 100%;
-        }
-        .hero-left { display: flex; flex-direction: column; }
-        .hero-right { display: flex; justify-content: flex-end; }
-        .hero-top-line {
-            color: var(--text-muted); font-size: 13px; font-family: var(--font-mono);
-            margin-bottom: 2rem; opacity: 0; animation: fadeTo60 0s ease-out 0ms forwards;
-        }
-        .hero h1 { color: #fff; margin-bottom: 1.5rem; }
-        .hero-line { display: block; }
-        .hero-line-1 { opacity: 0; transform: translateY(12px); animation: fadeUp 500ms ease-out 0ms forwards; }
-        .hero-line-2 { opacity: 0; transform: translateY(12px); animation: fadeUp 500ms ease-out 120ms forwards; }
-        .hero-subtitle {
-            font-size: 1.05rem; color: var(--text-secondary); max-width: 560px; margin: 0 0 2.5rem;
-            opacity: 0; transform: translateY(12px); animation: fadeUp 500ms ease-out 240ms forwards;
-        }
-        .hero-buttons {
-            display: flex; gap: 1rem; justify-content: flex-start; margin-bottom: 1rem; flex-wrap: wrap;
-            opacity: 0; transform: translateY(12px); animation: fadeUp 500ms ease-out 360ms forwards;
-        }
-        
-        .hero-star { color: var(--text-muted); font-size: 13px; margin-bottom: 4rem; opacity: 0; transform: translateY(12px); animation: fadeUp 500ms ease-out 360ms forwards;}
+/* SECTIONS */
+section.block { padding: 120px 0; }
+.sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: end; margin-bottom: 56px; }
+.sec-head h2 { margin-top: 18px; }
+.sec-head p { color: var(--ink-2); margin: 0; max-width: 32rem; }
 
-        /* SCORE CARD */
-        .score-card {
-            background: #111113;
-            border: 1px solid #27272a;
-            border-radius: 12px;
-            padding: 28px;
-            width: 100%;
-            max-width: 420px;
-        }
-        .sc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-        .sc-ticker-block { display: flex; flex-direction: column; gap: 2px; }
-        .sc-ticker { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #fafafa; }
-        .sc-name { font-size: 12px; color: #71717a; font-family: 'Inter', sans-serif; }
-        .sc-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; }
-        .sc-badge-safe { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.2); }
-        .sc-badge-warn { background: rgba(250, 204, 21, 0.1); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.2); }
-        .sc-scores { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
-        .sc-score-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-        .sc-score-label { display: flex; flex-direction: column; gap: 2px; min-width: 120px; }
-        .sc-label-name { font-size: 13px; color: #d4d4d8; font-family: 'Inter', sans-serif; font-weight: 500; }
-        .sc-label-sub { font-size: 11px; color: #52525b; font-family: 'Inter', sans-serif; }
-        .sc-score-right { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
-        .sc-bar-track { width: 80px; height: 3px; background: #27272a; border-radius: 2px; overflow: hidden; }
-        .sc-bar-fill { height: 100%; border-radius: 2px; }
-        .sc-bar-green { background: #4ade80; }
-        .sc-bar-amber { background: #facc15; }
-        .sc-score-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; min-width: 36px; text-align: right; }
-        .sc-val-green { color: #4ade80; }
-        .sc-val-amber { color: #facc15; }
-        .sc-divider { height: 1px; background: #1f1f23; margin: 16px 0; }
-        .sc-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 4px; }
-        .sc-metric { display: flex; flex-direction: column; gap: 2px; }
-        .sc-m-label { font-size: 11px; color: #52525b; font-family: 'Inter', sans-serif; }
-        .sc-m-val { font-size: 13px; color: #a1a1aa; font-family: 'JetBrains Mono', monospace; font-weight: 500; }
-        .sc-brief { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 20px; padding: 12px; background: #0d0d10; border-radius: 6px; border: 1px solid #1f1f23; }
-        .sc-brief-icon { color: #a1a1aa; font-size: 12px; margin-top: 2px; flex-shrink: 0; }
-        .sc-brief p { font-size: 12px; color: #71717a; font-family: 'Inter', sans-serif; line-height: 1.6; margin: 0; }
-        .sc-footer-row { display: flex; justify-content: space-between; }
-        .sc-footer-label { font-size: 11px; color: #3f3f46; font-family: 'Inter', sans-serif; }
+/* ENGINES */
+.engines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
+.engine { padding: 36px 40px 40px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 0; }
+.engine:nth-child(even) { padding: 36px 0 40px 40px; border-left: 1px solid var(--rule); }
+.engine .n { font: 500 12px/1.9 var(--mono); color: var(--ink-3); }
+.engine h3 { margin-bottom: 10px; }
+.engine p { margin: 0 0 18px; color: var(--ink-2); font-size: 15px; }
+.formula {
+  font: 400 12.5px/1.6 var(--mono); color: var(--ink); background: var(--bg-2);
+  border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: nowrap;
+}
+.formula .k { color: var(--accent); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font: 500 12px/1 var(--mono); color: var(--ink-2); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 10px; background: var(--surface); }
 
-        /* TERMINAL */
-        .terminal-wrapper {
-            background: var(--bg-color); border-radius: var(--radius); border: 1px solid var(--border-default);
-            width: 100%; max-width: 100%; margin: 0 auto; margin-top: 3rem; overflow: hidden;
-            opacity: 0; transform: translateY(12px); animation: fadeUp 500ms ease-out 360ms forwards;
-        }
-        .terminal-header {
-            background: var(--surface-2); height: 32px; padding: 0 16px;
-            display: flex; align-items: center; border-bottom: 1px solid var(--border-default);
-            position: relative;
-        }
-        .terminal-dots { display: flex; gap: 6px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-subtle); }
-        .terminal-title { position: absolute; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 12px; font-family: var(--font-sans); }
-        
-        .terminal-body { 
-            padding: 24px; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; 
-            color: var(--text-primary); white-space: pre-wrap; height: 380px; overflow-y: auto;
-        }
+/* REPORT */
+.report-sec { background: var(--bg-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.report-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; }
+.checks { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }
+.checks li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--ink-2); font-size: 15px; }
+.checks li::before { content: ""; width: 14px; height: 14px; margin-top: 5px; border-radius: 50%; border: 1.5px solid var(--accent); box-shadow: inset 0 0 0 3px var(--bg-2), inset 0 0 0 10px var(--accent); }
+.checks b { color: var(--ink); font-weight: 500; }
+.browser {
+  border-radius: 12px; overflow: hidden; background: #fff;
+  box-shadow: 0 0 0 1px rgba(19, 33, 61, .1), 0 40px 80px -30px rgba(19, 33, 61, .45);
+  transform: perspective(1600px) rotateY(-6deg) rotateX(2deg); transform-origin: left center;
+  transition: transform .6s cubic-bezier(.2, .7, .2, 1);
+}
+.browser:hover { transform: none; }
+.browser-bar { display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px; background: #EEEBE4; border-bottom: 1px solid #DED8CB; }
+.browser-bar i { width: 10px; height: 10px; border-radius: 50%; background: #D3CCBD; }
+.browser-bar span { margin-left: 12px; flex: 1; max-width: 340px; height: 22px; border-radius: 6px; background: #fff; font: 400 11.5px/22px var(--sans); color: #6A6F7A; padding: 0 10px; }
+.browser-view { height: 460px; overflow: hidden; }
+.browser-view img { width: 100%; }
 
-        .term-prompt { color: var(--text-muted); }
-        .term-arg { color: #fff; }
-        .term-sep { color: var(--border-subtle); }
-        .term-header { color: var(--text-secondary); text-transform: uppercase; }
-        .term-label { color: #d4d4d8; }
-        .term-val { color: #fff; }
-        .term-ok { color: var(--indicator-positive); }
-        .term-warn { color: var(--indicator-warning); }
-        .term-brief { color: #d4d4d8; font-style: italic; }
-        .term-saved { color: var(--text-secondary); }
-        .term-open { color: var(--indicator-positive); }
+/* HONEST DATA */
+.honest { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+.quote { font: 400 clamp(1.7rem, 3.2vw, 2.4rem)/1.2 var(--serif); letter-spacing: -.015em; margin: 18px 0 20px; }
+.quote em { color: var(--accent); }
+.ledger { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; font-size: 14px; }
+.ledger-row { display: grid; grid-template-columns: 1fr auto auto; gap: 18px; padding: 13px 18px; border-top: 1px solid var(--rule); align-items: center; }
+.ledger-row:first-child { border-top: 0; background: var(--bg-2); font: 500 11.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.ledger-row .v { font: 500 13.5px/1 var(--mono); text-align: right; min-width: 64px; }
+.pill { font: 500 11px/1 var(--mono); padding: 5px 8px; border-radius: 999px; }
+.pill.ok { color: var(--pos); background: color-mix(in srgb, var(--pos) 12%, transparent); }
+.pill.na { color: var(--accent); background: var(--accent-soft); }
+.ledger-note { padding: 14px 18px; border-top: 1px dashed var(--rule-2); font: 400 12.5px/1.55 var(--mono); color: var(--ink-3); }
 
-        /* STATS DIVIDER */
-        .stats-divider {
-            border-top: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default);
-            padding: 1.5rem 5%; text-align: center;
-        }
-        .stats-chips {
-            display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
-        }
-        .stat-chip {
-            font-family: var(--font-sans); font-size: 12px; color: var(--text-secondary);
-            border: 1px solid var(--border-default); padding: 4px 12px; border-radius: 16px;
-        }
+/* COMMANDS */
+.cmd-wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; background: var(--surface); }
+.cmd-list { border-right: 1px solid var(--rule); padding: 10px; display: flex; flex-direction: column; gap: 2px; background: var(--bg-2); }
+.cmd-tab {
+  text-align: left; border: 0; background: transparent; cursor: pointer; border-radius: 8px;
+  padding: 11px 14px; font: 500 14px/1.2 var(--mono); color: var(--ink-2); display: flex; justify-content: space-between; align-items: center;
+}
+.cmd-tab small { font: 400 11.5px/1 var(--sans); color: var(--ink-3); }
+.cmd-tab:hover { color: var(--ink); }
+.cmd-tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--rule); }
+.cmd-panel { padding: 36px 40px; min-height: 360px; }
+.cmd-panel[hidden] { display: none; }
+.cmd-panel h3 { margin-bottom: 8px; }
+.cmd-panel > p { color: var(--ink-2); margin: 0 0 24px; max-width: 38rem; }
+.code {
+  position: relative; background: var(--term-bg); color: var(--term-ink); border-radius: 10px;
+  font: 400 13.5px/1.75 var(--mono); padding: 18px 56px 18px 20px; overflow-x: auto; white-space: pre; margin: 0 0 20px;
+}
+.code .c { color: #8FB4E6; }
+.code .a { color: #E8A04A; }
+.code .f { color: var(--term-dim); }
+.code .s { color: #9BD3AE; }
+.copy-btn {
+  position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 7px;
+  display: grid; place-items: center; border: 1px solid var(--term-rule); background: transparent; color: var(--term-dim); cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.copy-btn:hover { color: var(--term-ink); border-color: #3A4865; }
+.copy-btn svg { width: 14px; height: 14px; }
+.outputs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-3); }
 
-        /* SECTIONS */
-        section { padding: 3.5rem 5% 3.5rem 6%; max-width: 1400px; margin: 0; }
-        .section-header { margin-bottom: 3rem; text-align: center; }
-        #mcp .section-header { text-align: left; }
-        #how-it-works .section-header { text-align: left; }
-        .section-header h2 { color: #fff; font-weight: 600; margin-bottom: 0.5rem; }
-        .section-header p { color: var(--text-muted); }
+/* MCP */
+.mcp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.chat { display: grid; gap: 12px; }
+.bubble { max-width: 88%; padding: 14px 18px; border-radius: 14px; font-size: 15px; }
+.bubble.you { justify-self: end; background: var(--ink); color: var(--bg); border-bottom-right-radius: 4px; }
+.bubble.ai { background: var(--surface); border: 1px solid var(--rule); border-bottom-left-radius: 4px; color: var(--ink-2); }
+.bubble.ai code { font-size: 12.5px; color: var(--accent); }
+.bubble .tool { display: flex; align-items: center; gap: 8px; font: 500 11.5px/1 var(--mono); color: var(--ink-3); margin-bottom: 8px; }
+.bubble .tool::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--pos); }
+.clients { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
 
-        /* FEATURES */
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-        .card {
-            background: var(--surface-1); border: 1px solid var(--border-default); border-radius: var(--radius);
-            padding: 24px; transition: border-color 0.2s;
-        }
-        .fade-up-feat { opacity: 0; transform: translateY(20px); transition: opacity 350ms ease-out, transform 350ms ease-out; }
-        .fade-up-feat.visible { opacity: 1; transform: translateY(0); }
-        
-        .card:hover { border-color: var(--border-subtle); }
-        .card-icon { 
-            background: var(--surface-2); border: 1px solid var(--border-subtle);
-            color: #fff; font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-            width: 36px; height: 36px; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;
-        }
-        .card h3 { color: #fff; font-size: 0.95rem; font-weight: 500; margin-bottom: 0.5rem; }
-        .card p { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; }
+/* FINAL CTA */
+.final { padding: 130px 0 120px; text-align: center; position: relative; overflow: hidden; border-top: 1px solid var(--rule); }
+.final h2 { font-size: clamp(2.4rem, 5vw, 3.8rem); max-width: 16ch; margin: 18px auto 18px; }
+.final p { color: var(--ink-2); margin: 0 auto 36px; max-width: 32rem; }
+.final .cta { justify-content: center; }
 
-        /* HOW IT WORKS */
-        .steps-list { display: flex; flex-direction: column; }
-        .step-row {
-            display: flex; gap: 2rem; padding: 2rem 0; border-bottom: 1px solid var(--surface-2);
-        }
-        .slide-in-row { opacity: 0; transform: translateX(-16px); transition: opacity 400ms ease-out, transform 400ms ease-out; }
-        .slide-in-row.visible { opacity: 1; transform: translateX(0); }
-        .step-row:last-child { border-bottom: none; }
-        .step-num { font-family: var(--font-mono); font-weight: 700; font-size: 3rem; color: var(--border-default); line-height: 1; width: 40px;}
-        .step-content { flex: 1; }
-        .step-content h3 { color: #fff; font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
-        .step-content p { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem; }
-        .step-code {
-            background: var(--surface-1); border: 1px solid var(--border-default);
-            font-family: var(--font-mono); font-size: 0.85rem; color: #d4d4d8;
-            border-radius: 6px; padding: 12px 16px; white-space: pre-wrap;
-            display: inline-block; width: auto; min-width: 240px; max-width: 100%;
-        }
+/* FOOTER */
+footer { border-top: 1px solid var(--rule); padding: 48px 0 40px; font-size: 14px; color: var(--ink-3); }
+.foot { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
+.foot h4 { margin: 0 0 14px; font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.foot ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
+.foot a { text-decoration: none; color: var(--ink-3); }
+.foot a:hover { color: var(--ink); }
+.foot-legal { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13px; }
 
-        /* COMMANDS SHOWCASE */
-        .tabs-container { margin-bottom: 1.5rem; }
-        .tabs { 
-            background: var(--surface-1); border: 1px solid var(--border-default); border-radius: var(--radius);
-            padding: 4px; display: inline-flex; gap: 2px; flex-wrap: wrap;
-        }
-        .tab-btn {
-            background: transparent; color: var(--text-secondary); font-family: var(--font-mono); font-size: 12px;
-            padding: 6px 14px; border-radius: 6px; cursor: pointer; border: none; outline: none; transition: all 0.2s;
-        }
-        .tab-btn:hover { color: var(--accent); }
-        .tab-btn.active { background: var(--border-default); color: #fff; }
-        
-        .tab-content { display: none; opacity: 0; transition: opacity 200ms ease-out; }
-        .tab-content.active { display: block; opacity: 1; }
-        
-        .cmd-block-wrapper {
-            position: relative;
-        }
-        .cmd-copy-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--surface-2);
-            border: 1px solid var(--border-default);
-            border-radius: 4px;
-            padding: 4px 6px;
-            cursor: pointer;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            transition: color 150ms, border-color 150ms;
-            z-index: 1;
-        }
-        .cmd-copy-btn:hover { 
-            color: var(--text-primary); 
-            border-color: var(--border-subtle); 
-        }
+/* REVEAL (content is visible without JS) */
+.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1); }
+.js .reveal.in { opacity: 1; transform: none; }
 
-        .cmd-block {
-            background: var(--bg-color); border: 1px solid var(--border-default);
-            font-family: var(--font-mono); font-size: 0.85rem; padding: 16px 20px; border-radius: 6px;
-            margin-bottom: 1.25rem; white-space: pre-wrap; line-height: 1.6;
-        }
-        .c-cmd { color: var(--code-keyword); }
-        .c-arg { color: var(--code-string); }
-        .c-flag { color: var(--text-secondary); }
-        .c-comment { color: var(--text-muted); }
-        
-        .tab-content p { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem; }
-        .files-wrap { display: flex; gap: 8px; flex-wrap: wrap; }
-        .file-chip {
-            background: var(--surface-2); border: 1px solid var(--border-default);
-            color: #d4d4d8; font-family: var(--font-mono); font-size: 11px;
-            padding: 3px 8px; border-radius: 4px;
-        }
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: var(--ink); color: var(--bg); font: 500 13px/1 var(--sans); padding: 12px 16px; border-radius: 8px;
+  transition: opacity .2s, transform .2s; z-index: 100;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-        /* MCP SERVER */
-        .mcp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-        .mcp-card { background: var(--surface-1); border: 1px solid var(--border-default); border-radius: var(--radius); padding: 24px; }
-        .mcp-card h3 { color: #fff; font-size: 1rem; font-weight: 500; margin-bottom: 1.25rem; }
-        
-        .mcp-code-block { position: relative; }
-        .mcp-copy-btn {
-            position: absolute; top: 8px; right: 8px; padding: 4px; display: flex; align-items: center; justify-content: center;
-        }
-        
-        .prompts-container { margin-top: 3rem; }
-        .prompts-container h4 { color: var(--text-muted); font-family: var(--font-sans); font-size: 0.9rem; font-weight: 400; margin-bottom: 1rem; }
-        .mcp-prompts { display: flex; flex-wrap: wrap; gap: 12px; }
-        .prompt-pill { 
-            background: var(--surface-1); border: 1px solid var(--border-default); 
-            color: #d4d4d8; font-family: var(--font-sans); font-size: 0.85rem; 
-            border-radius: 6px; padding: 6px 14px; transition: all 0.2s;
-        }
-        .prompt-pill:hover { border-color: var(--border-subtle); color: #fff; }
-
-        /* INSTALL SECTION */
-        .install-section { 
-            background: var(--bg-color); border-top: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default); 
-            padding: 5rem 5%; width: 100%; max-width: none;
-        }
-        .install-content { max-width: 1400px; margin: 0; text-align: left; }
-        
-        .install-steps-inline {
-            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        .i-step { color: var(--text-secondary); font-size: 14px; }
-        .i-arrow { color: var(--border-subtle); }
-
-        .big-install-cmd {
-            background: var(--surface-1); border: 1px solid var(--border-subtle);
-            display: inline-flex; align-items: center; gap: 16px;
-            padding: 12px 24px; border-radius: var(--radius); margin-bottom: 2rem;
-            transition: border-color 0.2s;
-        }
-        .big-install-cmd:hover { border-color: var(--text-muted); }
-        .bic-text { font-family: var(--font-mono); color: #fff; font-size: 1.1rem; }
-
-        .install-links { display: flex; gap: 24px; flex-wrap: wrap; }
-        .install-links a { font-size: 14px; }
-
-        /* FOOTER */
-        footer { padding: 4rem 5% 2rem; background: var(--bg-color); max-width: 1400px; margin: 0; border-top: 1px solid var(--surface-2); }
-        .footer-top { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem; margin-bottom: 4rem; }
-        .f-logo { color: #fff; font-family: var(--font-mono); font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
-        .f-by { color: var(--text-muted); font-size: 13px; }
-        
-        .f-links { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
-        .f-links a { color: var(--text-muted); font-size: 13px; }
-        .f-links a:hover { color: var(--accent); }
-        
-        .f-star { color: var(--text-secondary); font-size: 13px; display: inline-block; transition: transform 150ms, color 150ms; }
-        .f-star:hover { color: var(--text-primary); transform: translateX(2px); }
-        
-        .footer-bottom { color: #52525b; font-size: 12px; border-top: 1px solid var(--surface-2); padding-top: 2rem; }
-
-        /* KEYFRAMES */
-        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeTo60 { to { opacity: 0.6; } }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .mobile-menu-btn { display: block; }
-            .hero h1 { font-size: 2.5rem; }
-            .step-row { flex-direction: column; gap: 1rem; }
-            .footer-top { flex-direction: column; }
-            .hero-layout { grid-template-columns: 1fr; gap: 2rem; }
-            .hero-right { justify-content: flex-start; }
-            .score-card { max-width: 100%; }
-        }
-    </style>
+@media (max-width: 960px) {
+  .hero-grid, .sec-head, .report-grid, .honest, .mcp-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .hero { padding: 40px 0 72px; }
+  .strip .wrap { grid-template-columns: repeat(2, 1fr); }
+  .stat { padding: 24px 0 24px 20px; }
+  .stat:nth-child(3) { border-left: 0; padding-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .engines { grid-template-columns: minmax(0, 1fr); }
+  .engine, .engine:nth-child(even) { padding: 32px 0; border-left: 0; }
+  .browser { transform: none; }
+  .cmd-wrap { grid-template-columns: minmax(0, 1fr); }
+  .cmd-list { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--rule); }
+  .cmd-tab { flex: none; }
+  .cmd-tab small { display: none; }
+  .cmd-panel { padding: 28px 24px; }
+  .foot { grid-template-columns: 1fr 1fr; }
+  section.block { padding: 88px 0; }
+}
+@media (max-width: 720px) {
+  .wrap { padding: 0 16px; }
+  .nav-links a:not(.btn) { display: none; }
+  .nav-links { gap: 8px; }
+  .browser-view { height: 300px; }
+  .term { font-size: 11px; }
+  .install { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .reveal, .js .term .line { opacity: 1; transform: none; transition: none; }
+  .caret { animation: none; }
+  .browser { transform: none; transition: none; }
+}
+</style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 128 128"><defs><clipPath id="mc"><rect width="128" height="128" rx="28"/></clipPath></defs><g clip-path="url(#mc)"><rect width="128" height="128" rx="28" fill="#13213D"/><g fill="none" stroke-linejoin="round"><path d="M127.22 71.00C127.63 74.07 127.71 77.25 127.41 80.36C127.12 83.48 126.43 86.63 125.45 89.67C124.48 92.71 123.13 95.72 121.55 98.58C119.97 101.45 118.08 104.25 115.97 106.88C113.85 109.50 111.47 112.04 108.85 114.32C106.24 116.60 103.35 118.76 100.27 120.56C97.19 122.36 93.82 123.95 90.37 125.12C86.93 126.30 83.23 127.14 79.60 127.62C75.97 128.10 72.20 128.16 68.60 127.99C65.00 127.83 61.41 127.26 58.00 126.63C54.59 126.00 51.31 125.09 48.11 124.21C44.91 123.32 41.86 122.33 38.80 121.34C35.74 120.35 32.75 119.36 29.73 118.27C26.71 117.17 23.66 116.09 20.67 114.77C17.68 113.45 14.63 112.05 11.80 110.36C8.96 108.67 6.14 106.78 3.64 104.64C1.15 102.51 -1.19 100.10 -3.16 97.54C-5.13 94.99 -6.82 92.18 -8.18 89.32C-9.54 86.45 -10.57 83.40 -11.31 80.35C-12.06 77.30 -12.50 74.14 -12.66 71.00C-12.82 67.86 -12.71 64.66 -12.26 61.52C-11.82 58.38 -11.10 55.21 -10.00 52.18C-8.91 49.15 -7.47 46.13 -5.70 43.35C-3.92 40.57 -1.75 37.90 0.65 35.50C3.05 33.11 5.83 30.93 8.70 29.00C11.57 27.08 14.72 25.42 17.87 23.94C21.01 22.46 24.30 21.24 27.57 20.12C30.84 19.00 34.15 18.06 37.49 17.22C40.83 16.38 44.19 15.64 47.61 15.10C51.03 14.55 54.51 14.10 58.00 13.95C61.49 13.80 65.08 13.82 68.56 14.20C72.04 14.58 75.57 15.25 78.89 16.23C82.20 17.21 85.45 18.56 88.45 20.09C91.44 21.63 94.25 23.50 96.86 25.44C99.46 27.38 101.83 29.55 104.09 31.74C106.35 33.93 108.41 36.22 110.41 38.56C112.41 40.91 114.30 43.30 116.08 45.79C117.85 48.29 119.58 50.85 121.06 53.55C122.54 56.24 123.94 59.06 124.97 61.96C125.99 64.87 126.82 67.93 127.22 71.00Z" stroke="#F4F1EA" stroke-width="5.5" opacity="0.44"/><path d="M110.16 66.00C110.38 68.13 110.38 70.34 110.13 72.49C109.89 74.65 109.39 76.83 108.68 78.92C107.98 81.02 107.04 83.09 105.93 85.07C104.82 87.04 103.50 88.97 102.03 90.78C100.56 92.58 98.90 94.32 97.09 95.89C95.28 97.46 93.29 98.94 91.17 100.20C89.05 101.45 86.74 102.56 84.38 103.42C82.02 104.27 79.49 104.91 76.99 105.31C74.50 105.72 71.91 105.86 69.41 105.84C66.91 105.83 64.41 105.56 62.00 105.21C59.59 104.87 57.26 104.34 54.97 103.79C52.69 103.23 50.49 102.58 48.31 101.90C46.12 101.22 43.98 100.50 41.85 99.69C39.72 98.88 37.58 98.04 35.52 97.05C33.45 96.06 31.37 94.99 29.43 93.74C27.50 92.49 25.61 91.10 23.93 89.56C22.25 88.02 20.69 86.31 19.37 84.50C18.05 82.70 16.92 80.73 16.01 78.73C15.10 76.73 14.41 74.61 13.92 72.49C13.43 70.37 13.14 68.17 13.06 66.00C12.97 63.83 13.08 61.61 13.40 59.44C13.73 57.28 14.25 55.09 15.02 53.00C15.78 50.91 16.78 48.83 17.99 46.90C19.20 44.97 20.68 43.11 22.30 41.43C23.93 39.75 25.80 38.20 27.75 36.83C29.70 35.45 31.84 34.24 33.99 33.16C36.15 32.08 38.41 31.17 40.67 30.35C42.94 29.52 45.26 28.83 47.59 28.23C49.93 27.63 52.30 27.12 54.70 26.75C57.10 26.38 59.55 26.10 62.00 26.01C64.45 25.93 66.95 25.98 69.39 26.26C71.82 26.54 74.29 27.02 76.61 27.69C78.94 28.37 81.22 29.29 83.33 30.33C85.45 31.38 87.45 32.64 89.31 33.97C91.18 35.30 92.89 36.79 94.50 38.31C96.12 39.83 97.60 41.44 99.01 43.09C100.42 44.75 101.74 46.45 102.96 48.22C104.17 50.00 105.32 51.83 106.30 53.74C107.27 55.65 108.16 57.64 108.81 59.68C109.45 61.73 109.94 63.87 110.16 66.00Z" stroke="#F4F1EA" stroke-width="5.5" opacity="0.72"/><path d="M93.26 61.00C93.35 62.21 93.32 63.45 93.15 64.66C92.99 65.88 92.69 67.10 92.28 68.27C91.87 69.45 91.33 70.61 90.70 71.72C90.07 72.83 89.32 73.91 88.49 74.92C87.65 75.93 86.72 76.90 85.70 77.78C84.68 78.66 83.56 79.49 82.37 80.20C81.19 80.91 79.90 81.54 78.58 82.04C77.27 82.54 75.86 82.93 74.47 83.20C73.07 83.47 71.62 83.61 70.21 83.66C68.80 83.71 67.38 83.63 66.00 83.49C64.62 83.35 63.27 83.10 61.94 82.83C60.62 82.55 59.33 82.20 58.06 81.82C56.79 81.44 55.54 81.01 54.32 80.53C53.10 80.05 51.88 79.52 50.72 78.92C49.55 78.32 48.40 77.65 47.33 76.91C46.26 76.16 45.23 75.33 44.31 74.43C43.39 73.52 42.54 72.53 41.83 71.49C41.11 70.45 40.49 69.34 40.00 68.20C39.51 67.06 39.13 65.86 38.87 64.66C38.60 63.46 38.46 62.22 38.42 61.00C38.39 59.78 38.46 58.53 38.66 57.31C38.85 56.09 39.16 54.87 39.60 53.69C40.03 52.52 40.59 51.35 41.27 50.26C41.94 49.18 42.75 48.12 43.65 47.17C44.54 46.21 45.57 45.31 46.65 44.51C47.72 43.71 48.90 43.00 50.10 42.36C51.30 41.72 52.56 41.16 53.84 40.68C55.12 40.19 56.44 39.77 57.77 39.42C59.10 39.07 60.46 38.78 61.83 38.58C63.20 38.38 64.60 38.23 66.00 38.20C67.40 38.17 68.82 38.21 70.21 38.38C71.59 38.55 72.99 38.82 74.31 39.20C75.64 39.59 76.94 40.09 78.16 40.67C79.38 41.25 80.54 41.94 81.62 42.69C82.70 43.43 83.71 44.26 84.65 45.12C85.59 45.98 86.45 46.89 87.26 47.84C88.07 48.79 88.82 49.78 89.50 50.80C90.17 51.83 90.80 52.89 91.32 53.99C91.84 55.09 92.29 56.24 92.62 57.41C92.94 58.58 93.17 59.79 93.26 61.00Z" stroke="#F4F1EA" stroke-width="5.5" opacity="1.0"/></g><circle cx="70.0" cy="56.0" r="9" fill="#C8781A"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V5a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-gh" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 
-    <!-- NAVBAR -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-logo-container">
-            <a href="#" class="nav-logo">isoline</a>
-            <span class="nav-version">v0.8.0</span>
-        </div>
-        <button class="mobile-menu-btn" onclick="toggleMenu()">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-        <div class="nav-links" id="desktop-nav">
-            <a href="#features" class="nav-item" data-target="features">Features</a>
-            <a href="#how-it-works" class="nav-item" data-target="how-it-works">How it works</a>
-            <a href="#install" class="nav-item" data-target="install">Install</a>
-            <a href="https://pypi.org/project/isoline/" target="_blank">PyPI</a>
-            <a href="https://shubhwade.github.io/isoline/" target="_blank">Docs</a>
-            <a href="https://github.com/shubhwade/isoline" target="_blank">GitHub <svg class="icon-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
-        </div>
-        <div class="mobile-dropdown" id="mobile-nav">
-            <a href="#features" class="nav-item-m" data-target="features">Features</a>
-            <a href="#how-it-works" class="nav-item-m" data-target="how-it-works">How it works</a>
-            <a href="#install" class="nav-item-m" data-target="install">Install</a>
-            <a href="https://pypi.org/project/isoline/" target="_blank">PyPI</a>
-            <a href="https://shubhwade.github.io/isoline/" target="_blank">Docs</a>
-            <a href="https://github.com/shubhwade/isoline" target="_blank">GitHub</a>
-        </div>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Isoline home">
+      <svg aria-hidden="true"><use href="#mark"/></svg>
+      <span><span class="tittle">i</span>soline</span>
+      <span class="ver">v0.8.0</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#engines">Engines</a>
+      <a href="#report">Reports</a>
+      <a href="#commands">Commands</a>
+      <a href="#mcp">AI tools</a>
+      <a href="https://shubhwade.github.io/isoline/">Docs</a>
+      <button class="btn theme-toggle" id="theme" aria-label="Toggle colour theme"><svg><use href="#i-moon"/></svg></button>
+      <a class="btn" href="https://github.com/shubhwade/isoline"><svg><use href="#i-gh"/></svg>GitHub</a>
     </nav>
+  </div>
+</header>
 
-    <!-- HERO -->
-    <section class="hero" id="hero">
-        <div class="hero-layout">
-            <div class="hero-left">
-                <div class="hero-top-line">$ pip install isoline   —   v0.8.0   —   MIT License</div>
-                <h1>
-                    <span class="hero-line hero-line-1">Financial analysis.</span>
-                    <span class="hero-line hero-line-2">One command.</span>
-                </h1>
-                <p class="hero-subtitle">
-                    isoline scans any stock, calculates Piotroski F-score, Altman Z-score,
-                    Beneish M-score, and generates an Excel workbook and a print-ready HTML report
-                    — fast. No API key. No account. Just Python.
-                </p>
-                <div class="hero-buttons">
-                    <button class="btn-install copy-btn" onclick="copyText('pip install isoline', this)">
-                        $ pip install isoline
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
-                    <a href="https://github.com/shubhwade/isoline" class="btn-github">View on GitHub &rarr;</a>
-                </div>
-                <div class="hero-star">★ Star the repo if you find it useful</div>
-            </div>
-            
-            <div class="hero-right">
-                <div class="score-card" id="score-card"></div>
-            </div>
+<main id="top">
+  <section class="hero">
+    <canvas id="contours" aria-hidden="true"></canvas>
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Open-source financial analysis</span>
+        <h1>Financial statements, <em>measured precisely.</em></h1>
+        <p class="lede">Piotroski, Altman and Beneish scores, quality metrics, a DCF and a print-ready report for any listed company. One command, no API key, every formula shown.</p>
+        <div class="cta">
+          <button class="install" data-copy="pip install isoline" aria-label="Copy install command">
+            <span><span class="dollar">$ </span>pip install isoline</span>
+            <span class="copy"><svg><use href="#i-copy"/></svg></span>
+          </button>
+          <a class="btn btn-lg" href="https://shubhwade.github.io/isoline/quickstart/">Quick start <svg><use href="#i-arrow"/></svg></a>
         </div>
-
-        <div class="terminal-wrapper">
-            <div class="terminal-header">
-                <div class="terminal-dots">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-                <div class="terminal-title">isoline — zsh</div>
-            </div>
-            <div class="terminal-body" id="terminal-text"></div>
+        <div class="facts">
+          <span>Python 3.10+</span><span>Windows, macOS, Linux</span><span>MIT licensed</span>
         </div>
-    </section>
-
-    <!-- STATS CHIPS -->
-    <div class="stats-divider">
-        <div class="stats-chips">
-            <div class="stat-chip">US, India &amp; more via Yahoo</div>
-            <div class="stat-chip">No API key</div>
-            <div class="stat-chip">Piotroski, Altman, Beneish + quality</div>
-            <div class="stat-chip">Excel + HTML output</div>
+      </div>
+      <div>
+        <div class="term" role="img" aria-label="Terminal output of isoline scan ACME">
+          <div class="term-bar"><i></i><i></i><i></i><span>isoline scan ACME</span></div>
+<pre id="term"><span class="line"><span class="t-p">~</span> <span class="t-dim">$</span> <span class="t-b">isoline scan ACME</span></span>
+<span class="line"><span class="t-dim">────────</span> <span class="t-b">Acme Industrial</span> <span class="t-dim">(synthetic sample) ─ ACME ─────</span></span>
+<span class="line"><span class="t-dim">Scan duration: 25 ms</span></span>
+<span class="line"> </span>
+<span class="line"><span class="t-hd"> HEALTH              VALUE</span></span>
+<span class="line"> Piotroski F-score       <span class="t-b">9</span>  <span class="t-bar">████████████</span>  <span class="t-ok">ok</span></span>
+<span class="line"> Altman Z″-score      <span class="t-b">3.94</span>  <span class="t-bar">█████</span>         <span class="t-ok">ok</span></span>
+<span class="line"> Debt / Equity        <span class="t-b">1.07</span>  <span class="t-bar">█</span>             <span class="t-ok">ok</span></span>
+<span class="line"> Interest coverage   <span class="t-b">13.89</span>  <span class="t-bar">████████████</span>  <span class="t-ok">ok</span></span>
+<span class="line"> </span>
+<span class="line"><span class="t-hd"> GROWTH AND QUALITY</span></span>
+<span class="line"> Revenue CAGR 3y     <span class="t-b">12.5%</span>   ROE (DuPont)  <span class="t-b">20.9%</span></span>
+<span class="line"> PAT CAGR 3y         <span class="t-b">29.4%</span>   FCF margin    <span class="t-b">10.1%</span></span>
+<span class="line"> Margin trend    <span class="t-ok">improving</span>   Accruals      <span class="t-b">-3.3%</span></span>
+<span class="line"> </span>
+<span class="line"><span class="t-dim">╭─ Summary (rule-based) ─────────────────────────╮</span></span>
+<span class="line"><span class="t-dim">│</span> Strong fundamentals (Piotroski F-score of 9).  <span class="t-dim">│</span></span>
+<span class="line"><span class="t-dim">│</span> Financially safe. No red flags triggered.      <span class="t-dim">│</span></span>
+<span class="line"><span class="t-dim">╰────────────────────────────────────────────────╯</span></span>
+<span class="line"><span class="t-acc">Note:</span> <span class="t-dim">Beneish M-score not reported: inputs missing.</span></span>
+<span class="line"><span class="t-ok">✓</span> Wrote ACME_analysis.xlsx, ACME_dashboard.html</span>
+<span class="line"><span class="t-p">~</span> <span class="t-dim">$</span> <span class="caret"></span></span></pre>
         </div>
+        <p class="term-note">Excerpt of real output on a synthetic sample company.</p>
+      </div>
     </div>
+  </section>
 
-    <!-- FEATURES -->
-    <section id="features" class="nav-section">
-        <div class="section-header">
-            <h2>Everything you need to analyse any stock</h2>
-            <p>Four engines. One command. Instant results.</p>
+  <div class="strip">
+    <div class="wrap">
+      <div class="stat"><b>9</b><span>Piotroski signals across profitability, leverage and efficiency</span></div>
+      <div class="stat"><b>Z<sup>″</sup></b><span>Altman distress model for non-manufacturers and emerging markets</span></div>
+      <div class="stat"><b>8</b><span>Beneish variables screening for earnings manipulation</span></div>
+      <div class="stat"><b>3</b><span>DCF scenarios with a sensitivity grid and every assumption shown</span></div>
+    </div>
+  </div>
+
+  <section class="block" id="engines">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div><span class="eyebrow">The engines</span><h2>Published models, implemented faithfully.</h2></div>
+        <p>Each score follows its source paper, cites its inputs and states its limits. The methodology page lists every formula and data field, so you can check the work.</p>
+      </div>
+      <div class="engines">
+        <article class="engine reveal">
+          <span class="n">01</span>
+          <div>
+            <h3>Financial health</h3>
+            <p>Piotroski F-score from nine binary signals, plus the Altman Z″ distress model with safe, grey and distress zones.</p>
+            <div class="formula">Z″ = <span class="k">6.56</span>·X1 + <span class="k">3.26</span>·X2 + <span class="k">6.72</span>·X3 + <span class="k">1.05</span>·X4</div>
+          </div>
+        </article>
+        <article class="engine reveal">
+          <span class="n">02</span>
+          <div>
+            <h3>Earnings quality</h3>
+            <p>Beneish M-score across eight variables, accruals ratio and cash conversion to show when reported profit isn't turning into cash.</p>
+            <div class="formula">M = <span class="k">−4.84</span> + <span class="k">0.920</span>·DSRI + <span class="k">0.528</span>·GMI + <span class="k">0.404</span>·AQI + <span class="k">0.892</span>·SGI + …</div>
+          </div>
+        </article>
+        <article class="engine reveal">
+          <span class="n">03</span>
+          <div>
+            <h3>Returns and growth</h3>
+            <p>DuPont ROE split into margin, turnover and leverage. ROIC, FCF margin and yield, three-year revenue and profit CAGR, margin trend.</p>
+            <div class="tags"><span class="tag">ROE = NM × AT × EM</span><span class="tag">ROIC</span><span class="tag">FCF yield</span><span class="tag">CAGR 3y</span></div>
+          </div>
+        </article>
+        <article class="engine reveal">
+          <span class="n">04</span>
+          <div>
+            <h3>Valuation</h3>
+            <p>P/E, P/B and EV/EBITDA, plus a discounted cash flow with bear, base and bull cases and a discount-rate by terminal-growth grid.</p>
+            <div class="tags"><span class="tag">isoline value AAPL</span><span class="tag">--discount 0.09</span><span class="tag">--growth 0.07</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block report-sec" id="report">
+    <div class="wrap report-grid">
+      <div class="reveal">
+        <span class="eyebrow">Reports</span>
+        <h2 style="margin-top:18px">A report you can hand to someone.</h2>
+        <p class="lede" style="margin-top:18px">Every scan writes a formal HTML report and an Excel workbook next to you, then opens the report in your browser.</p>
+        <ul class="checks">
+          <li><span><b>Self-contained HTML.</b> Summary, score cards, explained tables and two charts. Works offline, prints cleanly to A4.</span></li>
+          <li><span><b>Multi-sheet Excel.</b> A dashboard sheet plus the raw figures behind every metric.</span></li>
+          <li><span><b>JSON and CSV.</b> <code>--json</code> or <code>--export</code> for pipelines, notebooks and Power BI.</span></li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="browser">
+          <div class="browser-bar"><i></i><i></i><i></i><span>ACME_dashboard.html</span></div>
+          <div class="browser-view"><img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png" alt="The HTML report Isoline writes: summary, score cards and valuation table for a synthetic sample company" loading="lazy" width="1280" height="1600"></div>
         </div>
-        <div class="features-grid">
-            <div class="card fade-up-feat">
-                <div class="card-icon">P</div>
-                <h3>Piotroski F-Score</h3>
-                <p>9-signal financial health check. Profitability, leverage, liquidity, efficiency — all scored in one number out of 9.</p>
-            </div>
-            <div class="card fade-up-feat">
-                <div class="card-icon">Z</div>
-                <h3>Altman Z-Score</h3>
-                <p>Bankruptcy risk prediction using Altman's proven formula. Know if a company is in the safe zone before you invest.</p>
-            </div>
-            <div class="card fade-up-feat">
-                <div class="card-icon">M</div>
-                <h3>Beneish M-Score</h3>
-                <p>8-variable earnings manipulation detector. Catch accounting red flags before they become front page news.</p>
-            </div>
-            <div class="card fade-up-feat">
-                <div class="card-icon">XL</div>
-                <h3>Excel Reports</h3>
-                <p>Every scan generates a formatted multi-sheet Excel workbook with charts, color coding, and a Dashboard sheet.</p>
-            </div>
-            <div class="card fade-up-feat">
-                <div class="card-icon">UI</div>
-                <h3>HTML Report</h3>
-                <p>A formal, self-contained report: summary, score cards, tables explaining every metric, two charts, and notes on missing data. Works offline and prints cleanly to A4.</p>
-            </div>
-            <div class="card fade-up-feat">
-                <div class="card-icon">MCP</div>
-                <h3>MCP Server</h3>
-                <p>Connect isoline to Claude, Cursor, or Windsurf as an MCP tool. Ask your AI IDE to analyse any stock in plain English.</p>
-            </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="honest">
+    <div class="wrap honest">
+      <div class="reveal">
+        <span class="eyebrow">Honest data</span>
+        <p class="quote">Missing inputs show <em>n/a</em> with a reason. Never a zero, never a guess.</p>
+        <p class="lede">Free financial data has gaps. When a figure can't be computed, Isoline withholds it and says why, instead of quietly scoring a company on numbers that aren't there. US tickers fall back to SEC EDGAR when Yahoo Finance is incomplete.</p>
+      </div>
+      <div class="ledger reveal" role="table" aria-label="Example of withheld metrics">
+        <div class="ledger-row" role="row"><span>Metric</span><span>Value</span><span>Status</span></div>
+        <div class="ledger-row" role="row"><span>Piotroski F-score</span><span class="v">9</span><span class="pill ok">ok</span></div>
+        <div class="ledger-row" role="row"><span>Altman Z″-score</span><span class="v">3.94</span><span class="pill ok">ok</span></div>
+        <div class="ledger-row" role="row"><span>Beneish M-score</span><span class="v">n/a</span><span class="pill na">withheld</span></div>
+        <div class="ledger-row" role="row"><span>ROIC</span><span class="v">n/a</span><span class="pill na">withheld</span></div>
+        <div class="ledger-note">Note: Beneish M-score not reported: required inputs are missing.<br>Note: ROIC not reported: EBIT or invested capital unavailable or not positive.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="commands" style="padding-top:40px">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div><span class="eyebrow">Commands</span><h2>Small surface, deep output.</h2></div>
+        <p>Use Yahoo Finance symbols: <code>AAPL</code> for US listings, <code>INFY.NS</code> for NSE, <code>.BO</code> for BSE. Every command takes <code>--help</code>.</p>
+      </div>
+      <div class="cmd-wrap reveal">
+        <div class="cmd-list" role="tablist" aria-label="Commands">
+          <button class="cmd-tab" role="tab" aria-selected="true" aria-controls="p-scan" id="t-scan">scan <small>full analysis</small></button>
+          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-compare" id="t-compare">compare <small>side by side</small></button>
+          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-value" id="t-value">value <small>DCF</small></button>
+          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-screen" id="t-screen">screen <small>sector filter</small></button>
+          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-tui" id="t-tui">tui <small>full screen</small></button>
+          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-powerbi" id="t-powerbi">powerbi <small>export</small></button>
         </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section id="how-it-works" class="nav-section">
-        <div class="section-header">
-            <h2>From command to report</h2>
+        <div class="cmd-panel" role="tabpanel" id="p-scan" aria-labelledby="t-scan">
+          <h3>Scan a company</h3>
+          <p>Runs every engine, prints the tables and summary, writes the Excel and HTML reports and opens the report.</p>
+<pre class="code"><span class="c">isoline</span> scan <span class="a">AAPL</span>
+<span class="c">isoline</span> scan <span class="a">INFY.NS</span> <span class="f">--no-open</span>
+<span class="c">isoline</span> scan <span class="a">MSFT</span> <span class="f">--json</span> <span class="f">--no-report</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
+          <div class="outputs">Writes <span class="tag">AAPL_analysis.xlsx</span><span class="tag">AAPL_dashboard.html</span></div>
         </div>
-        <div class="steps-list">
-            <div class="step-row slide-in-row">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                    <h3>Install</h3>
-                    <p>One command. Python 3.10+ required. No API key needed.</p>
-                    <div class="step-code"><span class="c-cmd">pip</span> install isoline</div>
-                </div>
-            </div>
-            <div class="step-row slide-in-row">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                    <h3>Scan any stock</h3>
-                    <p>Uses Yahoo Finance symbols: AAPL for US stocks, add .NS for NSE or .BO for BSE.</p>
-                    <div class="step-code"><span class="c-cmd">isoline</span> scan <span class="c-arg">AAPL</span>
-<span class="c-cmd">isoline</span> scan <span class="c-arg">INFY.NS</span>
-<span class="c-cmd">isoline</span> scan <span class="c-arg">RELIANCE.NS</span></div>
-                </div>
-            </div>
-            <div class="step-row slide-in-row">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                    <h3>Get instant analysis</h3>
-                    <p>Piotroski F, Altman Z, Beneish M, valuation ratios, growth metrics, rule-based summary, all in seconds.</p>
-                    <div class="step-code"><span class="c-comment"># Terminal shows full analysis table</span></div>
-                </div>
-            </div>
-            <div class="step-row slide-in-row">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                    <h3>Open your report</h3>
-                    <p>TICKER_analysis.xlsx and TICKER_dashboard.html are written to the current folder and the HTML opens in your browser. Use --no-report to skip files.</p>
-                    <div class="step-code"><span class="c-comment"># Excel + HTML auto-generated</span></div>
-                </div>
-            </div>
+        <div class="cmd-panel" role="tabpanel" id="p-compare" aria-labelledby="t-compare" hidden>
+          <h3>Compare two companies</h3>
+          <p>Every metric side by side, with a combined report.</p>
+<pre class="code"><span class="c">isoline</span> compare <span class="a">TCS.NS</span> <span class="a">INFY.NS</span>
+<span class="c">isoline</span> compare <span class="a">AAPL</span> <span class="a">MSFT</span> <span class="f">--export</span> <span class="s">compare.xlsx</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
         </div>
-    </section>
-
-    <!-- COMMANDS SHOWCASE -->
-    <section id="commands">
-        <div class="section-header">
-            <h2>Six powerful commands</h2>
-            <p>Everything you need for fundamental analysis</p>
+        <div class="cmd-panel" role="tabpanel" id="p-value" aria-labelledby="t-value" hidden>
+          <h3>Estimate intrinsic value</h3>
+          <p>A discounted cash flow with bear, base and bull scenarios, a sensitivity grid and margin of safety. Defaults are printed as assumptions; override any of them. Illustrative, not a price target.</p>
+<pre class="code"><span class="c">isoline</span> value <span class="a">AAPL</span>
+<span class="c">isoline</span> value <span class="a">AAPL</span> <span class="f">--discount</span> <span class="s">0.09</span> <span class="f">--growth</span> <span class="s">0.07</span> <span class="f">--years</span> <span class="s">10</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
         </div>
-        
-        <div class="tabs-container">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="openTab('tab-scan', this)">scan</button>
-                <button class="tab-btn" onclick="openTab('tab-compare', this)">compare</button>
-                <button class="tab-btn" onclick="openTab('tab-screen', this)">screen</button>
-                <button class="tab-btn" onclick="openTab('tab-check', this)">check</button>
-                <button class="tab-btn" onclick="openTab('tab-powerbi', this)">powerbi</button>
-                <button class="tab-btn" onclick="openTab('tab-serve', this)">serve (MCP)</button>
-            </div>
+        <div class="cmd-panel" role="tabpanel" id="p-screen" aria-labelledby="t-screen" hidden>
+          <h3>Screen a sector</h3>
+          <p>Filter an example sector universe by Piotroski score and leverage. Skipped tickers come with a reason.</p>
+<pre class="code"><span class="c">isoline</span> screen <span class="a">IT</span>
+<span class="c">isoline</span> screen <span class="a">Banking</span> <span class="f">--min-piotroski</span> <span class="s">7</span> <span class="f">--max-de</span> <span class="s">1.5</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
         </div>
-
-        <div class="tab-content-wrapper" style="position:relative;">
-            <div id="tab-scan" class="tab-content active">
-                <div class="cmd-block-wrapper">
-                <button class="cmd-copy-btn" onclick="copyCmd(this)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" 
-                    stroke="currentColor" stroke-width="2" 
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-                <div class="cmd-block"><span class="c-cmd">isoline</span> scan <span class="c-arg">INFY.NS</span>
-<span class="c-cmd">isoline</span> scan <span class="c-arg">AAPL</span>
-<span class="c-cmd">isoline</span> scan <span class="c-arg">RELIANCE.NS</span> <span class="c-flag">--json</span></div></div>
-                <p>Runs full analysis: valuation, health, growth, quality and red-flag engines. Writes an Excel workbook and an HTML report.</p>
-                <div class="files-wrap">
-                    <span class="file-chip">INFY_analysis.xlsx</span>
-                    <span class="file-chip">INFY_dashboard.html</span>
-                </div>
-            </div>
-
-            <div id="tab-compare" class="tab-content">
-                <div class="cmd-block-wrapper">
-                <button class="cmd-copy-btn" onclick="copyCmd(this)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" 
-                    stroke="currentColor" stroke-width="2" 
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-                <div class="cmd-block"><span class="c-cmd">isoline</span> compare <span class="c-arg">INFY.NS TCS.NS</span>
-<span class="c-cmd">isoline</span> compare <span class="c-arg">AAPL MSFT</span></div></div>
-                <p>Side by side comparison of two stocks across all metrics. See which company wins on each metric with color coding.</p>
-                <div class="files-wrap">
-                    <span class="file-chip">INFYvsTCS_comparison.xlsx</span>
-                    <span class="file-chip">INFYvsTCS_dashboard.html</span>
-                </div>
-            </div>
-
-            <div id="tab-screen" class="tab-content">
-                <div class="cmd-block-wrapper">
-                <button class="cmd-copy-btn" onclick="copyCmd(this)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" 
-                    stroke="currentColor" stroke-width="2" 
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-                <div class="cmd-block"><span class="c-cmd">isoline</span> screen <span class="c-flag">--sector</span> <span class="c-arg">IT</span>
-<span class="c-cmd">isoline</span> screen <span class="c-flag">--sector</span> <span class="c-arg">Banking</span> <span class="c-flag">--min-piotroski</span> <span class="c-arg">6</span>
-<span class="c-cmd">isoline</span> screen <span class="c-flag">--sector</span> <span class="c-arg">IT</span> <span class="c-flag">--max-de</span> <span class="c-arg">1.5</span></div></div>
-                <p>Scan an entire sector at once with custom filters. Find the strongest stocks in any sector instantly.</p>
-                <div class="files-wrap">
-                    <span class="file-chip">screen_results.xlsx</span>
-                    <span class="file-chip">screen_dashboard.html</span>
-                </div>
-            </div>
-
-            <div id="tab-check" class="tab-content">
-                <div class="cmd-block-wrapper">
-                <button class="cmd-copy-btn" onclick="copyCmd(this)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" 
-                    stroke="currentColor" stroke-width="2" 
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-                <div class="cmd-block"><span class="c-cmd">isoline</span> check <span class="c-arg">INFY.NS</span>
-<span class="c-cmd">isoline</span> check <span class="c-arg">AAPL</span></div></div>
-                <p>Quick health check only. Just Piotroski F and Altman Z. Fastest way to check if a stock is worth deeper analysis.</p>
-            </div>
-
-            <div id="tab-powerbi" class="tab-content">
-                <div class="cmd-block-wrapper">
-                <button class="cmd-copy-btn" onclick="copyCmd(this)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" 
-                    stroke="currentColor" stroke-width="2" 
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-                <div class="cmd-block"><span class="c-cmd">isoline</span> powerbi <span class="c-flag">--tickers</span> <span class="c-arg">INFY.NS TCS.NS WIPRO.NS</span> <span class="c-flag">--export</span> <span class="c-arg">portfolio.csv</span></div></div>
-                <p>Generates Power BI ready CSV for portfolio analysis. Also creates portfolio_report.html with pre-built charts.</p>
-                <div class="files-wrap">
-                    <span class="file-chip">portfolio.csv</span>
-                    <span class="file-chip">portfolio_report.html</span>
-                </div>
-            </div>
-
-            <div id="tab-serve" class="tab-content">
-                <div class="cmd-block-wrapper">
-                <button class="cmd-copy-btn" onclick="copyCmd(this)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" 
-                    stroke="currentColor" stroke-width="2" 
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-                <div class="cmd-block"><span class="c-cmd">isoline</span> serve</div></div>
-                <p>Starts MCP server for Claude Desktop, Cursor, or Windsurf. Add to your AI IDE config and ask it to analyse stocks in plain English.</p>
-                <div class="cmd-block" style="margin-bottom: 0;">{
-  <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"isoline"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
-      <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
-    }
-  }
-}</div>
-            </div>
+        <div class="cmd-panel" role="tabpanel" id="p-tui" aria-labelledby="t-tui" hidden>
+          <h3>Work in the terminal interface</h3>
+          <p>A full-screen app with modes, a command palette on <kbd>Ctrl</kbd>+<kbd>K</kbd> and session history.</p>
+<pre class="code"><span class="c">pip</span> install <span class="s">"isoline[tui]"</span>
+<span class="c">isoline</span> tui<button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
         </div>
-    </section>
-
-    <!-- MCP SERVER -->
-    <section id="mcp">
-        <div class="section-header">
-            <h2>Connect isoline to your AI IDE</h2>
-            <p>isoline turns Claude from an opinion machine into a financial analyst with live data</p>
+        <div class="cmd-panel" role="tabpanel" id="p-powerbi" aria-labelledby="t-powerbi" hidden>
+          <h3>Export to Power BI</h3>
+          <p>Portfolio metrics or red-flag details as a tidy CSV, ready to load.</p>
+<pre class="code"><span class="c">isoline</span> powerbi <span class="f">--tickers</span> <span class="a">INFY.NS TCS.NS WIPRO.NS</span> <span class="f">--export</span> <span class="s">portfolio.csv</span>
+<span class="c">isoline</span> powerbi <span class="a">AAPL MSFT</span> <span class="f">--flags</span> <span class="f">--export</span> <span class="s">flags.csv</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="mcp-grid">
-            <div class="mcp-card">
-                <h3>Claude Desktop</h3>
-                <div class="mcp-code-block cmd-block" style="margin-bottom:0;">
-                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;isoline&quot;: {\n      &quot;command&quot;: &quot;isoline&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
+  <section class="block" id="mcp" style="padding-top:40px">
+    <div class="wrap mcp-grid">
+      <div class="reveal">
+        <span class="eyebrow">For AI tools</span>
+        <h2 style="margin-top:18px">Give your assistant real numbers.</h2>
+        <p class="lede" style="margin:18px 0 28px">Run Isoline as an MCP server and Claude Desktop, Cursor or Windsurf can call the same engines, so answers rest on computed figures rather than recall.</p>
+        <div class="clients"><span class="tag">Claude Desktop</span><span class="tag">Cursor</span><span class="tag">Windsurf</span></div>
+<pre class="code"><span class="f"># pip install "isoline[mcp]"</span>
 {
-  <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"isoline"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
-      <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"isoline"</span>: { <span class="s">"command"</span>: <span class="a">"isoline"</span>, <span class="s">"args"</span>: [<span class="a">"serve"</span>] }
+  }
+}<button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
+      </div>
+      <div class="chat reveal" aria-label="Example conversation">
+        <div class="bubble you">Compare TCS and Infosys on balance-sheet strength.</div>
+        <div class="bubble ai"><div class="tool">compare · TCS.NS, INFY.NS</div>Here are Piotroski signals, Altman Z″, debt/equity and interest coverage side by side. One metric couldn't be computed from the filings, so it's marked n/a rather than guessed.</div>
+        <div class="bubble you">Which IT names pass Piotroski 7 or better with low debt?</div>
+        <div class="bubble ai"><div class="tool">screen · sector=IT, min_piotroski=7, max_de=1.0</div>Three tickers pass. Two were skipped, each with the reason it couldn't be scored.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap reveal">
+      <span class="eyebrow">Get started</span>
+      <h2>Your first report is one command away.</h2>
+      <p>Free and open source. No account, no API key. If it saves you time, a star on GitHub helps others find it.</p>
+      <div class="cta">
+        <button class="install" data-copy="pip install isoline" aria-label="Copy install command">
+          <span><span class="dollar">$ </span>pip install isoline</span>
+          <span class="copy"><svg><use href="#i-copy"/></svg></span>
+        </button>
+        <a class="btn btn-lg btn-solid" href="https://github.com/shubhwade/isoline"><svg><use href="#i-gh"/></svg>Star on GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a class="brand" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg><span><span class="tittle">i</span>soline</span></a>
+        <p style="margin:14px 0 0;max-width:26ch">Financial statements, measured precisely. Built by Shubh Wade.</p>
+      </div>
+      <div><h4>Product</h4><ul><li><a href="https://shubhwade.github.io/isoline/quickstart/">Quick start</a></li><li><a href="https://shubhwade.github.io/isoline/cli/">CLI reference</a></li><li><a href="https://shubhwade.github.io/isoline/sdk/">Python SDK</a></li><li><a href="https://shubhwade.github.io/isoline/mcp/">MCP server</a></li></ul></div>
+      <div><h4>Method</h4><ul><li><a href="https://shubhwade.github.io/isoline/methodology/">Formulas and sources</a></li><li><a href="https://shubhwade.github.io/isoline/valuation/">Valuation</a></li><li><a href="https://shubhwade.github.io/isoline/changelog/">Changelog</a></li></ul></div>
+      <div><h4>Project</h4><ul><li><a href="https://github.com/shubhwade/isoline">GitHub</a></li><li><a href="https://pypi.org/project/isoline/">PyPI</a></li><li><a href="https://github.com/shubhwade/isoline/blob/main/SECURITY.md">Security</a></li></ul></div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Isoline · MIT License · Formerly Telmus</span>
+      <span>Not investment advice. Data from Yahoo Finance and SEC EDGAR.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Copied to clipboard</div>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* theme toggle (remembered per browser) */
+  const themeBtn = document.getElementById('theme');
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const syncIcon = () => themeBtn.innerHTML = `<svg><use href="#i-${isDark() ? 'sun' : 'moon'}"/></svg>`;
+  try { const t = localStorage.getItem('isoline-theme'); if (t) root.dataset.theme = t; } catch (e) {}
+  syncIcon();
+  themeBtn.addEventListener('click', () => {
+    root.dataset.theme = isDark() ? 'light' : 'dark';
+    try { localStorage.setItem('isoline-theme', root.dataset.theme); } catch (e) {}
+    syncIcon(); drawContours(performance.now());
+  });
+
+  /* nav border on scroll */
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  /* copy */
+  const toast = document.getElementById('toast');
+  let toastTimer;
+  const copied = (el) => {
+    toast.classList.add('show'); clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+    const use = el.querySelector('use'); if (!use) return;
+    use.setAttribute('href', '#i-check'); setTimeout(() => use.setAttribute('href', '#i-copy'), 1600);
+  };
+  const copy = (text, el) => navigator.clipboard?.writeText(text).then(() => copied(el)).catch(() => {});
+  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => copy(b.dataset.copy, b)));
+  document.querySelectorAll('.copy-btn').forEach(b => b.addEventListener('click', () => {
+    const pre = b.closest('pre').cloneNode(true); pre.querySelector('.copy-btn').remove();
+    copy(pre.textContent.split('\n').filter(l => !l.trim().startsWith('#')).join('\n').trim(), b);
+  }));
+
+  /* command tabs with arrow-key support */
+  const tabs = [...document.querySelectorAll('.cmd-tab')];
+  const select = (t) => {
+    tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1;
+      document.getElementById(x.getAttribute('aria-controls')).hidden = !on; });
+  };
+  tabs.forEach((t, i) => {
+    t.tabIndex = i ? -1 : 0;
+    t.addEventListener('click', () => select(t));
+    t.addEventListener('keydown', e => {
+      const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+      if (!d) return; e.preventDefault();
+      const n = tabs[(i + d + tabs.length) % tabs.length]; n.focus(); select(n);
+    });
+  });
+
+  /* reveal on scroll */
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }),
+    { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* terminal: lines print in sequence */
+  const lines = [...document.querySelectorAll('#term .line')];
+  if (reduce) lines.forEach(l => l.classList.add('on'));
+  else lines.forEach((l, i) => setTimeout(() => l.classList.add('on'), 350 + i * (i < 3 ? 160 : 70)));
+
+  /* topographic background: marching squares over a slowly drifting height field */
+  const cv = document.getElementById('contours');
+  const ctx = cv.getContext('2d');
+  const peaks = [[.78, .30, .30], [.58, .78, .22], [.18, .62, .26], [.95, .85, .18], [.35, .12, .2]];
+  let W = 0, H = 0, dpr = 1;
+  const resize = () => {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+  };
+  const field = (x, y, t) => {
+    let v = 0;
+    for (let k = 0; k < peaks.length; k++) {
+      const [px, py, s] = peaks[k];
+      const ox = px + .025 * Math.sin(t * .00011 + k * 1.7), oy = py + .025 * Math.cos(t * .00009 + k);
+      const dx = (x - ox) * (W / H > 1 ? W / H : 1), dy = y - oy;
+      v += Math.exp(-(dx * dx + dy * dy) / (2 * s * s)) * (1 - k * .12);
+    }
+    return v + .06 * Math.sin(x * 9 + t * .0002) * Math.cos(y * 7);
+  };
+  function drawContours(t) {
+    if (!W) return;
+    const color = getComputedStyle(root).getPropertyValue('--contour').trim();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    const step = 14, cols = Math.ceil(W / step) + 1, rows = Math.ceil(H / step) + 1;
+    const g = new Float32Array(cols * rows);
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) g[j * cols + i] = field(i * step / W, j * step / H, t);
+    ctx.lineWidth = 1; ctx.strokeStyle = color;
+    for (let L = .12; L < 1.3; L += .085) {
+      ctx.beginPath();
+      for (let j = 0; j < rows - 1; j++) for (let i = 0; i < cols - 1; i++) {
+        const a = g[j * cols + i], b = g[j * cols + i + 1], c = g[(j + 1) * cols + i + 1], d = g[(j + 1) * cols + i];
+        const idx = (a > L) | (b > L) << 1 | (c > L) << 2 | (d > L) << 3;
+        if (idx === 0 || idx === 15) continue;
+        const x = i * step, y = j * step;
+        const e = [
+          [x + step * (L - a) / (b - a), y], [x + step, y + step * (L - b) / (c - b)],
+          [x + step * (L - d) / (c - d), y + step], [x, y + step * (L - a) / (d - a)]];
+        const segs = { 1: [[3, 0]], 2: [[0, 1]], 3: [[3, 1]], 4: [[1, 2]], 5: [[3, 0], [1, 2]], 6: [[0, 2]], 7: [[3, 2]],
+          8: [[2, 3]], 9: [[0, 2]], 10: [[0, 1], [2, 3]], 11: [[1, 2]], 12: [[1, 3]], 13: [[0, 1]], 14: [[0, 3]] }[idx];
+        for (const [p, q] of segs) { ctx.moveTo(e[p][0], e[p][1]); ctx.lineTo(e[q][0], e[q][1]); }
+      }
+      ctx.stroke();
     }
   }
-}</div>
-            </div>
-            <div class="mcp-card">
-                <h3>Cursor</h3>
-                <div class="mcp-code-block cmd-block" style="margin-bottom:0;">
-                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;isoline&quot;: {\n      &quot;command&quot;: &quot;isoline&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
-{
-  <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"isoline"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
-      <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
-    }
+  window.drawContours = drawContours;
+  resize(); drawContours(0);
+  addEventListener('resize', () => { resize(); drawContours(performance.now()); });
+  if (!reduce) {
+    let last = 0, visible = true;
+    new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(cv);
+    const loop = (t) => { if (visible && t - last > 66) { drawContours(t); last = t; } requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
   }
-}</div>
-            </div>
-            <div class="mcp-card">
-                <h3>Windsurf</h3>
-                <div class="mcp-code-block cmd-block" style="margin-bottom:0;">
-                    <button class="mcp-copy-btn copy-btn" onclick="copyText('{\n  &quot;mcpServers&quot;: {\n    &quot;isoline&quot;: {\n      &quot;command&quot;: &quot;isoline&quot;,\n      &quot;args&quot;: [&quot;serve&quot;]\n    }\n  }\n}', this)">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
-{
-  <span class="c-cmd">"mcpServers"</span>: {
-    <span class="c-cmd">"isoline"</span>: {
-      <span class="c-cmd">"command"</span>: <span class="c-arg">"isoline"</span>,
-      <span class="c-cmd">"args"</span>: [<span class="c-arg">"serve"</span>]
-    }
-  }
-}</div>
-            </div>
-        </div>
-
-        <div class="prompts-container">
-            <h4>Ask your AI anything:</h4>
-            <div class="mcp-prompts">
-                <div class="prompt-pill">"Analyse INFY.NS financials"</div>
-                <div class="prompt-pill">"Compare TCS.NS and Wipro.NS"</div>
-                <div class="prompt-pill">"Screen IT sector stocks with strong balance sheets"</div>
-                <div class="prompt-pill">"Is Zomato's balance sheet healthy?"</div>
-                <div class="prompt-pill">"What is the Beneish M-score for Adani Enterprises?"</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- INSTALL -->
-    <section class="install-section nav-section" id="install">
-        <div class="install-content">
-            <div class="install-steps-inline">
-                <span class="i-step">pip install isoline</span>
-                <span class="i-arrow">&rarr;</span>
-                <span class="i-step">isoline scan AAPL</span>
-                <span class="i-arrow">&rarr;</span>
-                <span class="i-step">Report opens in your browser</span>
-            </div>
-
-            <div>
-                <div class="big-install-cmd">
-                    <span class="bic-text">$ pip install isoline</span>
-                    <button class="copy-btn" onclick="copyText('pip install isoline', this)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="install-links">
-                <a href="https://pypi.org/project/isoline/">PyPI Package</a>
-                <a href="https://shubhwade.github.io/isoline/">Documentation</a>
-                <a href="https://github.com/shubhwade/isoline">GitHub Repo</a>
-                <a href="https://pypistats.org/packages/isoline">Track Downloads</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-top">
-            <div class="footer-brand">
-                <div class="f-logo">isoline</div>
-                <div class="f-by">Built by Shubh Wade</div>
-            </div>
-            <div class="f-links">
-                <a href="https://shubhwade.github.io/isoline/">Docs</a>
-                <a href="https://github.com/shubhwade/isoline">GitHub</a>
-                <a href="https://pypi.org/project/isoline/">PyPI</a>
-                <a href="https://shubhwade.github.io/isoline/changelog/">Changelog</a>
-                <a href="https://github.com/shubhwade/isoline/blob/main/SECURITY.md">Security</a>
-            </div>
-            <div class="footer-action">
-                <a href="https://github.com/shubhwade/isoline" class="f-star">Star on GitHub &nearr;</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; 2026 isoline &middot; MIT License &middot; Not financial advice &middot; Data via Yahoo Finance
-        </div>
-    </footer>
-
-    <!-- JAVASCRIPT -->
-    <script>
-        // Navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 20) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Mobile Menu Toggle
-        function toggleMenu() {
-            document.getElementById('mobile-nav').classList.toggle('active');
-        }
-        document.querySelectorAll('.mobile-dropdown a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('mobile-nav').classList.remove('active');
-            });
-        });
-
-        // Terminal Typing Animation
-        const terminalText = `<span class="term-prompt">$</span> <span class="term-arg">isoline scan ACME</span>
-
-<span class="term-sep">───────────</span> Acme Corp (synthetic sample, not a real company) <span class="term-sep">───────────</span>
-
-<span class="term-header">Engine    Metric              Value    Status</span>
-<span class="term-label">Valuation</span> P/E ratio           <span class="term-val">25.00</span>    <span class="term-ok">✓ ok</span>
-<span class="term-label">Valuation</span> EV/EBITDA           <span class="term-val">n/a</span>      <span class="term-warn">n/a</span>
-<span class="term-label">Health</span>    Piotroski F-score   <span class="term-val">8</span>        <span class="term-ok">✓ ok</span>
-<span class="term-label">Health</span>    Altman Z-score      <span class="term-val">4.65</span>     <span class="term-ok">✓ ok</span>
-<span class="term-label">Growth</span>    Margin trend        <span class="term-val">improving</span> <span class="term-ok">✓ ok</span>
-<span class="term-label">Quality</span>   ROE (DuPont)        <span class="term-val">21.4%</span>    <span class="term-ok">✓ ok</span>
-<span class="term-label">Quality</span>   ROIC                <span class="term-val">n/a</span>      <span class="term-warn">n/a</span>
-
-<span class="term-brief">Summary: Strong fundamentals. Financially safe.
-  No red flags were triggered by the checks that could be run.</span>
-<span class="term-brief">Note: ROIC not reported: effective tax rate unavailable.</span>
-
-<span class="term-saved">Saved: ACME_analysis.xlsx + ACME_dashboard.html</span>`;
-        
-        const terminalEl = document.getElementById('terminal-text');
-        
-        setTimeout(() => {
-            terminalEl.innerHTML = '<span class="term-prompt">$</span> <span class="term-arg">isoline scan ACME</span>\n<span style="color: #71717a;">...</span>';
-            
-            setTimeout(() => {
-                terminalEl.innerHTML = '';
-                let i = 0;
-                let isHTML = false;
-                let tempStr = '';
-                
-                const typeInterval = setInterval(() => {
-                    if (i < terminalText.length) {
-                        const char = terminalText.charAt(i);
-                        if (char === '<') isHTML = true;
-                        
-                        tempStr += char;
-                        
-                        if (char === '>') {
-                            isHTML = false;
-                            terminalEl.innerHTML = tempStr;
-                        } else if (!isHTML) {
-                            terminalEl.innerHTML = tempStr;
-                        }
-                        
-                        i++;
-                        terminalEl.scrollTop = terminalEl.scrollHeight;
-                    } else {
-                        clearInterval(typeInterval);
-                    }
-                }, 15);
-            }, 800);
-        }, 800);
-
-        // Feature Cards Fade Up Staggered
-        const featObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const cards = entry.target.querySelectorAll('.fade-up-feat');
-                    cards.forEach((card, index) => {
-                        setTimeout(() => {
-                            card.classList.add('visible');
-                        }, index * 60);
-                    });
-                    featObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1, rootMargin: "0px 0px -80px 0px" });
-        
-        const featuresGrid = document.querySelector('.features-grid');
-        if(featuresGrid) featObserver.observe(featuresGrid);
-
-        // How it works Rows Slide In Staggered
-        const rowsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const rows = entry.target.querySelectorAll('.slide-in-row');
-                    rows.forEach((row, index) => {
-                        setTimeout(() => {
-                            row.classList.add('visible');
-                        }, index * 80);
-                    });
-                    rowsObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-        
-        const stepsList = document.querySelector('.steps-list');
-        if(stepsList) rowsObserver.observe(stepsList);
-
-        // Copy to clipboard function
-        function copyText(text, btnElement) {
-            navigator.clipboard.writeText(text).then(() => {
-                const icon = btnElement.querySelector('svg');
-                if (icon) {
-                    const originalColor = icon.style.color || '';
-                    const originalHTML = icon.outerHTML;
-                    
-                    // Switch to checkmark
-                    icon.outerHTML = '<svg viewBox="0 0 24 24" width="' + (icon.getAttribute('width') || '18') + '" height="' + (icon.getAttribute('height') || '18') + '" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="' + (icon.getAttribute('style') || '') + '"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                    
-                    setTimeout(() => {
-                        btnElement.innerHTML = btnElement.innerHTML.replace(/<svg.*?<\/svg>/, originalHTML);
-                    }, 2000);
-                }
-            });
-        }
-
-        // Tabs logic with fade out/in
-        let isAnimatingTab = false;
-        function openTab(tabName, btnElement) {
-            if(isAnimatingTab || btnElement.classList.contains('active')) return;
-            isAnimatingTab = true;
-
-            const tabContents = document.querySelectorAll(".tab-content");
-            const tabBtns = document.querySelectorAll(".tab-btn");
-            
-            // Set buttons state
-            tabBtns.forEach(btn => btn.classList.remove("active"));
-            btnElement.classList.add("active");
-
-            // Find current active content
-            let currentActive = null;
-            tabContents.forEach(content => {
-                if(content.classList.contains('active')) {
-                    currentActive = content;
-                }
-            });
-
-            if(currentActive) {
-                // Fade out current
-                currentActive.style.transition = "opacity 120ms ease-out";
-                currentActive.style.opacity = "0";
-                
-                setTimeout(() => {
-                    currentActive.classList.remove("active");
-                    
-                    // Show new
-                    const newActive = document.getElementById(tabName);
-                    newActive.classList.add("active");
-                    newActive.style.opacity = "0";
-                    
-                    // Force reflow
-                    void newActive.offsetWidth;
-                    
-                    // Fade in new
-                    newActive.style.transition = "opacity 200ms ease-out";
-                    newActive.style.opacity = "1";
-                    
-                    setTimeout(() => {
-                        isAnimatingTab = false;
-                        newActive.style.transition = "";
-                    }, 200);
-                }, 120);
-            } else {
-                // Fallback if none active
-                const newActive = document.getElementById(tabName);
-                newActive.classList.add("active");
-                newActive.style.opacity = "1";
-                isAnimatingTab = false;
-            }
-        }
-
-        // Nav Link Active State (Scroll Spy)
-        const sections = document.querySelectorAll(".nav-section");
-        const navItems = document.querySelectorAll(".nav-item");
-        
-        const scrollSpyObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    navItems.forEach(link => {
-                        link.classList.remove('active');
-                        if(link.getAttribute('data-target') === id) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
-            });
-        }, { rootMargin: "-20% 0px -60% 0px" });
-        
-        sections.forEach(section => scrollSpyObserver.observe(section));
-
-        const stockData = [
-            {
-                ticker: "SAMPLE-A",
-                name: "Illustrative sample, not real data",
-                exchange: "DEMO",
-                badge: "SAFE",
-                badgeClass: "sc-badge-safe",
-                piotroski: { val: "6/9", pct: 66, cls: "amber" },
-                altman:    { val: "13.48", pct: 90, cls: "green" },
-                beneish:   { val: "−1.94", pct: 80, cls: "green" },
-                metrics: [
-                    { label: "P/E Ratio",      val: "13.21",  cls: "" },
-                    { label: "P/B Ratio",      val: "4.37",   cls: "" },
-                    { label: "Revenue CAGR",   val: "+3.44%", cls: "green" },
-                    { label: "Margin trend",   val: "Stable", cls: "" }
-                ],
-                brief: "Adequate fundamentals. Financially safe. Revenue growing 3.44% CAGR. No red flags detected."
-            },
-            {
-                ticker: "SAMPLE-B",
-                name: "Illustrative sample, not real data",
-                exchange: "DEMO",
-                badge: "SAFE",
-                badgeClass: "sc-badge-safe",
-                piotroski: { val: "7/9", pct: 78, cls: "green" },
-                altman:    { val: "9.12", pct: 75, cls: "green" },
-                beneish:   { val: "−2.31", pct: 85, cls: "green" },
-                metrics: [
-                    { label: "P/E Ratio",      val: "27.43",  cls: "" },
-                    { label: "P/B Ratio",      val: "46.2",   cls: "" },
-                    { label: "Revenue CAGR",   val: "+5.21%", cls: "green" },
-                    { label: "Margin trend",   val: "Improving", cls: "green" }
-                ],
-                brief: "Strong fundamentals. High valuation justified by margins. Financially very safe. Consistent growth."
-            },
-            {
-                ticker: "SAMPLE-C",
-                name: "Illustrative sample, not real data",
-                exchange: "DEMO",
-                badge: "ADEQUATE",
-                badgeClass: "sc-badge-warn",
-                piotroski: { val: "5/9", pct: 55, cls: "amber" },
-                altman:    { val: "4.87", pct: 58, cls: "amber" },
-                beneish:   { val: "−1.61", pct: 72, cls: "green" },
-                metrics: [
-                    { label: "P/E Ratio",      val: "22.10",  cls: "" },
-                    { label: "P/B Ratio",      val: "2.14",   cls: "" },
-                    { label: "Revenue CAGR",   val: "+8.11%", cls: "green" },
-                    { label: "Margin trend",   val: "Stable", cls: "" }
-                ],
-                brief: "Adequate health score. High revenue growth. Leverage elevated but manageable. Monitor debt levels."
-            },
-            {
-                ticker: "SAMPLE-D",
-                name: "Illustrative sample, not real data",
-                exchange: "DEMO",
-                badge: "SAFE",
-                badgeClass: "sc-badge-safe",
-                piotroski: { val: "8/9", pct: 89, cls: "green" },
-                altman:    { val: "11.34", pct: 88, cls: "green" },
-                beneish:   { val: "−2.67", pct: 92, cls: "green" },
-                metrics: [
-                    { label: "P/E Ratio",      val: "32.80",  cls: "" },
-                    { label: "P/B Ratio",      val: "12.4",   cls: "" },
-                    { label: "Revenue CAGR",   val: "+9.87%", cls: "green" },
-                    { label: "Margin trend",   val: "Improving", cls: "green" }
-                ],
-                brief: "Excellent fundamentals across all engines. High confidence. Strong moat. No red flags detected."
-            }
-        ];
-
-        function renderCard(d) {
-            const card = document.getElementById('score-card');
-            card.style.opacity = '0';
-            card.style.transition = 'opacity 300ms ease';
-            
-            setTimeout(() => {
-                card.innerHTML = `
-                <div class="sc-header">
-                    <div class="sc-ticker-block">
-                        <span class="sc-ticker">${d.ticker}</span>
-                        <span class="sc-name">${d.name}</span>
-                    </div>
-                    <div class="sc-badge ${d.badgeClass}">${d.badge}</div>
-                </div>
-
-                <div class="sc-scores">
-                    <div class="sc-score-row">
-                        <div class="sc-score-label">
-                            <span class="sc-label-name">Piotroski F</span>
-                            <span class="sc-label-sub">Financial health</span>
-                        </div>
-                        <div class="sc-score-right">
-                            <div class="sc-bar-track">
-                                <div class="sc-bar-fill sc-bar-${d.piotroski.cls}" style="width:${d.piotroski.pct}%"></div>
-                            </div>
-                            <span class="sc-score-val sc-val-${d.piotroski.cls}">${d.piotroski.val}</span>
-                        </div>
-                    </div>
-                    <div class="sc-score-row">
-                        <div class="sc-score-label">
-                            <span class="sc-label-name">Altman Z</span>
-                            <span class="sc-label-sub">Bankruptcy risk</span>
-                        </div>
-                        <div class="sc-score-right">
-                            <div class="sc-bar-track">
-                                <div class="sc-bar-fill sc-bar-${d.altman.cls}" style="width:${d.altman.pct}%"></div>
-                            </div>
-                            <span class="sc-score-val sc-val-${d.altman.cls}">${d.altman.val}</span>
-                        </div>
-                    </div>
-                    <div class="sc-score-row">
-                        <div class="sc-score-label">
-                            <span class="sc-label-name">Beneish M</span>
-                            <span class="sc-label-sub">Earnings manipulation</span>
-                        </div>
-                        <div class="sc-score-right">
-                            <div class="sc-bar-track">
-                                <div class="sc-bar-fill sc-bar-${d.beneish.cls}" style="width:${d.beneish.pct}%"></div>
-                            </div>
-                            <span class="sc-score-val sc-val-${d.beneish.cls}">${d.beneish.val}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sc-divider"></div>
-
-                <div class="sc-metrics">
-                    ${d.metrics.map(m => `
-                    <div class="sc-metric">
-                        <span class="sc-m-label">${m.label}</span>
-                        <span class="sc-m-val ${m.cls ? 'sc-val-'+m.cls : ''}">${m.val}</span>
-                    </div>`).join('')}
-                </div>
-
-                <div class="sc-divider"></div>
-
-                <div class="sc-brief">
-                    <span class="sc-brief-icon">✦</span>
-                    <p>${d.brief}</p>
-                </div>
-
-                <div class="sc-footer-row">
-                    <span class="sc-footer-label">Generated by isoline</span>
-                    <span class="sc-footer-label">${d.exchange} · Yahoo Finance</span>
-                </div>`;
-
-                card.style.opacity = '1';
-            }, 300);
-        }
-
-        let currentStock = 0;
-        renderCard(stockData[0]);
-        setInterval(() => {
-            currentStock = (currentStock + 1) % stockData.length;
-            renderCard(stockData[currentStock]);
-        }, 5000);
-
-        function copyCmd(btn) {
-            const block = btn.nextElementSibling;
-            const text = block.innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const svg = btn.querySelector('svg');
-                btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                setTimeout(() => {
-                    btn.innerHTML = svg.outerHTML.replace('stroke="#4ade80"', 'stroke="currentColor"');
-                }, 2000);
-            });
-        }
-
-    </script>
+})();
+</script>
 </body>
 </html>

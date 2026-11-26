@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/wordmark.svg" alt="Isoline" width="320">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/wordmark-dark.svg">
+    <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/wordmark.svg" alt="Isoline" width="300">
+  </picture>
 </p>
 
 <p align="center"><b>Financial statements, measured precisely.</b><br>
@@ -20,7 +23,7 @@ isoline scan AAPL
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/demo.gif" alt="isoline scan in the terminal, then the HTML report" width="800">
+  <img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/demo.gif" alt="isoline scan in the terminal, then the HTML report it writes" width="800">
 </p>
 
 <p align="center"><sub>A real run of the real engines on a <b>synthetic sample company</b> (no real firm's figures are implied): the terminal scan, then the report it writes.</sub></p>
