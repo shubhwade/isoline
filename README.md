@@ -36,7 +36,7 @@ isoline scan AAPL
 | **Scores** | Piotroski F (9 signals), Altman Z-double-prime, Beneish M (8 variables) |
 | **Quality** | DuPont ROE, ROIC, FCF margin, accruals, cash conversion cycle, dilution |
 | **Statements** | `isoline statements AAPL`: income statement, balance sheet and cash flow for four years, as reported |
-| **Reports** | A professional, print-ready report: full statements with YoY and common-size columns, ratio analysis, scoring models, DCF, charts and notes. Excel workbook with statement sheets; JSON and CSV export |
+| **Reports** | A print-ready report laid out like a company's published statements, readable by a first-time investor: every number explained in plain English, strengths and concerns, scores, a DCF, charts and a glossary. Excel workbook with statement sheets; JSON and CSV export |
 | **Compare and screen** | Side-by-side comparison; sector screens with reasons for every skipped ticker |
 | **Terminal UI** | `pip install "isoline[tui]"` then `isoline tui`: modes, command palette (Ctrl+K), session history |
 | **Valuation** | `isoline value AAPL`: DCF with scenarios, sensitivity and every assumption shown |

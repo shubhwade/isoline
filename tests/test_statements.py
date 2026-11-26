@@ -105,10 +105,17 @@ def test_year_on_year_rules() -> None:
 # ----------------------------------------------------------------- reports
 def test_scan_report_reads_like_a_statement() -> None:
     html = scan_report(_scan(synthetic()))
-    for text in ("Income statement", "Balance sheet", "Cash flow statement", "USD millions", "1,480", "(880)",
-                 "Total liabilities and equity", "&dagger;", "Valuation: discounted cash flow", "USD 19.02"):
+    for text in ("Income statement", "Balance sheet", "Cash flow statement", "In millions of USD", "1,480", "(880)",
+                 "Total liabilities and equity", "&dagger;", "discounted cash flow", "$19.02",
+                 # beginner aids: plain-English meanings, strengths/concerns, glossary, reading guide
+                 "What it means", "Strengths", "Concerns", "Glossary", "How to read this report",
+                 "of short-term assets for every 1.00 of bills due within a year"):
         assert text in html, text
     assert html.count('class="tot"') >= 3  # net income, total assets, free cash flow
+    # published-statement conventions: currency sign on the first row, flush result lines
+    assert '<td class="cur">$</td>' in html and 'class="sub flush"' in html
+    for slop in ("Georgia", "letter-spacing", "border-radius"):
+        assert slop not in html, slop
     assert "Page \" counter(page)" in html  # numbered pages when printed
 
 

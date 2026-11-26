@@ -14,6 +14,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from isoline import __version__
+from isoline.branding import BRAND
 from isoline.core.comparison import SECTIONS, all_metrics, format_value, stronger
 from isoline.core.errors import IsolineError
 from isoline.core.result import ScanResult
@@ -948,8 +949,11 @@ def info() -> None:
     package_version = __version__
     console.print(f"Version: [green]{package_version}[/green]")
     console.print(f"Python: [green]{sys.version.split()[0]}[/green]")
-    console.print("Data source: [green]yfinance[/green]")
-    console.print("Coverage: [green]valuation, health, growth, quality, red flags[/green]")
+    console.print("Data source: [green]Yahoo Finance (yfinance); SEC EDGAR fallback for US tickers[/green]")
+    console.print(
+        "Coverage: [green]financial statements, valuation, health, growth, quality, red flags, DCF[/green]"
+    )
+    console.print(f"Docs: {BRAND.docs_url}  Website: {BRAND.site_url}")
 
 
 @app.command()

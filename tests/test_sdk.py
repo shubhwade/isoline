@@ -181,9 +181,9 @@ def test_scan_report_contains_two_svg_charts_and_no_zero_bar_for_gaps(tmp_path) 
     out = tmp_path / "r.html"
     HtmlDashboardExporter().export_scan(r, str(out))
     html = out.read_text(encoding="utf-8")
-    assert html.count("<svg") == 2 and "Earnings quality" in html
+    assert html.count("<svg") == 2 and "Is profit turning into cash?" in html
     assert "FY2021" in html and "<script" not in html.lower()
-    assert "Times New Roman" in html and "Georgia" not in html  # lining figures, formal fonts
+    assert "Arial" in html and "Georgia" not in html  # plain sans with lining figures, as in filings
     # 4 revenue + 4 net income bars in chart 1 (+ gaps skipped in chart 2: 3 CFO + 3 FCF + 4 NI)
     assert html.count("<rect") >= 8 + 10
 

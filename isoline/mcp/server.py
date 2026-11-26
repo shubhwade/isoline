@@ -225,7 +225,7 @@ async def handle_tool_call(
     elif name == "info":
         payload = {
             "version": __version__,
-            "data_source": "yfinance",
+            "data_source": "Yahoo Finance (yfinance); SEC EDGAR fallback for US tickers",
             "coverage": ["valuation", "health", "growth", "quality", "flags", "statements", "dcf"],
             "description": "Financial statement analysis MCP server for AI IDEs.",
         }

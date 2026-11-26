@@ -59,13 +59,24 @@ isoline scan AAPL --export aapl.json      # .json, .csv or .xlsx
 isoline compare AAPL MSFT
 ```
 
-## 6. Files written
+## 6. Read the financial statements
+
+```bash
+isoline statements AAPL
+isoline statements AAPL --export aapl_statements.csv
+```
+
+## 7. Files written
 
 | Command | Files |
 |---|---|
 | `scan T` | `T_analysis.xlsx`, `T_dashboard.html` |
 | `compare A B` | `AvsB_comparison.xlsx`, `AvsB_dashboard.html` |
-| `screen IT` | printed table; `--export` for `.xlsx`/`.csv`/`.json` |
+| `screen IT` | `screen_results.xlsx`, `screen_dashboard.html`; `--export` adds `.xlsx`/`.csv`/`.json` |
+| `powerbi ... --export p.csv` | `p.csv`, `p_report.html` |
+| `statements T --export f` | `f` (`.csv` or `.json`) |
+
+Add `--no-report` to `scan`, `compare` or `screen` to write no files, and `--no-open` to keep the browser closed.
 
 ## Troubleshooting
 

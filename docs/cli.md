@@ -70,6 +70,15 @@ isoline powerbi --tickers INFY.NS TCS.NS --export flags.csv --flags
 ```
 Writes the CSV plus a `*_report.html` portfolio report (one row per company, averages of reported values, and a summary per company). A ticker that cannot be loaded is skipped and listed, instead of aborting the export; the command fails only if no ticker could be analysed.
 
+## tui
+
+```bash
+pip install "isoline[tui]"
+isoline tui
+```
+
+Opens the full-screen terminal interface: four modes (scan, valuation, compare, screen), a command palette on Ctrl+K and session history. See [Terminal interface](terminal.md).
+
 ## serve
 
 ```bash
