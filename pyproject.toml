@@ -34,7 +34,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://shubhwade.github.io/isoline"
+Homepage = "https://isolinee.vercel.app"
 Documentation = "https://shubhwade.github.io/isoline"
 Repository = "https://github.com/shubhwade/isoline"
 Changelog = "https://shubhwade.github.io/isoline/changelog/"
@@ -87,3 +87,10 @@ python_version = "3.10"
 ignore_missing_imports = true
 warn_unused_ignores = true
 files = ["isoline/core", "isoline/sdk", "isoline/__init__.py"]
+
+# numpy >= 2.5 ships stubs that use Python 3.12 `type` statements, which mypy rejects
+# when checking for 3.10. Treat numpy as untyped instead of parsing its stubs.
+[[tool.mypy.overrides]]
+module = ["numpy", "numpy.*"]
+follow_imports = "skip"
+follow_imports_for_stubs = true

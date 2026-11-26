@@ -30,11 +30,11 @@ DISCLAIMER = (
 )
 
 CSS = """
-:root{--ink:#1a1f2b;--muted:#5b6475;--line:#d9dde5;--soft:#f5f6f9;--navy:#1f3354;
+:root{--ink:#141414;--muted:#5c5c58;--line:#dededa;--soft:#f5f5f3;--navy:#0a0a0a;
 --good:#1b6b43;--warn:#8a5a00;--bad:#a42a22;--goodbg:#e8f4ed;--warnbg:#fbf2df;--badbg:#fbe9e7}
 *{box-sizing:border-box}
 html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-body{margin:0;background:#eef0f4;color:var(--ink);
+body{margin:0;background:#efefec;color:var(--ink);
 font:14px/1.5 Calibri,"Segoe UI",Arial,"Helvetica Neue",sans-serif;
 font-variant-numeric:lining-nums tabular-nums}
 .page{max-width:900px;margin:24px auto;background:#fff;padding:40px 48px;
@@ -51,12 +51,12 @@ padding-bottom:4px;border-bottom:1px solid var(--line)}
 .card .lab{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .card .val{font:700 25px/1.2 Calibri,"Segoe UI",Arial,sans-serif;margin:4px 0 2px;color:var(--navy)}
 .card .sub2{font-size:12px;font-weight:600}
-.bar{position:relative;height:6px;background:#e6e9ef;border-radius:3px;margin-top:8px}
+.bar{position:relative;height:6px;background:#e6e6e2;border-radius:3px;margin-top:8px}
 .fig{margin:10px 0 4px;border:1px solid var(--line);padding:10px 12px 6px}
 .fig figcaption{font:700 13px "Times New Roman",Times,serif;color:var(--navy);margin-bottom:2px}
 .fig .src{font-size:11px;color:var(--muted)}
 .fig svg{width:100%;height:auto;display:block}
-.fig text{font-family:Calibri,"Segoe UI",Arial,sans-serif;fill:#3b4354}
+.fig text{font-family:Calibri,"Segoe UI",Arial,sans-serif;fill:#3c3c38}
 .bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--navy)}
 table{border-collapse:collapse;width:100%;margin:4px 0;table-layout:fixed}
 table.t4 th:nth-child(1){width:27%}table.t4 th:nth-child(2){width:15%}table.t4 th:nth-child(3){width:17%}table.t4 th:nth-child(4){width:41%}
@@ -69,7 +69,7 @@ td.what{color:var(--muted);font-size:12.5px}
 .tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11.5px;font-weight:600;
 white-space:nowrap}
 .good{color:var(--good);background:var(--goodbg)}.warn{color:var(--warn);background:var(--warnbg)}
-.bad{color:var(--bad);background:var(--badbg)}.na{color:var(--muted);background:#eceef2}
+.bad{color:var(--bad);background:var(--badbg)}.na{color:var(--muted);background:#ececea}
 .none{color:var(--muted)}
 ul.notes{margin:6px 0 0 18px;padding:0;color:var(--muted);font-size:13px}
 .disc{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);
@@ -201,8 +201,8 @@ def _notes(notes: Sequence[str]) -> str:
 
 
 # ----------------------------------------------------------------------------- charts (inline SVG)
-PALETTE = ["#1f3354", "#7d97c4", "#a9b0bd"]
-LINE_COLOR = "#a05a00"
+PALETTE = ["#141414", "#8a8a86", "#c4c4bf"]
+LINE_COLOR = "#d13a10"
 
 
 def _scale(values: Sequence[float | None]) -> tuple[float, str]:
@@ -268,11 +268,11 @@ def _chart(
 
     out = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="{title}">']
     for t in ticks:
-        out.append(f'<line x1="{ml}" x2="{W - mr}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#e3e6ec" stroke-width="1"/>')
+        out.append(f'<line x1="{ml}" x2="{W - mr}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#e4e4e0" stroke-width="1"/>')
         out.append(f'<text x="{ml - 8}" y="{y(t) + 4:.1f}" font-size="11" text-anchor="end">{t:g}</text>')
-    out.append(f'<line x1="{ml}" x2="{W - mr}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#7a8294" stroke-width="1.2"/>')
+    out.append(f'<line x1="{ml}" x2="{W - mr}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#7c7c78" stroke-width="1.2"/>')
     if unit:
-        out.append(f'<text x="{ml}" y="14" font-size="11" text-anchor="start" style="fill:#5b6475">Amounts in {unit}</text>')
+        out.append(f'<text x="{ml}" y="14" font-size="11" text-anchor="start" style="fill:#5c5c58">Amounts in {unit}</text>')
 
     group = pw / n
     bw = group * 0.66 / len(scaled)

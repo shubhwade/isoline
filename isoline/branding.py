@@ -19,6 +19,7 @@ class Brand:
     tagline: str
     repo_url: str
     docs_url: str
+    site_url: str
     legacy_package: str | None = None  # kept on PyPI; points users to the successor
     successor_package: str | None = None
 
@@ -31,6 +32,7 @@ BRAND = Brand(
     tagline="Financial statements, measured precisely",
     repo_url="https://github.com/shubhwade/isoline",
     docs_url="https://shubhwade.github.io/isoline/",
+    site_url="https://isolinee.vercel.app",
     legacy_package="telmus",
 )
 

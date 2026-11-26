@@ -1,16 +1,17 @@
 """Build the demo GIF shown in the README and on PyPI.
 
-Four scenes, all in the Isoline brand: a title card, the REAL `isoline scan` output on
-the synthetic sample company from make_sample_assets.py, the report it writes scrolling
-past in a browser window, and an install card. Frames are rendered with Playwright's
-Chromium and encoded with an ffmpeg two-pass palette, so colours stay clean.
+Four scenes in the Isoline brand (black, white, one vermilion signal colour): a title
+card over ridgeline terrain, the REAL `isoline scan` output on the synthetic sample
+company from make_sample_assets.py, the report it writes scrolling in a browser window,
+and an install card. Frames are rendered with Playwright's Chromium and encoded with a
+two-pass ffmpeg palette. Also writes og.png, the 1200x630 social preview of the website.
 
     pip install playwright pillow && python -m playwright install chromium
     python examples/make_sample_assets.py docs/assets      # writes sample-report.png
-    python examples/make_demo_gif.py docs/assets [--fonts DIR]
+    python examples/make_demo_gif.py docs/assets [--fonts DIR] [--chrome PATH]
 
---fonts may point at a folder holding JetBrains Mono and Newsreader .woff2 files
-(for example from the @fontsource npm packages); otherwise system fonts are used.
+--fonts may point at a folder holding Inter Tight and IBM Plex Mono .woff2 files (for
+example the @fontsource npm packages); otherwise system fonts are used.
 """
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ from rich.console import Console
 from rich.terminal_theme import TerminalTheme
 
 sys.path.insert(0, str(Path(__file__).parent))
-from make_brand_assets import AMBER, INK, PAPER, mark_svg  # noqa: E402
+from make_brand_assets import ACCENT, mark_svg  # noqa: E402
 from make_sample_assets import synthetic  # noqa: E402
 
 from isoline.cli import app as cli  # noqa: E402
@@ -38,14 +39,19 @@ from isoline.core.scanner import IsolineScanner  # noqa: E402
 
 W, H = 1200, 675
 CMD = "isoline scan ACME"
+BG = "#0A0A0A"
+PANEL = "#141414"
+LINE = "#262626"
+DIM = "#6E6E6B"
+TEXT = "#E8E8E5"
 
-# Terminal palette tuned to the brand: deep navy ground, paper text, amber/blue accents.
+# Neutral terminal palette: greys and white, with vermilion in place of red/yellow.
 THEME = TerminalTheme(
-    (15, 24, 40), (217, 222, 231),
-    [(15, 24, 40), (231, 123, 110), (116, 198, 154), (232, 160, 74),
-     (127, 167, 217), (196, 160, 230), (125, 196, 214), (217, 222, 231)],
-    [(111, 123, 144), (240, 140, 128), (140, 214, 172), (240, 180, 100),
-     (150, 186, 232), (210, 180, 240), (150, 210, 226), (243, 241, 236)],
+    (20, 20, 20), (210, 210, 206),
+    [(20, 20, 20), (255, 90, 46), (244, 244, 242), (255, 90, 46),
+     (244, 244, 242), (163, 163, 160), (200, 200, 196), (210, 210, 206)],
+    [(110, 110, 107), (255, 110, 70), (255, 255, 255), (255, 110, 70),
+     (255, 255, 255), (190, 190, 186), (220, 220, 216), (255, 255, 255)],
 )
 
 
@@ -53,87 +59,95 @@ def font_css(fonts: Path | None) -> str:
     if not fonts:
         return ""
     rules = []
-    for fam, pat in (("JetBrains Mono", "jetbrains-mono-latin-{w}-normal.woff2"),
-                     ("Newsreader", "newsreader-latin-{w}-normal.woff2"),
-                     ("Newsreader", "newsreader-latin-{w}-italic.woff2")):
-        for w in (400, 500, 700):
-            hits = list(fonts.rglob(pat.format(w=w)))
+    for fam, pat, weights in (("Inter Tight", "inter-tight-latin-{w}-normal.woff2", (400, 600)),
+                              ("IBM Plex Mono", "ibm-plex-mono-latin-{w}-normal.woff2", (400, 500))):
+        for w in weights:
+            hits = sorted(fonts.rglob(pat.format(w=w)))
             if hits:
-                style = "italic" if "italic" in pat else "normal"
-                rules.append(f"@font-face{{font-family:'{fam}';font-weight:{w};font-style:{style};"
+                rules.append(f"@font-face{{font-family:'{fam}';font-weight:{w};"
                              f"src:url('{hits[0].resolve().as_uri()}')}}")
     return "".join(rules)
 
 
 BASE = """<!doctype html><html><head><meta charset="utf-8"><style>{fonts}
 *{{box-sizing:border-box}}html,body{{margin:0;width:{W}px;height:{H}px;overflow:hidden}}
-body{{background:{paper};font-family:Inter,'Segoe UI',system-ui,sans-serif;color:{ink};position:relative}}
-.serif{{font-family:Newsreader,Georgia,serif}}.mono{{font-family:'JetBrains Mono','DejaVu Sans Mono',Consolas,monospace}}
-#topo{{position:absolute;inset:0}}
-.win{{position:absolute;border-radius:12px;overflow:hidden;
- box-shadow:0 0 0 1px rgba(19,33,61,.14),0 40px 80px -30px rgba(15,24,40,.55),0 14px 28px -14px rgba(15,24,40,.35)}}
+body{{background:{bg};font-family:'Inter Tight',Inter,'Segoe UI',system-ui,sans-serif;color:#F4F4F2;position:relative}}
+.mono{{font-family:'IBM Plex Mono','DejaVu Sans Mono',Consolas,monospace}}
+#ridge{{position:absolute;inset:0}}
+.win{{position:absolute;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px {line},0 40px 90px -30px rgba(0,0,0,.9)}}
 .bar{{height:36px;display:flex;align-items:center;gap:7px;padding:0 14px}}
 .bar i{{width:11px;height:11px;border-radius:50%}}
-.cap{{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:14px;color:#7A8091;letter-spacing:.01em}}
-.cap b{{color:{ink};font-weight:600}}
-</style></head><body><canvas id="topo" width="{W2}" height="{H2}"></canvas>{body}
+.cap{{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:14px;color:{dim};
+ font-family:'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;font-size:11.5px}}
+.cap b{{color:{accent};font-weight:500}}
+</style></head><body><canvas id="ridge" width="{W2}" height="{H2}"></canvas>{body}
 <script>
-// static topographic texture (same marching-squares idea as the website)
-const c=document.getElementById('topo'),x=c.getContext('2d');x.scale(2,2);
-const P=[[.82,.22,.28],[.12,.85,.3],[.55,1.1,.22],[.02,.1,.2]];
-const f=(u,v)=>P.reduce((s,[a,b,r],k)=>{{const dx=(u-a)*{asp},dy=v-b;return s+Math.exp(-(dx*dx+dy*dy)/(2*r*r))*(1-k*.1)}},0)+.05*Math.sin(u*9)*Math.cos(v*7);
-const st=12,cols=Math.ceil({W}/st)+1,rows=Math.ceil({H}/st)+1,g=[];
-for(let j=0;j<rows;j++)for(let i=0;i<cols;i++)g.push(f(i*st/{W},j*st/{H}));
-x.strokeStyle='rgba(19,33,61,{alpha})';x.lineWidth=1;
-const S={{1:[[3,0]],2:[[0,1]],3:[[3,1]],4:[[1,2]],5:[[3,0],[1,2]],6:[[0,2]],7:[[3,2]],8:[[2,3]],9:[[0,2]],10:[[0,1],[2,3]],11:[[1,2]],12:[[1,3]],13:[[0,1]],14:[[0,3]]}};
-for(let L=.1;L<1.3;L+=.09){{x.beginPath();for(let j=0;j<rows-1;j++)for(let i=0;i<cols-1;i++){{
-const a=g[j*cols+i],b=g[j*cols+i+1],cc=g[(j+1)*cols+i+1],d=g[(j+1)*cols+i];
-const n=(a>L)|(b>L)<<1|(cc>L)<<2|(d>L)<<3;if(!n||n==15)continue;const X=i*st,Y=j*st;
-const e=[[X+st*(L-a)/(b-a),Y],[X+st,Y+st*(L-b)/(cc-b)],[X+st*(L-d)/(cc-d),Y+st],[X,Y+st*(L-a)/(d-a)]];
-for(const[p,q]of S[n]){{x.moveTo(...e[p]);x.lineTo(...e[q])}}}}x.stroke()}}
+// ridgeline terrain, the same motif as the website hero
+const c=document.getElementById('ridge'),x=c.getContext('2d');x.scale(2,2);
+const P=[[.72,.45,.13,1],[.88,.62,.09,.7],[.5,.72,.16,.55],[.2,.55,.12,.4],[.96,.3,.1,.5]];
+const h=(u,v)=>P.reduce((s,[a,b,r,k])=>{{const dx=u-a,dy=(v-b)*1.4;return s+k*Math.exp(-(dx*dx+dy*dy)/(2*r*r))}},0)+.05*Math.sin(u*22+v*6)*Math.sin(v*15);
+const rows=34,y0={H}*{top},bot={H}*1.02,amp={H}*.32,hot={hot};
+for(let r=0;r<rows;r++){{const v=r/(rows-1),base=y0+(bot-y0)*v,k=.35+v*.65;x.beginPath();x.moveTo(0,base);
+for(let X=0;X<={W}+5;X+=5)x.lineTo(X,base-amp*h(X/{W},v)*k);x.lineTo({W},{H}+2);x.lineTo(0,{H}+2);x.closePath();
+x.fillStyle='{bg}';x.fill();const isHot=r===hot;x.strokeStyle=isHot?'{accent}':'#F4F4F2';
+x.globalAlpha=isHot?1:{alpha}*(.25+v*.75);x.lineWidth=isHot?1.7:1;x.stroke();x.globalAlpha=1}}
 </script></body></html>"""
 
 
-def page(body: str, fonts: str, alpha: float = 0.07) -> str:
-    return BASE.format(fonts=fonts, W=W, H=H, W2=W * 2, H2=H * 2, paper=PAPER, ink=INK,
-                       body=body, asp=W / H, alpha=alpha)
+def page(body: str, fonts: str, alpha: float = .45, top: float = .12, hot: int = 15) -> str:
+    return BASE.format(fonts=fonts, W=W, H=H, W2=W * 2, H2=H * 2, bg=BG, line=LINE, dim=DIM,
+                       accent=ACCENT, body=body, alpha=alpha, top=top, hot=hot)
 
 
-def title_card(opacity: float, rise: float) -> str:
-    mark = mark_svg(size=96).replace("<svg ", '<svg style="display:block;border-radius:22px" ')
-    return f"""<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
- justify-content:center;gap:26px;opacity:{opacity};transform:translateY({rise}px)">
- <div style="box-shadow:0 24px 48px -20px rgba(19,33,61,.5);border-radius:22px">{mark}</div>
- <div style="font-size:64px;font-weight:600;letter-spacing:-.035em;line-height:1"><span style="color:{AMBER}">i</span>soline</div>
- <div class="serif" style="font-size:30px;color:#4B5468;font-style:italic;letter-spacing:-.01em">Financial statements, measured precisely.</div>
-</div>"""
+def dark_mark(size: int) -> str:
+    return mark_svg(size=size).replace("<svg ", f'<svg style="display:block;border-radius:{size * 28 // 128}px;'
+                                               f'box-shadow:0 0 0 1px #333" ')
 
 
-def terminal(body_html: str, cmd_typed: str, caret: bool, cap: str) -> str:
-    caret_html = f'<span style="display:inline-block;width:9px;height:17px;background:#D9DEE7;vertical-align:-3px"></span>' if caret else ""
-    prompt = '<span style="color:#7FA7D9">~/research</span> <span style="color:#6F7B90">$</span> '
-    return f"""<div class="win" style="left:80px;top:34px;width:1040px;height:560px;background:#0F1828">
- <div class="bar" style="border-bottom:1px solid #22304A"><i style="background:#2C3851"></i><i style="background:#2C3851"></i><i style="background:#2C3851"></i>
- <span style="flex:1;text-align:center;margin-right:50px;font-size:12.5px;color:#6F7B90">isoline — zsh</span></div>
- <pre class="mono" style="margin:0;padding:14px 22px;color:#D9DEE7;font-size:13.4px;line-height:17.6px;white-space:pre;height:524px;overflow:hidden">{prompt}<span style="color:#F3F1EC">{html.escape(cmd_typed)}</span>{caret_html}{body_html}</pre>
-</div><div class="cap">{cap}</div>"""
+def title_card(t: float) -> str:
+    """t in [0, 1]: words slide up out of a mask, then the tagline fades in."""
+    def line(text: str, delay: float, color: str = "#F4F4F2") -> str:
+        k = max(0.0, min(1.0, (t - delay) / 0.5))
+        k = 1 - (1 - k) ** 3
+        return (f'<div style="overflow:hidden;padding-bottom:16px;margin-bottom:-10px"><div style="transform:translateY({(1 - k) * 105:.1f}%);'
+                f'color:{color}">{text}</div></div>')
+    fade = max(0.0, min(1.0, (t - 0.55) / 0.45))
+    return f"""<div style="position:absolute;inset:0;background:linear-gradient(90deg,{BG} 0%,rgba(10,10,10,.85) 40%,rgba(10,10,10,0) 70%)"></div>
+<div style="position:absolute;left:72px;top:96px;opacity:{min(1, t * 3):.2f}">{dark_mark(56)}</div>
+<div style="position:absolute;left:72px;top:180px;font-size:92px;font-weight:600;letter-spacing:-.06em;line-height:.9">
+ {line("Financial", 0)}{line("statements,", .1)}{line("measured precisely.", .2, ACCENT)}</div>
+<div class="mono" style="position:absolute;left:76px;top:520px;font-size:15px;color:#A3A3A0;opacity:{fade:.2f};letter-spacing:.02em">
+ isoline · open-source financial statement analysis</div>"""
 
 
-def report(img: Path, offset: int, cap: str) -> str:
-    return f"""<div class="win" style="left:150px;top:28px;width:900px;height:570px;background:#fff">
- <div class="bar" style="background:#EEEBE4;border-bottom:1px solid #DED8CB"><i style="background:#D3CCBD"></i><i style="background:#D3CCBD"></i><i style="background:#D3CCBD"></i>
- <span style="margin-left:14px;width:420px;height:22px;border-radius:6px;background:#fff;font-size:12px;line-height:22px;color:#6A6F7A;padding:0 10px">ACME_dashboard.html</span></div>
+def terminal(body_html: str, cmd_typed: str, caret: bool) -> str:
+    caret_html = f'<span style="display:inline-block;width:9px;height:17px;background:{ACCENT};vertical-align:-3px"></span>' if caret else ""
+    prompt = f'<span style="color:{DIM}">~/research $</span> '
+    return f"""<div style="position:absolute;inset:0;background:rgba(10,10,10,.6)"></div>
+<div class="win" style="left:80px;top:34px;width:1040px;height:560px;background:{PANEL}">
+ <div class="bar" style="border-bottom:1px solid {LINE}"><i style="background:#2E2E2E"></i><i style="background:#2E2E2E"></i><i style="background:#2E2E2E"></i>
+ <span class="mono" style="flex:1;text-align:center;margin-right:50px;font-size:12px;color:{DIM}">isoline — zsh</span></div>
+ <pre class="mono" style="margin:0;padding:14px 22px;color:{TEXT};font-size:13.2px;line-height:17.4px;white-space:pre;height:524px;overflow:hidden">{prompt}<span style="color:#fff">{html.escape(cmd_typed)}</span>{caret_html}{body_html}</pre>
+</div><div class="cap">Real output of the real engines · <b>synthetic sample company</b></div>"""
+
+
+def report(img: Path, offset: int) -> str:
+    return f"""<div style="position:absolute;inset:0;background:rgba(10,10,10,.6)"></div>
+<div class="win" style="left:150px;top:28px;width:900px;height:570px;background:#fff">
+ <div class="bar" style="background:#F2F2F0;border-bottom:1px solid #E2E2DF"><i style="background:#D6D6D2"></i><i style="background:#D6D6D2"></i><i style="background:#D6D6D2"></i>
+ <span class="mono" style="margin-left:14px;font-size:11.5px;color:#6F6F68">ACME_dashboard.html</span></div>
  <div style="height:534px;overflow:hidden;background:#F3F4F6"><img src="{img.as_uri()}" style="display:block;width:900px;transform:translateY(-{offset}px)"></div>
-</div><div class="cap">{cap}</div>"""
+</div><div class="cap">The same scan as a formal, print-ready report</div>"""
 
 
 def end_card() -> str:
-    mark = mark_svg(size=56).replace("<svg ", '<svg style="display:block;border-radius:13px" ')
-    return f"""<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px">
- <div style="display:flex;align-items:center;gap:14px">{mark}<span style="font-size:40px;font-weight:600;letter-spacing:-.03em"><span style="color:{AMBER}">i</span>soline</span></div>
- <div class="mono" style="font-size:30px;background:#0F1828;color:#F3F1EC;padding:20px 34px;border-radius:12px;
-  box-shadow:0 30px 60px -24px rgba(15,24,40,.55)"><span style="color:#6F7B90">$ </span>pip install isoline</div>
- <div style="font-size:16px;color:#4B5468">Open source · No API key · <b style="color:{INK}">github.com/shubhwade/isoline</b></div>
+    return f"""<div style="position:absolute;inset:0;background:linear-gradient(0deg,{BG} 10%,rgba(10,10,10,.7) 60%,rgba(10,10,10,.4))"></div>
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px">
+ <div style="display:flex;align-items:center;gap:14px">{dark_mark(52)}<span style="font-size:44px;font-weight:600;letter-spacing:-.045em"><span style="color:{ACCENT}">i</span>soline</span></div>
+ <div class="mono" style="font-size:28px;background:#141414;color:#fff;padding:18px 18px 18px 32px;border-radius:999px;display:flex;align-items:center;gap:22px;
+  box-shadow:0 0 0 1px #333,0 30px 60px -24px rgba(0,0,0,.9)"><span><span style="color:{DIM}">$ </span>pip install isoline</span>
+  <span style="width:44px;height:44px;border-radius:50%;background:{ACCENT}"></span></div>
+ <div class="mono" style="font-size:13px;color:#A3A3A0;letter-spacing:.06em;text-transform:uppercase">Open source · No API key · isolinee.vercel.app</div>
 </div>"""
 
 
@@ -159,39 +173,36 @@ def main() -> None:
     img = (outdir / "sample-report.png").resolve()
 
     frames: list[tuple[str, float]] = []  # (html, seconds)
-    # 1. title card: fade up, hold
-    for k in range(1, 7):
-        t = k / 6
-        frames.append((page(title_card(t, 14 * (1 - t) ** 2), fonts), 0.05))
-    frames.append((page(title_card(1, 0), fonts), 1.6))
+    # 1. title: words rise out of a mask over the terrain; the hot ridgeline climbs
+    for k in range(0, 15):
+        frames.append((page(title_card(k / 14), fonts, hot=8 + k // 2), 0.05))
+    frames.append((page(title_card(1), fonts, hot=15), 1.7))
 
     # 2. terminal: type the command, then stream the real output
     lines = scan_lines()
-    cap = "Real output of the real engines on a <b>synthetic sample company</b>"
     for n in range(0, len(CMD) + 1):
-        frames.append((page(terminal("", CMD[:n], True, cap), fonts, .05), 0.06 if n else 0.5))
-    frames.append((page(terminal("", CMD, True, cap), fonts, .05), 0.35))
+        frames.append((page(terminal("", CMD[:n], True), fonts, .16, hot=-1), 0.06 if n else 0.45))
+    frames.append((page(terminal("", CMD, True), fonts, .16, hot=-1), 0.35))
     visible = 28
     shown = 1
     while shown <= len(lines):
         chunk = lines[max(0, shown - visible + 1):shown]
-        frames.append((page(terminal("\n" + "\n".join(chunk), CMD, False, cap), fonts, .05), 0.07))
+        frames.append((page(terminal("\n" + "\n".join(chunk), CMD, False), fonts, .16, hot=-1), 0.07))
         shown += 2
-    frames.append((page(terminal("\n" + "\n".join(lines[-(visible - 1):]), CMD, False, cap), fonts, .05), 2.4))
+    frames.append((page(terminal("\n" + "\n".join(lines[-(visible - 1):]), CMD, False), fonts, .16, hot=-1), 2.4))
 
     # 3. the report, scrolling with ease-in-out
-    rcap = "The same scan as a formal, print-ready report"
-    frames.append((page(report(img, 0, rcap), fonts), 1.2))
+    frames.append((page(report(img, 0), fonts, .16, hot=-1), 1.2))
     max_off = int(2300 * 900 / 1100) - 534
     steps = 34
     for k in range(1, steps + 1):
         t = k / steps
         e = t * t * (3 - 2 * t)
-        frames.append((page(report(img, int(e * max_off * 0.62), rcap), fonts), 0.06))
-    frames.append((page(report(img, int(max_off * 0.62), rcap), fonts), 1.6))
+        frames.append((page(report(img, int(e * max_off * 0.62)), fonts, .16, hot=-1), 0.06))
+    frames.append((page(report(img, int(max_off * 0.62)), fonts, .16, hot=-1), 1.6))
 
     # 4. install card
-    frames.append((page(end_card(), fonts), 3.0))
+    frames.append((page(end_card(), fonts, .5, top=.3, hot=20), 3.0))
 
     from playwright.sync_api import sync_playwright
 
@@ -207,6 +218,12 @@ def main() -> None:
             pg.screenshot(path=str(tmp / f"f{i:04d}.png"))
         browser.close()
 
+    # social preview (1200x630) from the settled title frame
+    from PIL import Image
+
+    title_idx = 15
+    Image.open(tmp / f"f{title_idx:04d}.png").convert("RGB").crop((0, 0, W, 630)).save(outdir / "og.png", optimize=True)
+
     concat = tmp / "list.txt"
     with concat.open("w") as fh:
         for i, (_, d) in enumerate(frames):
@@ -215,7 +232,7 @@ def main() -> None:
     out = outdir / "demo.gif"
     ff = shutil.which("ffmpeg") or "ffmpeg"
     common = [ff, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(concat)]
-    subprocess.run(common + ["-vf", "palettegen=max_colors=192:stats_mode=full", str(tmp / "pal.png")], check=True)
+    subprocess.run(common + ["-vf", "palettegen=max_colors=160:stats_mode=full", str(tmp / "pal.png")], check=True)
     subprocess.run(common + ["-i", str(tmp / "pal.png"), "-lavfi",
                              "[0:v][1:v]paletteuse=dither=sierra2_4a:diff_mode=rectangle",
                              "-fps_mode", "vfr", "-loop", "0", str(out)], check=True)

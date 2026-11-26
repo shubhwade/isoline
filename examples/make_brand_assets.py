@@ -16,10 +16,9 @@ import math
 import re
 from pathlib import Path
 
-INK = "#13213D"  # navy, the brand ink
-PAPER = "#F4F1EA"  # warm paper
-AMBER = "#C8781A"  # summit / accent
-AMBER_DARK = "#E59A3C"  # accent on dark grounds
+INK = "#0A0A0A"  # near-black ink
+PAPER = "#FFFFFF"  # white
+ACCENT = "#FF4A1C"  # vermilion signal: the summit point and the dot of the "i"
 
 
 def _contour(cx: float, cy: float, r: float, wobble: float, n: int = 40) -> str:
@@ -38,7 +37,7 @@ def _contour(cx: float, cy: float, r: float, wobble: float, n: int = 40) -> str:
     return "".join(d) + "Z"
 
 
-def mark_body(ink: str = INK, line: str = PAPER, accent: str = AMBER, rings: int = 3, width: float = 5.5) -> str:
+def mark_body(ink: str = INK, line: str = PAPER, accent: str = ACCENT, rings: int = 3, width: float = 5.5) -> str:
     """Inner markup of the 128x128 mark."""
     summit = (70.0, 56.0)
     parts = [f'<rect width="128" height="128" rx="28" fill="{ink}"/>']
@@ -117,12 +116,12 @@ def main() -> None:
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    light = dict(ink=INK, line=PAPER, accent=AMBER)
+    light = dict(ink=INK, line=PAPER, accent=ACCENT)
     (out / "logo.svg").write_text(mark_svg(**light), encoding="utf-8")
     (out / "favicon.svg").write_text(mark_svg(size=32, rings=2, width=7, **light), encoding="utf-8")
     (out / "wordmark.svg").write_text(wordmark_svg(a.font, INK, **light), encoding="utf-8")
     (out / "wordmark-dark.svg").write_text(
-        wordmark_svg(a.font, PAPER, ink=PAPER, line=INK, accent=AMBER), encoding="utf-8")
+        wordmark_svg(a.font, PAPER, ink=PAPER, line=INK, accent=ACCENT), encoding="utf-8")
     print("wrote", ", ".join(p.name for p in sorted(out.glob("*.svg"))))
 
 

@@ -4,6 +4,8 @@ docs_dir: docs
 exclude_docs: |
   internal/
 site_url: https://shubhwade.github.io/isoline
+extra:
+  homepage: https://isolinee.vercel.app
 repo_url: https://github.com/shubhwade/isoline
 repo_name: shubhwade/isoline
 extra_css:
@@ -28,8 +30,8 @@ theme:
         icon: material/brightness-4
         name: Switch to dark mode
   font:
-    text: Inter
-    code: JetBrains Mono
+    text: Inter Tight
+    code: IBM Plex Mono
   features:
     - navigation.tabs
     - navigation.sections
