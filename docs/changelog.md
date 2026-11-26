@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### Fixed
+- The README download badge showed only the last 30 days (979) because no pepy.tech API key is set. It now shows all-time downloads of `isoline` and the legacy `telmus` combined as one number (16.7k at the time of writing), read from pepy.tech's public badge when no key is set. If a count cannot be read, the previous badge stays instead of a partial or estimated figure.
+
 ## v0.9.0
 ### Added
 - **Financial statements** in every scan: income statement, balance sheet and cash flow for up to four fiscal years, newest first, as reported (`isoline statements TICKER`, with `--json` and `--export .csv/.json`; SDK `isoline.sdk.statements()`; MCP tool `statements`). Values are matched to fiscal periods by date and never estimated; free cash flow and total liabilities and equity are marked when computed; a balance check warns when the source data does not balance. Capex, dividends and buybacks are always shown as outflows whatever sign the provider uses.
