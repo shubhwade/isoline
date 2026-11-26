@@ -43,10 +43,10 @@ Changelog = "https://shubhwade.github.io/isoline/changelog/"
 isoline = "isoline.cli.app:app"
 
 [project.optional-dependencies]
-mcp = ["mcp>=1.20,<2"]
+mcp = ["mcp>=1.20,<3"]
 tui = ["textual>=1.0,<9"]
 dev = [
-    "mcp>=1.20,<2",
+    "mcp>=1.20,<3",
     "textual>=1.0,<9",
     "mypy",
     "build",

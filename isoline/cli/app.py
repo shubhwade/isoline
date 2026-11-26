@@ -930,16 +930,13 @@ def serve() -> None:
             'Install it with:  pip install "isoline\\[mcp]"'
         )
         raise typer.Exit(code=1) from None
-    config = {
-        "mcpServers": {
-            "isoline": {
-                "command": "isoline",
-                "args": ["serve"],
-                "description": "Financial statement analysis — real ratios for any ticker",
-            }
-        }
-    }
-    console.print_json(data=config)
+    # stdout is the MCP protocol channel: anything printed there corrupts the session.
+    # The setup hint goes to stderr, and only when a person runs this in a terminal.
+    if sys.stdin.isatty():
+        config = {"mcpServers": {"isoline": {"command": "isoline", "args": ["serve"]}}}
+        hint = Console(stderr=True)
+        hint.print("Isoline MCP server is running on stdio. Add this to your MCP client config:")
+        hint.print_json(data=config)
     run_mcp_server()
 
 
