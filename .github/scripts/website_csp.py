@@ -29,7 +29,7 @@ def policy(html: str) -> str:
             f"script-src {hashes}",
             "style-src 'unsafe-inline' https://fonts.googleapis.com",
             "font-src https://fonts.gstatic.com",
-            "img-src 'self' data: https://raw.githubusercontent.com",
+            "img-src 'self' data:",
             "base-uri 'none'",
             "form-action 'none'",
             "object-src 'none'",

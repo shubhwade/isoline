@@ -77,7 +77,17 @@ def main(out: Path, chrome: str | None = None) -> None:
     cli._print_scan(result)
     rec.save_svg(str(out / "sample-terminal.svg"), title="isoline scan ACME  (synthetic sample)")
     render_png(out / "sample-report.html", out / "sample-report.png", chrome=chrome)
+    _copy_to_website(out / "sample-report.png")
     print("wrote", out)
+
+
+def _copy_to_website(png: Path) -> None:
+    """The website serves its own copy, so a deploy always shows the report from the same commit."""
+    import shutil
+
+    site = Path(__file__).resolve().parents[1] / "website"
+    if png.exists() and site.is_dir() and png.resolve().parent == (site.parent / "docs" / "assets").resolve():
+        shutil.copyfile(png, site / png.name)
 
 
 def render_png(html_file: Path, png: Path, width: int = 1100, height: int = 2300,

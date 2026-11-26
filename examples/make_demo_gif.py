@@ -223,6 +223,9 @@ def main() -> None:
 
     title_idx = 15
     Image.open(tmp / f"f{title_idx:04d}.png").convert("RGB").crop((0, 0, W, 630)).save(outdir / "og.png", optimize=True)
+    site = Path(__file__).resolve().parents[1] / "website"
+    if site.is_dir() and outdir.resolve() == (site.parent / "docs" / "assets").resolve():
+        shutil.copyfile(outdir / "og.png", site / "og.png")  # served at https://isolinee.vercel.app/og.png
 
     concat = tmp / "list.txt"
     with concat.open("w") as fh:
