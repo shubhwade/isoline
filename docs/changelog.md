@@ -3,6 +3,7 @@
 ## Unreleased
 ### Fixed
 - The README download badge showed only the last 30 days (979) because no pepy.tech API key is set. It now shows all-time downloads of `isoline` and the legacy `telmus` combined as one number (16.7k at the time of writing), read from pepy.tech's public badge when no key is set. If a count cannot be read, the previous badge stays instead of a partial or estimated figure.
+- Each nightly badge update also triggered a failed Vercel preview, because the `badges` branch holds only the badge data and has no `website/` folder. The branch now carries a Vercel config that skips deployment.
 
 ## v0.9.0
 ### Added
