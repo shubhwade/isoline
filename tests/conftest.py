@@ -19,5 +19,12 @@ def _offline_by_default(request: pytest.FixtureRequest, monkeypatch: pytest.Monk
         raise OSError("live network is disabled in unit tests")
 
     monkeypatch.setattr(loaders, "_import_yfinance", _blocked)
+
+    def _no_sec(*_args, **_kwargs):  # the SEC EDGAR fallback must not reach sec.gov either
+        raise OSError("live network is disabled in unit tests")
+
+    import urllib.request
+
+    monkeypatch.setattr(urllib.request, "urlopen", _no_sec)
     yield
     loaders.load_financials.cache_clear()

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from isoline.core.dcf import DCFResult
 from isoline.core.errors import (
     InvalidTickerError,
     IsolineError,
@@ -9,12 +10,15 @@ from isoline.core.errors import (
     ProviderUnavailableError,
     RateLimitError,
 )
-from isoline.core.result import CompareResult, ScanResult
+from isoline.core.result import CompareResult, ScanResult, StatementLine, StatementsResult
 from isoline.core.scanner import IsolineScanner
-from isoline.sdk.reconciler import compare, compare_to_dataframe, scan
+from isoline.sdk.reconciler import compare, compare_to_dataframe, scan, statements, value
 
 __all__ = [
     "CompareResult",
+    "DCFResult",
+    "StatementLine",
+    "StatementsResult",
     "InvalidTickerError",
     "NoDataError",
     "ProviderUnavailableError",
@@ -25,4 +29,6 @@ __all__ = [
     "compare",
     "compare_to_dataframe",
     "scan",
+    "statements",
+    "value",
 ]

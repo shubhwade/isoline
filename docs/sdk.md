@@ -17,6 +17,8 @@ from isoline import scan, compare, IsolineScanner, ScanResult, CompareResult
 | `scan(ticker)` | `ScanResult` |
 | `compare(ticker_a, ticker_b)` | `CompareResult` (`.ticker_a`, `.ticker_b`, `.result_a`, `.result_b`) |
 | `isoline.sdk.compare_to_dataframe(compare_result)` | `pandas.DataFrame` indexed by metric, one column per ticker |
+| `statements(ticker)` | `StatementsResult` or `None`: `periods` (ISO dates, newest first), `currency`, `income` / `balance` / `cashflow` as lists of `StatementLine(label, values, kind, key, group, sign, per_share, computed)`, `notes` |
+| `value(ticker, discount=None, growth=None, terminal=None, years=5)` | `DCFResult` (same as `isoline value`) |
 | `IsolineScanner().scan(t)` / `.compare(a, b)` | same as above; use when you want one reusable scanner |
 
 Tickers use Yahoo Finance format: `AAPL`, `INFY.NS` (NSE), `500209.BO` (BSE).
@@ -35,6 +37,8 @@ Tickers use Yahoo Finance format: `AAPL`, `INFY.NS` (NSE), `500209.BO` (BSE).
 | `highest_concern` | str | `"low"`, `"medium"` or `"high"` |
 | `analyst_brief` | str | rule-based text summary, not advice |
 | `notes` | list[str] | one line for every metric that is `None`, saying why |
+| `statements` | `StatementsResult` or `None` | the three statements, as returned by `statements(ticker)` |
+| `dcf` | dict or `None` | default-assumption DCF (`DCFResult.to_dict()`); when it cannot be computed, `assumptions` is `None` and `notes` say why |
 | `scan_duration_ms`, `schema_version` | int | |
 
 **Missing data is `None`, never `0`.** Check `result.notes` to see why a value is missing (for example, banks have no meaningful Altman Z″ or Beneish M).

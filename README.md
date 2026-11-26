@@ -35,12 +35,14 @@ isoline scan AAPL
 |---|---|
 | **Scores** | Piotroski F (9 signals), Altman Z-double-prime, Beneish M (8 variables) |
 | **Quality** | DuPont ROE, ROIC, FCF margin, accruals, cash conversion cycle, dilution |
-| **Reports** | Formal HTML report with two charts, Excel workbook, JSON and CSV export |
+| **Statements** | `isoline statements AAPL`: income statement, balance sheet and cash flow for four years, as reported |
+| **Reports** | A print-ready report laid out like a company's published statements, readable by a first-time investor: every number explained in plain English, strengths and concerns, scores, a DCF, charts and a glossary. Excel workbook with statement sheets; JSON and CSV export |
 | **Compare and screen** | Side-by-side comparison; sector screens with reasons for every skipped ticker |
 | **Terminal UI** | `pip install "isoline[tui]"` then `isoline tui`: modes, command palette (Ctrl+K), session history |
 | **Valuation** | `isoline value AAPL`: DCF with scenarios, sensitivity and every assumption shown |
 | **Integrations** | Python SDK, Power BI export, optional MCP server for AI coding tools |
 | **Honest data** | Missing inputs show `n/a` with a note, never a zero. Yahoo Finance first, SEC EDGAR fallback for US tickers |
+| **Secure by default** | Self-contained reports with a strict CSP, spreadsheet formula-injection protection, validated inputs everywhere (CLI, SDK, MCP), no network calls from exporters; see [SECURITY.md](SECURITY.md) |
 
 > **Formerly Telmus.** Isoline is the new name of the `telmus` project. `pip install -U telmus`
 > installs this package and keeps the old command working. Earlier `telmus` releases and their

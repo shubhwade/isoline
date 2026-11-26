@@ -26,5 +26,5 @@ class HtmlDashboardExporter:
     def export_compare(self, result: CompareResult, path: str) -> None:
         _write(path, compare_report(escape_obj(result)))
 
-    def export_screen(self, results: Sequence[ScanResult], path: str) -> None:
-        _write(path, screen_report(escape_obj(list(results))))
+    def export_screen(self, results: Sequence[ScanResult], path: str, criteria: str = "") -> None:
+        _write(path, screen_report(escape_obj(list(results)), escape_obj(criteria)))

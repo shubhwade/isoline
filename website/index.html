@@ -2,16 +2,18 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MBxMtXYHJaeZhXWHLwaOfIA+uKL6MyBTc6xDHZ/G+L4=' 'sha256-jEhwpmcmgQJOVx5RvjI0N4X0LgTqF4FKqSezNF2xItE='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Isoline: financial statements, measured precisely</title>
 <meta name="description" content="Open-source Python CLI for financial statement analysis. Piotroski F, Altman Z″ and Beneish M scores, quality metrics, DCF valuation and print-ready reports for any listed company.">
 <link rel="canonical" href="https://isolinee.vercel.app/">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#0A0A0A">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://isolinee.vercel.app/">
 <meta property="og:title" content="Isoline: financial statements, measured precisely">
 <meta property="og:description" content="Piotroski, Altman and Beneish scores, quality metrics, a DCF and print-ready reports from one command. Open source, no API key.">
-<meta property="og:image" content="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/og.png">
+<meta property="og:image" content="https://isolinee.vercel.app/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32" role="img" aria-label="Isoline"%3E%3Cdefs%3E%3CclipPath id="c"%3E%3Crect width="128" height="128" rx="28"/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path="url%28%23c%29"%3E%3Crect width="128" height="128" rx="28" fill="%230A0A0A"/%3E%3Cg fill="none" stroke-linejoin="round"%3E%3Cpath d="M110.16 66.00C110.38 68.13 110.38 70.34 110.13 72.49C109.89 74.65 109.39 76.83 108.68 78.92C107.98 81.02 107.04 83.09 105.93 85.07C104.82 87.04 103.50 88.97 102.03 90.78C100.56 92.58 98.90 94.32 97.09 95.89C95.28 97.46 93.29 98.94 91.17 100.20C89.05 101.45 86.74 102.56 84.38 103.42C82.02 104.27 79.49 104.91 76.99 105.31C74.50 105.72 71.91 105.86 69.41 105.84C66.91 105.83 64.41 105.56 62.00 105.21C59.59 104.87 57.26 104.34 54.97 103.79C52.69 103.23 50.49 102.58 48.31 101.90C46.12 101.22 43.98 100.50 41.85 99.69C39.72 98.88 37.58 98.04 35.52 97.05C33.45 96.06 31.37 94.99 29.43 93.74C27.50 92.49 25.61 91.10 23.93 89.56C22.25 88.02 20.69 86.31 19.37 84.50C18.05 82.70 16.92 80.73 16.01 78.73C15.10 76.73 14.41 74.61 13.92 72.49C13.43 70.37 13.14 68.17 13.06 66.00C12.97 63.83 13.08 61.61 13.40 59.44C13.73 57.28 14.25 55.09 15.02 53.00C15.78 50.91 16.78 48.83 17.99 46.90C19.20 44.97 20.68 43.11 22.30 41.43C23.93 39.75 25.80 38.20 27.75 36.83C29.70 35.45 31.84 34.24 33.99 33.16C36.15 32.08 38.41 31.17 40.67 30.35C42.94 29.52 45.26 28.83 47.59 28.23C49.93 27.63 52.30 27.12 54.70 26.75C57.10 26.38 59.55 26.10 62.00 26.01C64.45 25.93 66.95 25.98 69.39 26.26C71.82 26.54 74.29 27.02 76.61 27.69C78.94 28.37 81.22 29.29 83.33 30.33C85.45 31.38 87.45 32.64 89.31 33.97C91.18 35.30 92.89 36.79 94.50 38.31C96.12 39.83 97.60 41.44 99.01 43.09C100.42 44.75 101.74 46.45 102.96 48.22C104.17 50.00 105.32 51.83 106.30 53.74C107.27 55.65 108.16 57.64 108.81 59.68C109.45 61.73 109.94 63.87 110.16 66.00Z" stroke="%23FFFFFF" stroke-width="7" opacity="0.72"/%3E%3Cpath d="M93.26 61.00C93.35 62.21 93.32 63.45 93.15 64.66C92.99 65.88 92.69 67.10 92.28 68.27C91.87 69.45 91.33 70.61 90.70 71.72C90.07 72.83 89.32 73.91 88.49 74.92C87.65 75.93 86.72 76.90 85.70 77.78C84.68 78.66 83.56 79.49 82.37 80.20C81.19 80.91 79.90 81.54 78.58 82.04C77.27 82.54 75.86 82.93 74.47 83.20C73.07 83.47 71.62 83.61 70.21 83.66C68.80 83.71 67.38 83.63 66.00 83.49C64.62 83.35 63.27 83.10 61.94 82.83C60.62 82.55 59.33 82.20 58.06 81.82C56.79 81.44 55.54 81.01 54.32 80.53C53.10 80.05 51.88 79.52 50.72 78.92C49.55 78.32 48.40 77.65 47.33 76.91C46.26 76.16 45.23 75.33 44.31 74.43C43.39 73.52 42.54 72.53 41.83 71.49C41.11 70.45 40.49 69.34 40.00 68.20C39.51 67.06 39.13 65.86 38.87 64.66C38.60 63.46 38.46 62.22 38.42 61.00C38.39 59.78 38.46 58.53 38.66 57.31C38.85 56.09 39.16 54.87 39.60 53.69C40.03 52.52 40.59 51.35 41.27 50.26C41.94 49.18 42.75 48.12 43.65 47.17C44.54 46.21 45.57 45.31 46.65 44.51C47.72 43.71 48.90 43.00 50.10 42.36C51.30 41.72 52.56 41.16 53.84 40.68C55.12 40.19 56.44 39.77 57.77 39.42C59.10 39.07 60.46 38.78 61.83 38.58C63.20 38.38 64.60 38.23 66.00 38.20C67.40 38.17 68.82 38.21 70.21 38.38C71.59 38.55 72.99 38.82 74.31 39.20C75.64 39.59 76.94 40.09 78.16 40.67C79.38 41.25 80.54 41.94 81.62 42.69C82.70 43.43 83.71 44.26 84.65 45.12C85.59 45.98 86.45 46.89 87.26 47.84C88.07 48.79 88.82 49.78 89.50 50.80C90.17 51.83 90.80 52.89 91.32 53.99C91.84 55.09 92.29 56.24 92.62 57.41C92.94 58.58 93.17 59.79 93.26 61.00Z" stroke="%23FFFFFF" stroke-width="7" opacity="1.0"/%3E%3C/g%3E%3Ccircle cx="70.0" cy="56.0" r="9" fill="%23FF4A1C"/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -249,13 +251,15 @@ html:not(.js) .step-txt > div { grid-area: auto; }
 /* REPORT */
 .report-grid { padding-top: 64px; width: 100%; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; }
 .paper {
-  position: relative; width: 100%; height: min(76svh, 760px); border-radius: 14px; overflow: hidden; background: #fff; box-shadow: var(--shadow), 0 0 0 1px var(--line);
+  position: relative; width: 100%; height: min(76svh, 760px); border-radius: 0; overflow: hidden; background: #fff;
+  /* a printed sheet with a second sheet behind it: square corners, hairline edges, soft drop */
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .14), 12px 12px 0 -1px #efefec, 12px 12px 0 0 rgba(0, 0, 0, .16), 0 50px 90px -40px rgba(0, 0, 0, .65);
   transform: perspective(1800px) rotateX(calc(var(--tilt, 0) * 1deg)) rotateY(calc(var(--tilt, 0) * -1.2deg));
 }
-.paper-bar { height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 12px; background: #F2F2F0; border-bottom: 1px solid #E2E2DF; }
-.paper-bar i { width: 10px; height: 10px; border-radius: 50%; background: #D6D6D2; }
-.paper-bar span { margin-left: 10px; font: 400 11.5px/1 "IBM Plex Mono", monospace; color: #6F6F68; }
-.paper-view { position: absolute; inset: 34px 0 0 0; overflow: hidden; background: #F3F4F6; }
+.paper-bar { height: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: #fff; border-bottom: 1px solid #1a1a1a; }
+.paper-bar span { font: 500 11px/1 "IBM Plex Mono", monospace; color: #1a1a1a; letter-spacing: .02em; }
+.paper-bar span + span { color: #6F6F68; font-weight: 400; }
+.paper-view { position: absolute; inset: 34px 0 0 0; overflow: hidden; background: #fff; }
 .paper-view img { width: 100%; height: auto; transform: translateY(calc(var(--scroll, 0) * -1px)); will-change: transform; }
 .feats { list-style: none; padding: 0; margin: 34px 0 0; display: grid; border-top: 1px solid var(--line); }
 .feats li { padding: 16px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 46px minmax(0, 1fr); color: var(--ink-2); font-size: 15px; transition: color .3s; }
@@ -540,17 +544,17 @@ footer { border-top: 1px solid var(--line); padding: 56px 0 40px; font-size: 14p
         <div>
           <span class="label"><b>●</b>&nbsp; Reports</span>
           <h2 style="margin-top:22px">A report you can hand to someone.</h2>
-          <p class="muted" style="font-size:1.08rem;max-width:28rem;margin:22px 0 0">Every scan writes a formal HTML report and an Excel workbook next to you, then opens the report.</p>
+          <p class="muted" style="font-size:1.08rem;max-width:28rem;margin:22px 0 0">Every scan writes a print-ready report laid out like a company's published statements, readable by a first-time investor, plus an Excel workbook.</p>
           <ul class="feats" id="feats">
-            <li><span>01</span><span><b>Summary and score cards.</b> The verdict first, then the evidence.</span></li>
-            <li><span>02</span><span><b>Explained tables.</b> What every metric measures, beside its value.</span></li>
-            <li><span>03</span><span><b>Two charts.</b> Revenue, profit and margin trend over four years.</span></li>
+            <li><span>01</span><span><b>Statements like an annual report.</b> Income statement, balance sheet and cash flow, four years.</span></li>
+            <li><span>02</span><span><b>Every number explained.</b> A plain-English line beside each measure, plus a glossary.</span></li>
+            <li><span>03</span><span><b>Strengths and concerns.</b> Built only from the figures that could be computed.</span></li>
             <li><span>04</span><span><b>Prints to A4.</b> Self-contained and offline. Excel, JSON and CSV too.</span></li>
           </ul>
         </div>
         <div class="paper" id="paper">
-          <div class="paper-bar"><i></i><i></i><i></i><span>ACME_dashboard.html</span></div>
-          <div class="paper-view"><img id="paper-img" src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png" alt="The HTML report Isoline writes for a synthetic sample company: summary, score cards, explained tables and charts" width="1100" height="2300"></div>
+          <div class="paper-bar"><span>ACME_dashboard.html</span><span>A4 &middot; print-ready</span></div>
+          <div class="paper-view"><img id="paper-img" src="sample-report.png" alt="The HTML report Isoline writes for a synthetic sample company: key figures, strengths and concerns, and the income statement and balance sheet laid out like an annual report" width="1100" height="2300"></div>
         </div>
       </div>
     </div>
@@ -844,6 +848,7 @@ footer { border-top: 1px solid var(--line); padding: 56px 0 40px; font-size: 14p
     { k: 'scan', cmd: 'isoline scan AAPL', h: 'Scan a company', p: 'Runs every engine, prints tables and a rule-based summary, writes the Excel and HTML reports and opens the report.', chips: ['--json', '--export FILE', '--no-report', '--no-open'],
       out: ['', '<span class="p"># example: real output for the synthetic sample company</span>', '<span class="p">──</span> <span class="c">Acme Industrial (synthetic sample)</span> <span class="p">── ACME ──</span>', ' Piotroski F-score        <span class="c">9</span>', ' Altman Z-score        <span class="c">3.94</span>', ' Revenue CAGR 3y      <span class="c">12.5%</span>', ' ROE (DuPont)         <span class="c">20.9%</span>', ' ROIC                   <span class="f">n/a</span>', '', ' Strong fundamentals (Piotroski F-score of 9).', ' Financially safe (Altman Z-score of 3.94).'] },
     { k: 'compare', cmd: 'isoline compare TCS.NS INFY.NS', h: 'Compare two companies', p: 'Every metric side by side, with a combined Excel and HTML report.', chips: ['--export FILE', '--no-report', '--no-open'] },
+    { k: 'statements', cmd: 'isoline statements AAPL', h: 'Read the statements', p: 'Income statement, balance sheet and cash flow for up to four fiscal years, as reported. Costs in parentheses; lines a company did not report show n/a.', chips: ['--json', '--export FILE.csv'] },
     { k: 'value', cmd: 'isoline value AAPL --discount 0.09', h: 'Estimate intrinsic value', p: 'A DCF with bear, base and bull cases, a sensitivity grid and margin of safety. Defaults are printed as assumptions. Illustrative, not a price target.', chips: ['--discount', '--growth', '--terminal', '--years', '--json'] },
     { k: 'screen', cmd: 'isoline screen IT --min-piotroski 7', h: 'Screen a sector', p: 'Filter an example sector universe (IT, Banking) by Piotroski score and debt/equity. Skipped tickers come with a reason.', chips: ['--min-piotroski', '--max-de', '--export FILE'] },
     { k: 'check', cmd: 'isoline check INFY.NS', h: 'Quick health check', p: 'Just Piotroski F and Altman Z: the fastest way to decide whether a company deserves a full scan.', chips: ['ticker'] },

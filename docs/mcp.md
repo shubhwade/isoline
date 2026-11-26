@@ -26,7 +26,11 @@ isoline serve
 | `scan_ticker` | `ticker`, optional `exchange` (`NSE`, `BSE`, `LSE`, `NYSE`, `NASDAQ`, `US`) | same; `INFY` + `NSE` scans `INFY.NS`; a ticker that already has a suffix is left alone; unknown exchange is an error |
 | `compare` | `ticker_a`, `ticker_b` | `{"result": CompareResult}` |
 | `screen` | optional `sector` (`IT` or `Banking`, default `IT`), `min_piotroski` (default 0), `max_de` (default 10) | `{"matches": [ScanResult...], "skipped": {ticker: reason}}`; unknown sector is an error |
+| `statements` | `ticker` | `{"ticker", "statements": {periods, currency, income, balance, cashflow, notes}}`; values as reported, `sign` -1 marks a cost |
+| `value` | `ticker`, optional `discount` (0-1), `growth` (-0.5-1), `terminal` (-0.05-0.2), `years` (1-15) | `{"result": DCFResult}` with every assumption, scenarios and the sensitivity grid |
 | `info` | none | `{version, data_source, coverage, description}` |
+
+Every argument is validated before anything is fetched: tickers must look like tickers (no paths, markup or control characters) and numbers must be finite and within the stated ranges. Invalid input is returned as an error, never passed to a data provider.
 
 Missing metrics are `null` with an explanation in each result's `notes`. `screen` only covers the small built-in example lists described in the [CLI](cli.md#screen) page.
 

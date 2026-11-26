@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from typing import Any
 
 from isoline.core.brief import generate_brief
 from isoline.core.engines.flags import FlagsEngine
@@ -8,9 +9,20 @@ from isoline.core.engines.growth import GrowthEngine
 from isoline.core.engines.health import HealthEngine
 from isoline.core.engines.history import HistoryEngine
 from isoline.core.engines.quality import QualityEngine
+from isoline.core.engines.statements import StatementsEngine
 from isoline.core.engines.valuation import ValuationEngine
 from isoline.core.loaders import load_financials
 from isoline.core.result import CompareResult, ScanResult
+
+
+def _default_dcf(financials: dict[str, Any], ticker: str) -> dict[str, Any] | None:
+    """Default-assumption DCF (its notes explain when it is not computed). Never fails a scan."""
+    from isoline.core.dcf import run_dcf
+
+    try:
+        return run_dcf(financials, ticker, None, None, None, 5).to_dict()
+    except Exception:  # noqa: BLE001 - a missing valuation must not break the scan
+        return None
 
 
 class IsolineScanner:
@@ -66,6 +78,8 @@ class IsolineScanner:
             notes=[*financials.get("notes", []), *health.notes, *flags.notes, *quality.notes],
             quality=quality,
             history=HistoryEngine().run(financials),
+            statements=StatementsEngine().run(financials),
+            dcf=_default_dcf(financials, resolved_ticker),
         )
 
     def compare(self, ticker_a: str, ticker_b: str) -> CompareResult:

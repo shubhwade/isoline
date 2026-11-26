@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from isoline.core.result import CompareResult, ScanResult
+from isoline.core.dcf import DCFResult, run_dcf
+from isoline.core.result import CompareResult, ScanResult, StatementsResult
 from isoline.core.scanner import IsolineScanner
 
 
@@ -12,6 +13,30 @@ def scan(ticker: str) -> ScanResult:
 
 def compare(ticker_a: str, ticker_b: str) -> CompareResult:
     return IsolineScanner().compare(ticker_a, ticker_b)
+
+
+def statements(ticker: str) -> StatementsResult | None:
+    """Income statement, balance sheet and cash flow (newest first), or None if unavailable."""
+    from isoline.core.engines.statements import StatementsEngine
+    from isoline.core.loaders import load_financials
+    from isoline.core.validation import validate_ticker
+
+    return StatementsEngine().run(load_financials(validate_ticker(ticker)))
+
+
+def value(
+    ticker: str,
+    discount: float | None = None,
+    growth: float | None = None,
+    terminal: float | None = None,
+    years: int = 5,
+) -> DCFResult:
+    """Discounted-cash-flow estimate; defaults match ``isoline value``."""
+    from isoline.core.loaders import load_financials
+    from isoline.core.validation import validate_ticker
+
+    t = validate_ticker(ticker)
+    return run_dcf(load_financials(t), t, discount, growth, terminal, years)
 
 
 def compare_to_dataframe(compare_result: CompareResult) -> pd.DataFrame:

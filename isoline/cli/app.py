@@ -14,10 +14,12 @@ from rich.panel import Panel
 from rich.table import Table
 
 from isoline import __version__
+from isoline.branding import BRAND
 from isoline.core.comparison import SECTIONS, all_metrics, format_value, stronger
 from isoline.core.errors import IsolineError
 from isoline.core.result import ScanResult
 from isoline.core.scanner import IsolineScanner
+from isoline.exporters._safe import safe_csv_writer
 
 warnings.filterwarnings(
     "ignore",
@@ -75,19 +77,29 @@ logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 
 _STATE = {"debug": os.environ.get("ISOLINE_DEBUG", "") not in ("", "0", "false")}
-_TICKER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9.\-^=& ]{0,39}")
-
-
 def _validate_ticker(raw: str) -> str:
     """Accept tickers (AAPL, INFY.NS, BRK-B, ^GSPC) and short company names."""
-    ticker = raw.strip()
-    if not _TICKER_RE.fullmatch(ticker):
+    from isoline.core.validation import InvalidInputError, validate_ticker
+
+    try:
+        return validate_ticker(raw)
+    except InvalidInputError:
         console.print(
             f"[bold red]Error:[/] '{escape(raw[:40])}' is not a valid ticker.\n"
             "Use a symbol such as AAPL, MSFT or INFY.NS."
         )
-        raise typer.Exit(code=2)
-    return ticker
+        raise typer.Exit(code=2) from None
+
+
+def _open_report(path: str) -> None:
+    """Open a written report in the default browser by absolute file URI; never fail the command."""
+    import pathlib
+    import webbrowser
+
+    try:
+        webbrowser.open(pathlib.Path(path).resolve().as_uri())
+    except Exception:  # noqa: BLE001 - no browser (servers, CI) is not an error
+        logging.getLogger(__name__).debug("Could not open %s in a browser", path)
 
 
 def _file_stem(ticker: str) -> str:
@@ -332,10 +344,9 @@ def scan(
 
                 ExcelExporter().export(result, export)
             elif export.endswith(".csv"):
-                import csv
 
                 with open(export, "w", newline="", encoding="utf-8") as f:
-                    writer = csv.writer(f)
+                    writer = safe_csv_writer(f)
                     writer.writerow(["Category", "Metric", "Value", "Status"])
                     writer.writerow(["Summary", "Company Name", result.company, ""])
                     writer.writerow(["Summary", "Ticker", result.ticker, ""])
@@ -472,9 +483,7 @@ def scan(
             print(f"Saved: {excel_path} and {html_path}")
 
             if open_browser:
-                import webbrowser
-
-                webbrowser.open(html_path)
+                _open_report(html_path)
 
     except Exception as exc:
         _fail(exc)
@@ -549,10 +558,9 @@ def compare(
 
                 ExcelExporter().export_compare(comparison, export)
             elif export.endswith(".csv"):
-                import csv
 
                 with open(export, "w", newline="", encoding="utf-8") as f:
-                    writer = csv.writer(f)
+                    writer = safe_csv_writer(f)
                     writer.writerow(["Metric", res_a.ticker, res_b.ticker, "Stronger"])
                     for m in all_metrics():
                         va, vb = m.get(res_a), m.get(res_b)
@@ -583,9 +591,7 @@ def compare(
         console.print(f"Saved: {name}_comparison.xlsx and {name}_dashboard.html")
 
         if open_browser:
-            import webbrowser
-
-            webbrowser.open(f"{name}_dashboard.html")
+            _open_report(f"{name}_dashboard.html")
 
     except Exception as exc:
         _fail(exc)
@@ -621,6 +627,86 @@ def value(
         typer.echo(_json.dumps(res.to_dict(), indent=2, default=str))
         return
     _print_value(res)
+
+
+@app.command()
+def statements(
+    ticker: str,
+    json_output: bool = typer.Option(False, "--json", help="Print raw JSON output."),
+    export: str | None = typer.Option(None, "--export", help="Save the statements to a .csv or .json file."),
+) -> None:
+    """Income statement, balance sheet and cash flow, up to four fiscal years.
+
+    Example: isoline statements AAPL --export aapl_statements.csv
+    """
+    import dataclasses
+    import json as _json
+
+    from isoline.core.engines.statements import StatementsEngine
+    from isoline.core.loaders import load_financials
+
+    ticker = _validate_ticker(ticker)
+    try:
+        st = StatementsEngine().run(load_financials(ticker))
+    except Exception as exc:  # noqa: BLE001
+        _fail(exc)
+    if st is None:
+        console.print(f"[bold red]Error:[/] No financial statements are available for {escape(ticker)}.")
+        raise typer.Exit(code=1)
+    if json_output:
+        typer.echo(_json.dumps(dataclasses.asdict(st), indent=2))
+        return
+    if export:
+        _export_statements(st, export)
+        console.print(f"Saved to {export}")
+        return
+    _print_statements(st, ticker)
+
+
+def _export_statements(st: typing.Any, path: str) -> None:
+    import dataclasses
+    import json as _json
+
+    if path.lower().endswith(".json"):
+        with open(path, "w", encoding="utf-8") as handle:
+            _json.dump(dataclasses.asdict(st), handle, indent=2)
+        return
+    if not path.lower().endswith(".csv"):
+        raise typer.BadParameter("--export must end in .csv or .json")
+    with open(path, "w", newline="", encoding="utf-8") as handle:
+        writer = safe_csv_writer(handle)
+        writer.writerow(["Statement", "Line item", *(f"FY{p[:4]}" for p in st.periods), "Computed"])
+        for name, lines in (("Income statement", st.income), ("Balance sheet", st.balance), ("Cash flow", st.cashflow)):
+            for ln in lines:
+                writer.writerow([name, ln.label, *("" if v is None else v * ln.sign for v in ln.values), "yes" if ln.computed else ""])
+
+
+def _print_statements(st: typing.Any, ticker: str) -> None:
+    from isoline.exporters.report import _acct, _scale
+
+    values = [v for lines in (st.income, st.balance, st.cashflow) for ln in lines if not ln.per_share for v in ln.values]
+    div, word = _scale(values)
+    biggest = max((abs(v) / div for v in values if v is not None), default=0)
+    nd = 0 if biggest >= 100 else 2
+    unit = f"{st.currency} {word}".strip() or "reported units"
+    console.rule(f"[bold]{escape(ticker)}[/] statements, {escape(unit)} (costs and outflows in parentheses)")
+    for title, lines in (("Income statement", st.income), ("Balance sheet", st.balance), ("Cash flow statement", st.cashflow)):
+        if not lines:
+            continue
+        table = Table(title=title, title_justify="left", show_lines=False)
+        table.add_column("Line item")
+        for p in st.periods:
+            table.add_column(f"FY{p[:4]}", justify="right")
+        for ln in lines:
+            cells = [_acct(None if v is None else v * ln.sign, 1 if ln.per_share else div, 2 if ln.per_share else nd) for v in ln.values]
+            cells = [c.replace('<span class="na">n/a</span>', "n/a") for c in cells]
+            style = "bold" if ln.kind in ("subtotal", "total") else "dim" if ln.kind == "memo" else None
+            table.add_row(ln.label + (" *" if ln.computed else ""), *cells, style=style)
+        console.print(table)
+    if any(ln.computed for lines in (st.income, st.balance, st.cashflow) for ln in lines):
+        console.print("[dim]* Computed from reported lines (free cash flow; total liabilities and equity).[/dim]")
+    for note in st.notes:
+        console.print(f"[yellow]{escape(note)}[/yellow]")
 
 
 def _fmt_money(v: float | None) -> str:
@@ -704,9 +790,20 @@ def screen(
     export: str | None = typer.Option(
         None, "--export", help="Save screening results to file (.xlsx, .csv, or .json)."
     ),
+    report: bool = typer.Option(True, "--report/--no-report", help="Write the Excel + HTML reports (default: yes)."),
+    open_browser: bool = typer.Option(True, "--open/--no-open", help="Open the HTML report in your browser (default: yes)."),
 ) -> None:
     """Screen a small example sector universe (IT, Banking) by Piotroski F and debt/equity."""
     from isoline.core.screening import screen_sector
+    from isoline.core.validation import InvalidInputError, bounded_number, validate_sector
+
+    try:
+        sector = validate_sector(sector)
+        min_piotroski = int(bounded_number(min_piotroski, "--min-piotroski", 0, 9, 6))
+        max_de = bounded_number(max_de, "--max-de", 0, 1000, 1.0)
+    except InvalidInputError as exc:
+        console.print(f"[bold red]Error:[/] {escape(str(exc))}")
+        raise typer.Exit(code=2) from None
 
     try:
         outcome = screen_sector(sector, min_piotroski, max_de)
@@ -721,10 +818,9 @@ def screen(
 
             ExcelExporter().export_screen(results, export)
         elif export.endswith(".csv"):
-            import csv
 
             with open(export, "w", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
+                writer = safe_csv_writer(f)
                 writer.writerow(
                     [
                         "Ticker",
@@ -799,17 +895,17 @@ def screen(
                 json.dump([r.to_dict() for r in results], handle, indent=2)
             console.print(f"Saved to {export}")
 
-    # Auto-generate dashboards
+    if not report:
+        return
     from isoline.exporters.excel import ExcelExporter
     from isoline.exporters.html_dashboard import HtmlDashboardExporter
 
+    criteria = f"{sector}: Piotroski F at least {min_piotroski}, debt/equity at most {max_de:g}"
     ExcelExporter().export_screen(results, "screen_results.xlsx")
-    HtmlDashboardExporter().export_screen(results, "screen_dashboard.html")
+    HtmlDashboardExporter().export_screen(results, "screen_dashboard.html", criteria)
     print("Saved: screen_results.xlsx and screen_dashboard.html")
-
-    import webbrowser
-
-    webbrowser.open("screen_dashboard.html")
+    if open_browser:
+        _open_report("screen_dashboard.html")
 
 
 @app.command()
@@ -853,8 +949,11 @@ def info() -> None:
     package_version = __version__
     console.print(f"Version: [green]{package_version}[/green]")
     console.print(f"Python: [green]{sys.version.split()[0]}[/green]")
-    console.print("Data source: [green]yfinance[/green]")
-    console.print("Coverage: [green]valuation, health, growth, quality, red flags[/green]")
+    console.print("Data source: [green]Yahoo Finance (yfinance); SEC EDGAR fallback for US tickers[/green]")
+    console.print(
+        "Coverage: [green]financial statements, valuation, health, growth, quality, red flags, DCF[/green]"
+    )
+    console.print(f"Docs: {BRAND.docs_url}  Website: {BRAND.site_url}")
 
 
 @app.command()
@@ -897,15 +996,15 @@ def powerbi(
             console.print("[bold red]Error:[/] No tickers provided.")
             raise typer.Exit(code=1)
 
-        # Deduplicate while preserving order
+        # Validate, then deduplicate while preserving order
         seen = set()
         clean_tickers = []
-        for t in all_tickers:
-            if t not in seen:
-                seen.add(t)
+        for t in (_validate_ticker(x) for x in all_tickers):
+            if t.upper() not in seen:
+                seen.add(t.upper())
                 clean_tickers.append(t)
 
-        from isoline.exporters.powerbi import PowerBIExporter
+        from isoline.exporters.powerbi import PowerBIExporter, report_path
 
         exporter = PowerBIExporter()
         if flags:
@@ -913,12 +1012,9 @@ def powerbi(
             console.print(f"Saved to {export}")
         else:
             exporter.export_portfolio(clean_tickers, export)
-            html_export = (
-                export[:-4] + "_report.html"
-                if export.lower().endswith(".csv")
-                else export + "_report.html"
-            )
             console.print(f"Saved to {export}")
-            console.print(f"Saved to {html_export}")
+            console.print(f"Saved to {report_path(export)}")
+        for ticker, why in exporter.failures.items():
+            console.print(f"[yellow]Skipped {escape(ticker)}:[/] {escape(why)}")
     except Exception as exc:
         _fail(exc)

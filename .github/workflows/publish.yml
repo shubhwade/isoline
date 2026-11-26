@@ -8,7 +8,7 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write
+  contents: read   # jobs that need more ask for it themselves
 
 jobs:
   build:
@@ -16,6 +16,8 @@ jobs:
     if: ${{ vars.RELEASES_DISABLED != 'true' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -29,7 +31,7 @@ jobs:
           CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/isoline/${PKG}/json")
           if [ "$CODE" = "200" ]; then echo "isoline $PKG is already on PyPI; published versions are never overwritten. Bump the version."; exit 1; fi
       - run: python -m pip install -e ".[dev]"
-      - run: ruff check isoline tests && pytest
+      - run: ruff check isoline tests && mypy && pytest
       - run: python -m build
       - run: python -m twine check dist/*
       - uses: actions/upload-artifact@v4
@@ -61,6 +63,7 @@ jobs:
   smoke-test:
     needs: publish
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - uses: actions/setup-python@v5
         with:

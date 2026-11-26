@@ -37,3 +37,36 @@ def test_website_url_is_consistent():
     assert homepage and homepage.group(1).rstrip("/") == BRAND.site_url.rstrip("/")
     site = (root / "website" / "index.html").read_text(encoding="utf-8")
     assert f'<link rel="canonical" href="{BRAND.site_url.rstrip("/")}/">' in site
+
+
+def test_website_version_label_matches_package() -> None:
+    import re
+    from pathlib import Path
+
+    page = (Path(__file__).parents[1] / "website" / "index.html").read_text(encoding="utf-8")
+    labels = set(re.findall(r"\bv(\d+\.\d+\.\d+)\b", page))
+    assert labels == {__version__}, f"website shows {labels}, package is {__version__}"
+
+
+def test_every_cli_command_is_documented() -> None:
+    from pathlib import Path
+
+    from typer.main import get_command
+
+    from isoline.cli.app import app
+
+    docs = (Path(__file__).parents[1] / "docs" / "cli.md").read_text(encoding="utf-8")
+    commands = [name for name, cmd in get_command(app).commands.items() if not cmd.hidden]
+    missing = [c for c in commands if f"## {c}" not in docs]
+    assert not missing, f"undocumented commands in docs/cli.md: {missing}"
+
+
+def test_website_assets_match_docs_assets() -> None:
+    """The website serves its own copies; they must be the current ones, never a stale report."""
+    from pathlib import Path
+
+    root = Path(__file__).parents[1]
+    for name in ("sample-report.png", "og.png"):
+        assert (root / "website" / name).read_bytes() == (root / "docs" / "assets" / name).read_bytes(), name
+    page = (root / "website" / "index.html").read_text(encoding="utf-8")
+    assert 'src="sample-report.png"' in page and "raw.githubusercontent.com" not in page

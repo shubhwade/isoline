@@ -1,0 +1,38 @@
+name: Security audit
+# Known-vulnerability scan of the dependencies a user actually installs, in a clean
+# virtual environment (so the runner's own tools are not counted). Runs weekly, on
+# demand, and on pull requests that change dependencies.
+on:
+  schedule:
+    - cron: "41 4 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths: ["pyproject.toml", ".github/workflows/security.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install isoline with all extras in a clean venv
+        run: |
+          python -m venv "$RUNNER_TEMP/app"
+          "$RUNNER_TEMP/app/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/app/bin/python" -m pip install ".[mcp,tui]"
+          "$RUNNER_TEMP/app/bin/python" -m pip freeze \
+            | grep -viE '^(isoline|pip|setuptools|wheel)( @|==)' > "$RUNNER_TEMP/reqs.txt"
+      - name: pip-audit (dependencies of isoline, audited from a separate venv)
+        run: |
+          python -m venv "$RUNNER_TEMP/tools"
+          "$RUNNER_TEMP/tools/bin/python" -m pip install pip-audit bandit
+          "$RUNNER_TEMP/tools/bin/pip-audit" --strict --desc -r "$RUNNER_TEMP/reqs.txt"
+      - name: Bandit (static analysis of isoline)
+        run: '"$RUNNER_TEMP/tools/bin/bandit" -q -r isoline -ll'

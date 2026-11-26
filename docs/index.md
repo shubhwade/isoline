@@ -15,12 +15,15 @@ Financial statement analysis from your terminal, Python, or an AI coding assista
 | Growth | 3-year revenue and profit CAGR, operating-margin trend, FCF yield |
 | Quality | DuPont ROE, ROIC, FCF margin, accruals, cash conversion cycle, share dilution |
 | Red flags | Beneish M-score, negative equity, negative free cash flow, leverage, liquidity |
+| Statements | Income statement, balance sheet and cash flow for up to four fiscal years, as reported |
+| Valuation (DCF) | Discounted cash flow with bear/base/bull cases and a sensitivity grid |
 
 Every formula is documented in [Methodology](methodology.md) and checked by hand-computed tests. **When the data needed for a metric is missing, isoline shows `n/a` and says why. It never substitutes zero.**
 
 ## Features
 
-- **Reports:** each scan can write an Excel workbook and a formal, self-contained HTML report with two charts (`--no-report` to skip). See [Reports](reports.md).
+- **Reports:** each scan writes an Excel workbook and a print-ready HTML report laid out like a company's published statements, with a plain-English explanation of every number, strengths and concerns, and a glossary (`--no-report` to skip). See [Reports](reports.md).
+- **Statements:** `isoline statements AAPL` prints the three financial statements; `--export` saves them as CSV or JSON.
 - **Data:** Yahoo Finance via `yfinance`. No API key needed. It is an unofficial source: coverage varies by company and exchange, and values can be delayed or wrong.
 - **Python SDK** and **MCP server** (optional extra) on the same engine.
 - **Local:** runs on your machine; isoline sends no telemetry.

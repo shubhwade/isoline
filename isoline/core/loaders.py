@@ -173,7 +173,8 @@ def _load_data_with_retry(symbol: str):
             logger.debug("Attempt %d/%d for %s failed: %s", attempt + 1, _ATTEMPTS, symbol, exc)
             if attempt < _ATTEMPTS - 1:
                 _sleep(2**attempt)  # 1s, 2s
-    assert last is not None
+    if last is None:  # unreachable while _ATTEMPTS >= 1; explicit so -O cannot remove it
+        raise ProviderUnavailableError(f"No data could be loaded for {symbol}")
     raise last
 
 
