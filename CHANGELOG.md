@@ -20,6 +20,9 @@
 - Unit tests can no longer reach SEC EDGAR by accident (they now make zero network connections).
 
 ### Fixed
+- Website browser-tab icon showed a blank globe: the inline icon contained unescaped quotes that cut the attribute short. The site now ships real `favicon.ico`, `favicon.svg`, `icon-192.png` and an Apple touch icon, generated from the logo.
+- The website's report preview looked doubled (a page inside a page): the sample image included the report's grey screen background, and the frame drew a second sheet. The image is now the report sheet alone, edge to edge, in a single square-cornered frame.
+- Reports show the Isoline mark in their header and as their browser-tab icon (base64-embedded, kept identical to the brand files by a test).
 - A ticker that fails in `isoline powerbi` is skipped and reported instead of aborting the whole export.
 - Reports open in the browser by absolute file URI, and a missing browser never fails the command.
 - Red flags read in plain English in summaries and reports ("negative free cash flow in 2+ years").

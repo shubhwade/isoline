@@ -6,7 +6,7 @@ wordmarks is converted to outlines, so the SVGs render identically on GitHub, Py
 and in browsers without any web font.
 
     pip install fonttools
-    python examples/make_brand_assets.py docs/assets --font /path/to/InterDisplay-SemiBold.otf
+    python examples/make_brand_assets.py docs/assets --font /path/to/InterDisplay-SemiBold.otf --site website
 """
 
 from __future__ import annotations
@@ -109,10 +109,49 @@ def wordmark_svg(font_path: str, text_fill: str, ink: str, line: str, accent: st
             f'<path d="{dot}" fill="{accent}"/></g></svg>\n')
 
 
+def _rasterise(svg: str, size: int, chrome: str | None) -> bytes:
+    """PNG of an SVG at ``size`` px with a transparent background (Playwright's Chromium)."""
+    from playwright.sync_api import sync_playwright
+
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(executable_path=chrome) if chrome else pw.chromium.launch()
+        page = browser.new_page(viewport={"width": size, "height": size}, device_scale_factor=1)
+        page.set_content(
+            "<html><body style='margin:0;background:transparent'>"
+            + svg.replace("<svg ", f'<svg style="display:block;width:{size}px;height:{size}px" ', 1)
+            + "</body></html>"
+        )
+        png = page.screenshot(omit_background=True, clip={"x": 0, "y": 0, "width": size, "height": size})
+        browser.close()
+    return png
+
+
+def write_site_icons(site: Path, chrome: str | None = None) -> None:
+    """Browser-tab and home-screen icons for the website: .ico, .svg and Apple touch icon."""
+    import io
+
+    from PIL import Image
+
+    light = dict(ink=INK, line=PAPER, accent=ACCENT)
+    small = mark_svg(size=32, rings=2, width=7, **light)  # fewer, bolder rings stay legible at 16 px
+    large = mark_svg(size=512, **light)
+    (site / "favicon.svg").write_text(small, encoding="utf-8")
+    ico_frames = [Image.open(io.BytesIO(_rasterise(small, s, chrome))).convert("RGBA") for s in (16, 32, 48)]
+    ico_frames[-1].save(site / "favicon.ico", sizes=[(16, 16), (32, 32), (48, 48)], append_images=ico_frames[:-1])
+    big = Image.open(io.BytesIO(_rasterise(large, 512, chrome))).convert("RGBA")
+    # iOS masks its own corners, so the touch icon is the full square on the brand ink
+    touch = Image.new("RGBA", (512, 512), INK)
+    touch.alpha_composite(big)
+    touch.convert("RGB").resize((180, 180), Image.LANCZOS).save(site / "apple-touch-icon.png", optimize=True)
+    big.resize((192, 192), Image.LANCZOS).save(site / "icon-192.png", optimize=True)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("out", nargs="?", default="docs/assets")
     ap.add_argument("--font", default="/usr/share/fonts/opentype/inter/InterDisplay-SemiBold.otf")
+    ap.add_argument("--site", type=Path, default=None, help="Also write website icons into this folder (needs Playwright).")
+    ap.add_argument("--chrome", default=None, help="Path to a Chrome/Chromium binary (optional).")
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -123,6 +162,15 @@ def main() -> None:
     (out / "wordmark-dark.svg").write_text(
         wordmark_svg(a.font, PAPER, ink=PAPER, line=INK, accent=ACCENT), encoding="utf-8")
     print("wrote", ", ".join(p.name for p in sorted(out.glob("*.svg"))))
+    embedded = Path(__file__).resolve().parents[1] / "isoline" / "exporters" / "brand_mark.py"
+    if embedded.exists():  # the mark reports embed (header logo and tab icon)
+        text = embedded.read_text(encoding="utf-8")
+        head = text[: text.index("MARK_SVG = ")]
+        mark = (out / "favicon.svg").read_text(encoding="utf-8").strip()
+        embedded.write_text(head + f"MARK_SVG = {mark!r}\n", encoding="utf-8")
+    if a.site:
+        write_site_icons(a.site, a.chrome)
+        print("wrote website icons in", a.site)
 
 
 if __name__ == "__main__":

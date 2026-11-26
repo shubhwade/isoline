@@ -70,3 +70,35 @@ def test_website_assets_match_docs_assets() -> None:
         assert (root / "website" / name).read_bytes() == (root / "docs" / "assets" / name).read_bytes(), name
     page = (root / "website" / "index.html").read_text(encoding="utf-8")
     assert 'src="sample-report.png"' in page and "raw.githubusercontent.com" not in page
+
+
+def test_report_mark_matches_brand_files() -> None:
+    from pathlib import Path
+
+    from isoline.exporters.brand_mark import MARK_SVG
+
+    assert MARK_SVG == (Path(__file__).parents[1] / "docs" / "assets" / "favicon.svg").read_text(encoding="utf-8").strip()
+
+
+def test_website_icons_are_real_files() -> None:
+    """Inline data-URI icons broke once (unescaped quotes); the site links real files instead."""
+    from pathlib import Path
+
+    root = Path(__file__).parents[1] / "website"
+    page = (root / "index.html").read_text(encoding="utf-8")
+    for name in ("favicon.ico", "favicon.svg", "apple-touch-icon.png", "icon-192.png"):
+        assert (root / name).stat().st_size > 0 and f'href="/{name}"' in page, name
+    assert "data:image/svg" not in page
+
+
+def test_website_report_image_size_attributes_match_file() -> None:
+    import re
+    import struct
+    from pathlib import Path
+
+    root = Path(__file__).parents[1] / "website"
+    page = (root / "index.html").read_text(encoding="utf-8")
+    m = re.search(r'src="sample-report.png"[^>]*width="(\d+)" height="(\d+)"', page)
+    header = (root / "sample-report.png").read_bytes()[:24]
+    assert header[:8] == b"\x89PNG\r\n\x1a\n"
+    assert m and tuple(map(int, m.groups())) == struct.unpack(">II", header[16:24])
