@@ -16,7 +16,7 @@ pip install "isoline[mcp]"
 isoline serve
 ```
 
-`isoline serve` speaks MCP over **stdio**: it opens no network port and prints nothing on its own. You normally don't run it by hand; your MCP client launches it (see the client examples below). Without the extra installed, the command exits with a message telling you to install it.
+`isoline serve` speaks MCP over **stdio**: it opens no network port and writes nothing to standard output except protocol messages (run by hand in a terminal, it shows a setup hint on standard error). It works with the MCP Python SDK 1.x and 2.x. You normally don't run it by hand; your MCP client launches it (see the client examples below). Without the extra installed, the command exits with a message telling you to install it.
 
 ## Available MCP tools
 

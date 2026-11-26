@@ -213,3 +213,23 @@ def test_screen_validates_bounds_and_can_skip_reports(tmp_path: Path, monkeypatc
     assert res.exit_code == 0, res.output
     html = (tmp_path / "screen_dashboard.html").read_text(encoding="utf-8")
     assert "Piotroski F at least 0" in html
+
+
+def test_serve_never_writes_to_stdout(monkeypatch: pytest.MonkeyPatch) -> None:
+    """stdout carries the MCP protocol; a printed config snippet broke client parsing."""
+    pytest.importorskip("mcp")
+    import io
+    import sys
+
+    import isoline.mcp.server as mcp_server
+    from isoline.cli import app as cli
+
+    monkeypatch.setattr(mcp_server, "run_mcp_server", lambda: None)
+    out, err = io.StringIO(), io.StringIO()
+    for tty in (False, True):
+        monkeypatch.setattr(sys, "stdin", type("S", (), {"isatty": staticmethod(lambda t=tty: t)})())
+        monkeypatch.setattr(sys, "stdout", out)
+        monkeypatch.setattr(sys, "stderr", err)
+        cli.serve()
+    assert out.getvalue() == ""
+    assert "mcpServers" in err.getvalue()  # the hint still reaches a person at a terminal

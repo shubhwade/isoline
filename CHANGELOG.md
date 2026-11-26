@@ -23,6 +23,9 @@
 - Website browser-tab icon showed a blank globe: the inline icon contained unescaped quotes that cut the attribute short. The site now ships real `favicon.ico`, `favicon.svg`, `icon-192.png` and an Apple touch icon, generated from the logo.
 - The website's report preview looked doubled (a page inside a page): the sample image included the report's grey screen background, and the frame drew a second sheet. The image is now the report sheet alone, edge to edge, in a single square-cornered frame.
 - Reports show the Isoline mark in their header and as their browser-tab icon (base64-embedded, kept identical to the brand files by a test).
+- `isoline serve` printed a configuration snippet to standard output before starting, corrupting the MCP stdio channel (clients logged "Failed to parse JSONRPC message"). Standard output now carries only protocol messages; the hint goes to standard error, and only in a terminal.
+- The MCP server works with both MCP Python SDK 1.x and 2.x (2.x replaced the decorator API with constructor handlers); the `mcp` extra now allows `<3`, and CI tests the 1.x path in a separate job. Verified with real stdio sessions on both SDKs.
+- A test that timed two concurrent scans with a stopwatch failed on slow CI runners; it now proves concurrency with a barrier.
 - A ticker that fails in `isoline powerbi` is skipped and reported instead of aborting the whole export.
 - Reports open in the browser by absolute file URI, and a missing browser never fails the command.
 - Red flags read in plain English in summaries and reports ("negative free cash flow in 2+ years").

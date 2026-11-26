@@ -12,11 +12,7 @@ from isoline import __version__
 from isoline.core.scanner import IsolineScanner
 from isoline.core.validation import bounded_number, validate_sector, validate_ticker
 
-server = Server(
-    "isoline",
-    version=__version__,
-    instructions="Financial statement analysis MCP server for AI IDEs.",
-)
+INSTRUCTIONS = "Financial statement analysis MCP server for AI IDEs."
 
 TOOL_DEFINITIONS: list[types.Tool] = [
     types.Tool(
@@ -151,12 +147,10 @@ async def _serialized_tool_result(payload: dict[str, Any]) -> types.CallToolResu
     )
 
 
-@server.list_tools()
-async def list_tools(_: types.ListToolsRequest | None = None) -> types.ListToolsResult:
+async def list_tools(_: Any = None) -> types.ListToolsResult:
     return types.ListToolsResult(tools=TOOL_DEFINITIONS)
 
 
-@server.call_tool(validate_input=False)
 async def handle_tool_call(
     name: str, arguments: dict[str, Any] | None
 ) -> types.CallToolResult:
@@ -233,6 +227,45 @@ async def handle_tool_call(
         raise ValueError(f"Unknown tool: {name}")
 
     return await _serialized_tool_result(payload)
+
+
+def _error_result(exc: BaseException) -> types.CallToolResult:
+    return types.CallToolResult(content=[types.TextContent(type="text", text=str(exc))], isError=True)
+
+
+def _build_server() -> Server:
+    """Register the same two handlers with whichever MCP Python SDK API is installed.
+
+    SDK 1.x registers handlers with decorators (``@server.list_tools()``) and turns an
+    exception into an error result itself. SDK 2.x takes ``on_list_tools`` /
+    ``on_call_tool`` in the constructor; there the wrapper converts exceptions into the
+    same error result, so clients see identical behaviour on both.
+    """
+    if hasattr(Server, "list_tools"):  # SDK 1.x
+        srv = Server("isoline", version=__version__, instructions=INSTRUCTIONS)
+        srv.list_tools()(list_tools)
+        srv.call_tool(validate_input=False)(handle_tool_call)
+        return srv
+
+    async def on_list_tools(_ctx: Any, _params: Any) -> types.ListToolsResult:
+        return await list_tools()
+
+    async def on_call_tool(_ctx: Any, params: Any) -> types.CallToolResult:
+        try:
+            return await handle_tool_call(params.name, params.arguments)
+        except Exception as exc:  # noqa: BLE001 - reported to the client as a tool error
+            return _error_result(exc)
+
+    return Server(  # type: ignore[call-arg,unused-ignore]
+        "isoline",
+        version=__version__,
+        instructions=INSTRUCTIONS,
+        on_list_tools=on_list_tools,
+        on_call_tool=on_call_tool,
+    )
+
+
+server = _build_server()
 
 
 def run_mcp_server() -> None:
