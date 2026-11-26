@@ -246,13 +246,15 @@ def test_screen_cli_unknown_sector_exit_code() -> None:
     assert res.exit_code == 2 and "Available sectors" in " ".join(res.output.split())
 
 
-def test_powerbi_radar_uses_null_for_missing_not_zero_or_ten(tmp_path) -> None:
+def test_portfolio_report_shows_na_for_missing_not_zero(tmp_path) -> None:
     from isoline.exporters.powerbi import PowerBIExporter
 
     out = tmp_path / "r.html"
-    PowerBIExporter()._generate_html_report([_empty_scan("AAA")], str(out))
+    PowerBIExporter()._generate_html_report([_empty_scan("AAA")], str(out), ["AAA", "ZZZ"])
     html = out.read_text(encoding="utf-8")
-    assert "[null, null, null, null, null]" in html
+    assert "n/a" in html and "0.00" not in html and "0.0%" not in html
+    assert "<script" not in html.lower() and "cdn." not in html.lower()
+    assert "Could not be analysed: ZZZ" in html
 
 
 def test_check_prints_zero_scores_not_na_and_info_runs() -> None:

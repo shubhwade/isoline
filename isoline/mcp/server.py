@@ -10,6 +10,7 @@ from mcp.server.stdio import stdio_server
 
 from isoline import __version__
 from isoline.core.scanner import IsolineScanner
+from isoline.core.validation import bounded_number, validate_sector, validate_ticker
 
 server = Server(
     "isoline",
@@ -77,6 +78,36 @@ TOOL_DEFINITIONS: list[types.Tool] = [
         outputSchema={"type": "object"},
     ),
     types.Tool(
+        name="statements",
+        title="Financial statements",
+        description="Income statement, balance sheet and cash flow (up to four fiscal years, newest first, as reported; costs have sign -1).",
+        inputSchema={
+            "type": "object",
+            "properties": {"ticker": {"type": "string"}},
+            "required": ["ticker"],
+            "additionalProperties": False,
+        },
+        outputSchema={"type": "object"},
+    ),
+    types.Tool(
+        name="value",
+        title="Discounted cash flow",
+        description="DCF estimate with bear/base/bull scenarios and a sensitivity grid. Every assumption is returned; illustrative, not a price target.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string"},
+                "discount": {"type": "number", "description": "Discount rate, e.g. 0.10"},
+                "growth": {"type": "number", "description": "Year-1 free cash flow growth, e.g. 0.06"},
+                "terminal": {"type": "number", "description": "Terminal growth, e.g. 0.025"},
+                "years": {"type": "integer", "description": "Explicit forecast years, 1-15"},
+            },
+            "required": ["ticker"],
+            "additionalProperties": False,
+        },
+        outputSchema={"type": "object"},
+    ),
+    types.Tool(
         name="info",
         title="Server info",
         description="Return basic server metadata and coverage information.",
@@ -97,6 +128,8 @@ def _with_exchange(ticker: str, exchange: str | None) -> str:
     """Apply an exchange hint to a bare symbol (``INFY`` + ``NSE`` -> ``INFY.NS``)."""
     if not exchange:
         return ticker
+    if not isinstance(exchange, str):
+        raise ValueError("Exchange must be text, for example NSE or NASDAQ.")
     suffix = EXCHANGE_SUFFIXES.get(exchange.strip().upper())
     if suffix is None:
         raise ValueError(
@@ -127,38 +160,73 @@ async def list_tools(_: types.ListToolsRequest | None = None) -> types.ListTools
 async def handle_tool_call(
     name: str, arguments: dict[str, Any] | None
 ) -> types.CallToolResult:
-    arguments = arguments or {}
+    if arguments is None:
+        arguments = {}
+    if not isinstance(arguments, dict):
+        raise ValueError("Tool arguments must be an object.")
     if name == "scan" or name == "scan_ticker":
-        ticker = arguments.get("ticker")
-        if not ticker:
+        if not arguments.get("ticker"):
             raise ValueError("Missing ticker")
+        ticker = validate_ticker(arguments["ticker"])
         if name == "scan_ticker":
-            ticker = _with_exchange(ticker, arguments.get("exchange"))
+            ticker = validate_ticker(_with_exchange(ticker, arguments.get("exchange")))
         payload = {"result": json.loads(_scan_and_serialize(IsolineScanner(), ticker))}
     elif name == "compare":
-        ticker_a = arguments.get("ticker_a")
-        ticker_b = arguments.get("ticker_b")
-        if not ticker_a or not ticker_b:
+        if not arguments.get("ticker_a") or not arguments.get("ticker_b"):
             raise ValueError("Missing ticker_a or ticker_b")
+        ticker_a = validate_ticker(arguments["ticker_a"])
+        ticker_b = validate_ticker(arguments["ticker_b"])
         comparison = IsolineScanner().compare(ticker_a, ticker_b)
         payload = {"result": json.loads(comparison.to_json())}
     elif name == "screen":
         from isoline.core.screening import screen_sector
 
         outcome = screen_sector(
-            arguments.get("sector", "IT"),
-            int(arguments.get("min_piotroski", 0)),
-            float(arguments.get("max_de", 10.0)),
+            validate_sector(arguments.get("sector")),
+            int(bounded_number(arguments.get("min_piotroski"), "min_piotroski", 0, 9, 0)),
+            bounded_number(arguments.get("max_de"), "max_de", 0, 1000, 10.0),
         )
         payload = {
             "matches": [r.to_dict() for r in outcome.matches],
             "skipped": outcome.skipped,
         }
+    elif name == "statements":
+        import dataclasses
+
+        from isoline.core.engines.statements import StatementsEngine
+        from isoline.core.loaders import load_financials
+
+        if not arguments.get("ticker"):
+            raise ValueError("Missing ticker")
+        ticker = validate_ticker(arguments["ticker"])
+        st = StatementsEngine().run(load_financials(ticker))
+        payload = {"ticker": ticker, "statements": dataclasses.asdict(st) if st else None}
+    elif name == "value":
+        from isoline.core.dcf import run_dcf
+        from isoline.core.loaders import load_financials
+
+        if not arguments.get("ticker"):
+            raise ValueError("Missing ticker")
+        ticker = validate_ticker(arguments["ticker"])
+
+        def opt(key: str, lo: float, hi: float) -> float | None:
+            raw = arguments.get(key)
+            return None if raw is None else bounded_number(raw, key, lo, hi, 0.0)
+
+        res = run_dcf(
+            load_financials(ticker),
+            ticker,
+            opt("discount", 0.0, 1.0),
+            opt("growth", -0.5, 1.0),
+            opt("terminal", -0.05, 0.2),
+            int(bounded_number(arguments.get("years"), "years", 1, 15, 5)),
+        )
+        payload = {"result": res.to_dict()}
     elif name == "info":
         payload = {
             "version": __version__,
             "data_source": "yfinance",
-            "coverage": ["valuation", "health", "growth", "quality", "flags"],
+            "coverage": ["valuation", "health", "growth", "quality", "flags", "statements", "dcf"],
             "description": "Financial statement analysis MCP server for AI IDEs.",
         }
     else:

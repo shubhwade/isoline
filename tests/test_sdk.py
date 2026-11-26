@@ -117,12 +117,18 @@ def test_reports_are_self_contained_and_formal(tmp_path) -> None:
         path = tmp_path / f"{name}.html"
         fn(str(path))
         pages[name] = path.read_text(encoding="utf-8")
+    import re
+
     for html in pages.values():
         low = html.lower()
-        assert "<script" not in low and "http://" not in low and "https://" not in low
+        assert "<script" not in low and "@import" not in low and "url(" not in low
+        # nothing is loaded from anywhere: no remote src/href, and a CSP that forbids it
+        assert not re.search(r"""(src|href)\s*=\s*["']?(https?:)?//""", low)
+        assert "content-security-policy" in low and "default-src 'none'" in low
         assert "investment advice" in low and "not a registered" in low and "isoline v" in low
         assert html.count("<h1>") == 1
-    assert "Piotroski F-score signals" in pages["scan"] and "21.4%" in pages["scan"]
+    assert "Piotroski F-score" in pages["scan"] and "21.4%" in pages["scan"]
+    assert "Income statement" in pages["scan"] and "Balance sheet" in pages["scan"]
     assert "Stronger" in pages["compare"] and "AAA" in pages["compare"]
 
 

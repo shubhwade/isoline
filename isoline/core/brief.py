@@ -53,7 +53,7 @@ def generate_brief(result: ScanResult) -> str:
 
     if result.red_flags:
         flags_text = ", ".join(
-            f"{flag.type.replace('_', ' ')} ({flag.severity})"
+            f"{flag.label} ({flag.severity})"
             for flag in result.red_flags
         )
         final_sentence = (

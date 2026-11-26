@@ -12,6 +12,7 @@ from openpyxl.utils import get_column_letter
 
 from isoline import __version__
 from isoline.core.result import CompareResult, ScanResult
+from isoline.exporters._safe import harden_workbook
 
 logger = logging.getLogger(__name__)
 
@@ -624,225 +625,55 @@ class ExcelExporter:
             chart3.series[0].title = SeriesLabel(strRef=StrRef(f="Dashboard!$A$4"))
             chart3.series[0].graphicalProperties.solidFill = "10B981"  # Emerald
 
-        # Fetch raw financials to construct line chart for margin trend if multiple periods available
-        from isoline.core.labels import get_series_fallback as _get_series_fallback
-        from isoline.core.loaders import load_financials
-
+        # Multi-year charts come from the scan's own history: no second download, so the
+        # workbook always matches the scan (including SEC EDGAR fallback data).
         chart4 = None
         chart5 = None
         chart6 = None
-        row_idx = 4
-        try:
-            financials = load_financials(result.ticker)
-            income_stmt = financials.get("income_stmt")
-            if income_stmt is not None:
-                operating_income = _get_series_fallback(
-                    income_stmt, ["Operating Income", "OperatingIncome", "Ebit", "EBIT"]
-                )
-                revenue = _get_series_fallback(
-                    income_stmt, ["Total Revenue", "TotalRevenue", "Revenue"]
-                )
+        hst = result.history
+        if hst is not None:
+            margin_rows = [(y, m * 100.0) for y, m in zip(hst.years, hst.operating_margin, strict=False) if m is not None]
+            if margin_rows:
+                ws_dash.cell(row=3, column=11, value="Year")
+                ws_dash.cell(row=3, column=12, value="Operating Margin (%)")
+                for i, (yr, val) in enumerate(margin_rows, start=4):
+                    ws_dash.cell(row=i, column=11, value=yr)
+                    ws_dash.cell(row=i, column=12, value=round(val, 2))
+                last = 3 + len(margin_rows)
+                self._style_range(ws_dash, "K3:L3", font=self.font_data_bold, fill=self.fill_alt, border=self.border_all, alignment=Alignment(horizontal="center"))
+                self._style_range(ws_dash, f"K4:L{last}", font=self.font_data, fill=self.fill_white, border=self.border_all, alignment=Alignment(horizontal="center"))
+                chart4 = LineChart()
+                chart4.title = "Operating Margin Trend"
+                chart4.y_axis.title = "Margin (%)"
+                chart4.x_axis.title = "Year"
+                chart4.legend = None
+                chart4.add_data(Reference(ws_dash, min_col=12, min_row=3, max_row=last), titles_from_data=True)
+                chart4.set_categories(Reference(ws_dash, min_col=11, min_row=4, max_row=last))
+                if chart4.series:
+                    chart4.series[0].graphicalProperties.line.solidFill = "111111"
 
-                if operating_income is not None and revenue is not None:
-                    # Write margin trend table to Dashboard sheet in Columns K and L
-                    # We will sort years ascending so the line chart flows correctly
-                    unsorted_data = []
-                    for col in revenue.index:
-                        try:
-                            rev_val = float(revenue.loc[col])
-                            op_val = float(operating_income.loc[col])
-                            if rev_val != 0:
-                                margin_pct = (op_val / rev_val) * 100.0
-                                year_str = (
-                                    str(col.year)
-                                    if hasattr(col, "year")
-                                    else str(col)[:4]
-                                )
-                                unsorted_data.append((year_str, margin_pct))
-                        except Exception:
-                            continue
+            rev_rows = [(y, v) for y, v in zip(hst.years, hst.revenue, strict=False) if v is not None]
+            if rev_rows:
+                ws_dash.cell(row=3, column=14, value="Year")
+                ws_dash.cell(row=3, column=15, value="Revenue")
+                for i, (yr, val) in enumerate(rev_rows, start=4):
+                    ws_dash.cell(row=i, column=14, value=yr)
+                    ws_dash.cell(row=i, column=15, value=val)
+                last = 3 + len(rev_rows)
+                self._style_range(ws_dash, "N3:O3", font=self.font_data_bold, fill=self.fill_alt, border=self.border_all, alignment=Alignment(horizontal="center"))
+                self._style_range(ws_dash, f"N4:O{last}", font=self.font_data, fill=self.fill_white, border=self.border_all, alignment=Alignment(horizontal="center"))
+                chart5 = BarChart()
+                chart5.type = "col"
+                chart5.title = "Revenue History"
+                chart5.y_axis.title = f"Revenue ({hst.currency})" if hst.currency else "Revenue"
+                chart5.x_axis.title = "Year"
+                chart5.legend = None
+                chart5.add_data(Reference(ws_dash, min_col=15, min_row=3, max_row=last), titles_from_data=True)
+                chart5.set_categories(Reference(ws_dash, min_col=14, min_row=4, max_row=last))
+                if chart5.series:
+                    chart5.series[0].graphicalProperties.solidFill = "8A8A86"
 
-                    # Sort by year ascending
-                    unsorted_data.sort(key=lambda x: x[0])
-
-                    if unsorted_data:
-                        ws_dash.cell(row=3, column=11, value="Year")
-                        ws_dash.cell(row=3, column=12, value="Margin (%)")
-                        self._style_range(
-                            ws_dash,
-                            "K3:L3",
-                            font=self.font_data_bold,
-                            fill=self.fill_alt,
-                            border=self.border_all,
-                            alignment=Alignment(horizontal="center"),
-                        )
-
-                        for yr, mrg in unsorted_data:
-                            ws_dash.cell(row=row_idx, column=11, value=yr)
-                            ws_dash.cell(row=row_idx, column=12, value=mrg)
-                            row_idx += 1
-
-                        self._style_range(
-                            ws_dash,
-                            f"K4:L{row_idx - 1}",
-                            font=self.font_data,
-                            fill=self.fill_white,
-                            border=self.border_all,
-                            alignment=Alignment(horizontal="center"),
-                        )
-
-                        # Set up LineChart
-                        chart4 = LineChart()
-                        chart4.title = "Operating Margin Trend (%)"
-                        chart4.y_axis.title = "Margin (%)"
-                        chart4.x_axis.title = "Year"
-                        chart4.legend = None
-
-                        cats4 = Reference(
-                            ws_dash, min_col=11, min_row=4, max_row=row_idx - 1
-                        )
-                        data4 = Reference(
-                            ws_dash, min_col=12, min_row=3, max_row=row_idx - 1
-                        )
-                        chart4.add_data(data4, titles_from_data=True)
-                        chart4.set_categories(cats4)
-
-                        if len(chart4.series) > 0:
-                            chart4.series[
-                                0
-                            ].graphicalProperties.line.solidFill = "3B82F6"  # Blue
-
-                        # Chart 5: Revenue History
-                        chart5 = BarChart()
-                        chart5.type = "col"
-                        chart5.title = "Revenue History"
-                        chart5.y_axis.title = "Revenue"
-                        chart5.x_axis.title = "Year"
-                        chart5.legend = None
-
-                        rev_data = []
-                        for col in revenue.index:
-                            try:
-                                r_val = float(revenue.loc[col])
-                                y_str = (
-                                    str(col.year)
-                                    if hasattr(col, "year")
-                                    else str(col)[:4]
-                                )
-                                rev_data.append((y_str, r_val))
-                            except Exception:
-                                pass
-                        rev_data.sort(key=lambda x: x[0])
-
-                        if rev_data:
-                            ws_dash.cell(row=3, column=14, value="Year")
-                            ws_dash.cell(row=3, column=15, value="Revenue")
-                            self._style_range(
-                                ws_dash,
-                                "N3:O3",
-                                font=self.font_data_bold,
-                                fill=self.fill_alt,
-                                border=self.border_all,
-                                alignment=Alignment(horizontal="center"),
-                            )
-                            r_idx = 4
-                            for yr, rval in rev_data:
-                                ws_dash.cell(row=r_idx, column=14, value=yr)
-                                ws_dash.cell(row=r_idx, column=15, value=rval)
-                                r_idx += 1
-                            self._style_range(
-                                ws_dash,
-                                f"N4:O{r_idx - 1}",
-                                font=self.font_data,
-                                fill=self.fill_white,
-                                border=self.border_all,
-                                alignment=Alignment(horizontal="center"),
-                            )
-                            cats5 = Reference(
-                                ws_dash, min_col=14, min_row=4, max_row=r_idx - 1
-                            )
-                            data5 = Reference(
-                                ws_dash, min_col=15, min_row=3, max_row=r_idx - 1
-                            )
-                            chart5.add_data(data5, titles_from_data=True)
-                            chart5.set_categories(cats5)
-                            if len(chart5.series) > 0:
-                                chart5.series[
-                                    0
-                                ].graphicalProperties.solidFill = "10B981"
-
-                        # Chart 6: P/E History
-                        # Fetch price history to calculate P/E
-                        chart6 = LineChart()
-                        chart6.title = "P/E History"
-                        chart6.y_axis.title = "P/E Ratio"
-                        chart6.x_axis.title = "Year"
-                        chart6.legend = None
-
-                        pe_data = []
-                        try:
-                            import yfinance as yf
-
-                            hist = yf.Ticker(result.ticker).history(period="5y")
-                            eps_series = _get_series_fallback(
-                                income_stmt, ["Basic EPS", "Diluted EPS"]
-                            )
-                            if eps_series is not None and not hist.empty:
-                                hist["Year"] = hist.index.year
-                                last_prices = hist.groupby("Year")["Close"].last()
-                                for col in eps_series.index:
-                                    y_str = (
-                                        int(col.year)
-                                        if hasattr(col, "year")
-                                        else int(str(col)[:4])
-                                    )
-                                    eps_val = float(eps_series.loc[col])
-                                    if eps_val > 0 and y_str in last_prices:
-                                        pe_val = last_prices[y_str] / eps_val
-                                        pe_data.append((str(y_str), pe_val))
-                        except Exception:
-                            pass
-
-                        pe_data.sort(key=lambda x: x[0])
-                        if pe_data:
-                            ws_dash.cell(row=3, column=17, value="Year")
-                            ws_dash.cell(row=3, column=18, value="P/E")
-                            self._style_range(
-                                ws_dash,
-                                "Q3:R3",
-                                font=self.font_data_bold,
-                                fill=self.fill_alt,
-                                border=self.border_all,
-                                alignment=Alignment(horizontal="center"),
-                            )
-                            p_idx = 4
-                            for yr, pval in pe_data:
-                                ws_dash.cell(row=p_idx, column=17, value=yr)
-                                ws_dash.cell(row=p_idx, column=18, value=pval)
-                                p_idx += 1
-                            self._style_range(
-                                ws_dash,
-                                f"Q4:R{p_idx - 1}",
-                                font=self.font_data,
-                                fill=self.fill_white,
-                                border=self.border_all,
-                                alignment=Alignment(horizontal="center"),
-                            )
-                            cats6 = Reference(
-                                ws_dash, min_col=17, min_row=4, max_row=p_idx - 1
-                            )
-                            data6 = Reference(
-                                ws_dash, min_col=18, min_row=3, max_row=p_idx - 1
-                            )
-                            chart6.add_data(data6, titles_from_data=True)
-                            chart6.set_categories(cats6)
-                            if len(chart6.series) > 0:
-                                chart6.series[
-                                    0
-                                ].graphicalProperties.line.solidFill = "F59E0B"
-
-        except Exception as e:
-            logger.warning("Failed to fetch financials for Excel line chart: %s", e)
+        self._statement_sheets(wb, result)
 
         # Add charts to Dashboard in a 2x2 grid layout
         ws_dash.add_chart(chart1, "B6")
@@ -858,7 +689,41 @@ class ExcelExporter:
         # Adjust column widths for Dashboard sheet (re-run to fit K/L column width too)
         self._auto_fit_columns(ws_dash)
 
+        harden_workbook(wb)
         wb.save(path)
+
+    def _statement_sheets(self, wb: Workbook, result: ScanResult) -> None:
+        """Income statement, balance sheet and cash flow as their own sheets (full precision)."""
+        st = result.statements
+        if st is None:
+            return
+        number_format = '#,##0;(#,##0);"-"'
+        eps_format = '#,##0.00;(#,##0.00);"-"'
+        for title, lines in (("Income Statement", st.income), ("Balance Sheet", st.balance), ("Cash Flow", st.cashflow)):
+            if not lines:
+                continue
+            ws = wb.create_sheet(title)
+            ws.cell(row=1, column=1, value=f"{title} ({st.currency or 'reported currency'}, as reported; costs and outflows negative)")
+            ws.cell(row=1, column=1).font = self.font_data_bold
+            ws.cell(row=2, column=1, value="Line item")
+            for j, period in enumerate(st.periods, start=2):
+                ws.cell(row=2, column=j, value=f"FY{period[:4]} ({period})")
+            self._style_range(ws, f"A2:{get_column_letter(len(st.periods) + 1)}2", font=self.font_data_bold, fill=self.fill_alt, border=self.border_all)
+            for i, ln in enumerate(lines, start=3):
+                label = ln.label + (" (computed)" if ln.computed else "")
+                ws.cell(row=i, column=1, value=label)
+                for j, v in enumerate(ln.values, start=2):
+                    cell = ws.cell(row=i, column=j, value=None if v is None else v * ln.sign)
+                    cell.number_format = eps_format if ln.per_share else number_format
+                    if v is None:
+                        cell.value = "n/a"
+                if ln.kind in ("subtotal", "total"):
+                    for j in range(1, len(st.periods) + 2):
+                        ws.cell(row=i, column=j).font = self.font_data_bold
+            ws.column_dimensions["A"].width = 44
+            for j in range(2, len(st.periods) + 2):
+                ws.column_dimensions[get_column_letter(j)].width = 22
+            ws.freeze_panes = "B3"
 
     def export_compare(self, result: CompareResult, path: str) -> None:
         wb = Workbook()
@@ -952,6 +817,7 @@ class ExcelExporter:
             )
 
         self._auto_fit_columns(ws)
+        harden_workbook(wb)
         wb.save(path)
 
     def _get_winner_details(
@@ -1106,4 +972,5 @@ class ExcelExporter:
             )
 
         self._auto_fit_columns(ws)
+        harden_workbook(wb)
         wb.save(path)

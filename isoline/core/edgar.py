@@ -35,6 +35,7 @@ from isoline.core.errors import NoDataError, ProviderUnavailableError
 
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 FACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json"
+_ALLOWED_PREFIXES = ("https://www.sec.gov/", "https://data.sec.gov/")
 _MIN_INTERVAL = 0.15  # about 6 requests/second, under the SEC's 10/s ceiling
 
 # yfinance-style row label -> us-gaap concepts, best first. First concept with data wins.
@@ -107,11 +108,13 @@ def _get_json(url: str) -> Any:
         if wait > 0:
             time.sleep(wait)
         _last_call = time.monotonic()
+    if not url.startswith(_ALLOWED_PREFIXES):  # only fixed https SEC endpoints, never file:// etc.
+        raise ProviderUnavailableError("Refusing to fetch a non-SEC URL")
     req = urllib.request.Request(
         url, headers={"User-Agent": user_agent(), "Accept-Encoding": "identity"}
     )
     try:
-        with urllib.request.urlopen(req, timeout=20) as resp:  # noqa: S310 (fixed https hosts)
+        with urllib.request.urlopen(req, timeout=20) as resp:  # noqa: S310  # nosec B310
             return json.load(resp)
     except Exception as exc:
         raise ProviderUnavailableError(f"Could not reach SEC EDGAR ({exc})") from exc
