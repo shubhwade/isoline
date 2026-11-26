@@ -36,6 +36,10 @@ jobs:
             git checkout --orphan badges && git rm -rf . >/dev/null
           fi
           cp /tmp/downloads.json downloads.json
-          git add downloads.json
+          # This branch holds only the badge data. Vercel builds every branch from website/,
+          # so tell it to skip this one instead of reporting a failed preview each night.
+          mkdir -p website
+          printf '%s\n' '{"git": {"deploymentEnabled": false}, "ignoreCommand": "exit 0"}' > website/vercel.json
+          git add downloads.json website/vercel.json
           git diff --cached --quiet || git commit -m "update download badge"
           git push origin badges
