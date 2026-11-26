@@ -1,605 +1,607 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Isoline: financial statements, measured precisely</title>
 <meta name="description" content="Open-source Python CLI for financial statement analysis. Piotroski F, Altman Z″ and Beneish M scores, quality metrics, DCF valuation and print-ready reports for any listed company.">
-<meta name="theme-color" content="#F4F1EA" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E1626" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://isolinee.vercel.app/">
+<meta name="theme-color" content="#0A0A0A">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://isolinee.vercel.app/">
 <meta property="og:title" content="Isoline: financial statements, measured precisely">
-<meta property="og:description" content="Piotroski, Altman and Beneish scores, quality metrics, DCF and print-ready reports from one command. Open source, no API key.">
-<meta property="og:image" content="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32" role="img" aria-label="Isoline"%3E%3Cdefs%3E%3CclipPath id="c"%3E%3Crect width="128" height="128" rx="28"/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path="url%28%23c%29"%3E%3Crect width="128" height="128" rx="28" fill="%2313213D"/%3E%3Cg fill="none" stroke-linejoin="round"%3E%3Cpath d="M110.16 66.00C110.38 68.13 110.38 70.34 110.13 72.49C109.89 74.65 109.39 76.83 108.68 78.92C107.98 81.02 107.04 83.09 105.93 85.07C104.82 87.04 103.50 88.97 102.03 90.78C100.56 92.58 98.90 94.32 97.09 95.89C95.28 97.46 93.29 98.94 91.17 100.20C89.05 101.45 86.74 102.56 84.38 103.42C82.02 104.27 79.49 104.91 76.99 105.31C74.50 105.72 71.91 105.86 69.41 105.84C66.91 105.83 64.41 105.56 62.00 105.21C59.59 104.87 57.26 104.34 54.97 103.79C52.69 103.23 50.49 102.58 48.31 101.90C46.12 101.22 43.98 100.50 41.85 99.69C39.72 98.88 37.58 98.04 35.52 97.05C33.45 96.06 31.37 94.99 29.43 93.74C27.50 92.49 25.61 91.10 23.93 89.56C22.25 88.02 20.69 86.31 19.37 84.50C18.05 82.70 16.92 80.73 16.01 78.73C15.10 76.73 14.41 74.61 13.92 72.49C13.43 70.37 13.14 68.17 13.06 66.00C12.97 63.83 13.08 61.61 13.40 59.44C13.73 57.28 14.25 55.09 15.02 53.00C15.78 50.91 16.78 48.83 17.99 46.90C19.20 44.97 20.68 43.11 22.30 41.43C23.93 39.75 25.80 38.20 27.75 36.83C29.70 35.45 31.84 34.24 33.99 33.16C36.15 32.08 38.41 31.17 40.67 30.35C42.94 29.52 45.26 28.83 47.59 28.23C49.93 27.63 52.30 27.12 54.70 26.75C57.10 26.38 59.55 26.10 62.00 26.01C64.45 25.93 66.95 25.98 69.39 26.26C71.82 26.54 74.29 27.02 76.61 27.69C78.94 28.37 81.22 29.29 83.33 30.33C85.45 31.38 87.45 32.64 89.31 33.97C91.18 35.30 92.89 36.79 94.50 38.31C96.12 39.83 97.60 41.44 99.01 43.09C100.42 44.75 101.74 46.45 102.96 48.22C104.17 50.00 105.32 51.83 106.30 53.74C107.27 55.65 108.16 57.64 108.81 59.68C109.45 61.73 109.94 63.87 110.16 66.00Z" stroke="%23F4F1EA" stroke-width="7" opacity="0.72"/%3E%3Cpath d="M93.26 61.00C93.35 62.21 93.32 63.45 93.15 64.66C92.99 65.88 92.69 67.10 92.28 68.27C91.87 69.45 91.33 70.61 90.70 71.72C90.07 72.83 89.32 73.91 88.49 74.92C87.65 75.93 86.72 76.90 85.70 77.78C84.68 78.66 83.56 79.49 82.37 80.20C81.19 80.91 79.90 81.54 78.58 82.04C77.27 82.54 75.86 82.93 74.47 83.20C73.07 83.47 71.62 83.61 70.21 83.66C68.80 83.71 67.38 83.63 66.00 83.49C64.62 83.35 63.27 83.10 61.94 82.83C60.62 82.55 59.33 82.20 58.06 81.82C56.79 81.44 55.54 81.01 54.32 80.53C53.10 80.05 51.88 79.52 50.72 78.92C49.55 78.32 48.40 77.65 47.33 76.91C46.26 76.16 45.23 75.33 44.31 74.43C43.39 73.52 42.54 72.53 41.83 71.49C41.11 70.45 40.49 69.34 40.00 68.20C39.51 67.06 39.13 65.86 38.87 64.66C38.60 63.46 38.46 62.22 38.42 61.00C38.39 59.78 38.46 58.53 38.66 57.31C38.85 56.09 39.16 54.87 39.60 53.69C40.03 52.52 40.59 51.35 41.27 50.26C41.94 49.18 42.75 48.12 43.65 47.17C44.54 46.21 45.57 45.31 46.65 44.51C47.72 43.71 48.90 43.00 50.10 42.36C51.30 41.72 52.56 41.16 53.84 40.68C55.12 40.19 56.44 39.77 57.77 39.42C59.10 39.07 60.46 38.78 61.83 38.58C63.20 38.38 64.60 38.23 66.00 38.20C67.40 38.17 68.82 38.21 70.21 38.38C71.59 38.55 72.99 38.82 74.31 39.20C75.64 39.59 76.94 40.09 78.16 40.67C79.38 41.25 80.54 41.94 81.62 42.69C82.70 43.43 83.71 44.26 84.65 45.12C85.59 45.98 86.45 46.89 87.26 47.84C88.07 48.79 88.82 49.78 89.50 50.80C90.17 51.83 90.80 52.89 91.32 53.99C91.84 55.09 92.29 56.24 92.62 57.41C92.94 58.58 93.17 59.79 93.26 61.00Z" stroke="%23F4F1EA" stroke-width="7" opacity="1.0"/%3E%3C/g%3E%3Ccircle cx="70.0" cy="56.0" r="9" fill="%23C8781A"/%3E%3C/g%3E%3C/svg%3E">
+<meta property="og:description" content="Piotroski, Altman and Beneish scores, quality metrics, a DCF and print-ready reports from one command. Open source, no API key.">
+<meta property="og:image" content="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32" role="img" aria-label="Isoline"%3E%3Cdefs%3E%3CclipPath id="c"%3E%3Crect width="128" height="128" rx="28"/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path="url%28%23c%29"%3E%3Crect width="128" height="128" rx="28" fill="%230A0A0A"/%3E%3Cg fill="none" stroke-linejoin="round"%3E%3Cpath d="M110.16 66.00C110.38 68.13 110.38 70.34 110.13 72.49C109.89 74.65 109.39 76.83 108.68 78.92C107.98 81.02 107.04 83.09 105.93 85.07C104.82 87.04 103.50 88.97 102.03 90.78C100.56 92.58 98.90 94.32 97.09 95.89C95.28 97.46 93.29 98.94 91.17 100.20C89.05 101.45 86.74 102.56 84.38 103.42C82.02 104.27 79.49 104.91 76.99 105.31C74.50 105.72 71.91 105.86 69.41 105.84C66.91 105.83 64.41 105.56 62.00 105.21C59.59 104.87 57.26 104.34 54.97 103.79C52.69 103.23 50.49 102.58 48.31 101.90C46.12 101.22 43.98 100.50 41.85 99.69C39.72 98.88 37.58 98.04 35.52 97.05C33.45 96.06 31.37 94.99 29.43 93.74C27.50 92.49 25.61 91.10 23.93 89.56C22.25 88.02 20.69 86.31 19.37 84.50C18.05 82.70 16.92 80.73 16.01 78.73C15.10 76.73 14.41 74.61 13.92 72.49C13.43 70.37 13.14 68.17 13.06 66.00C12.97 63.83 13.08 61.61 13.40 59.44C13.73 57.28 14.25 55.09 15.02 53.00C15.78 50.91 16.78 48.83 17.99 46.90C19.20 44.97 20.68 43.11 22.30 41.43C23.93 39.75 25.80 38.20 27.75 36.83C29.70 35.45 31.84 34.24 33.99 33.16C36.15 32.08 38.41 31.17 40.67 30.35C42.94 29.52 45.26 28.83 47.59 28.23C49.93 27.63 52.30 27.12 54.70 26.75C57.10 26.38 59.55 26.10 62.00 26.01C64.45 25.93 66.95 25.98 69.39 26.26C71.82 26.54 74.29 27.02 76.61 27.69C78.94 28.37 81.22 29.29 83.33 30.33C85.45 31.38 87.45 32.64 89.31 33.97C91.18 35.30 92.89 36.79 94.50 38.31C96.12 39.83 97.60 41.44 99.01 43.09C100.42 44.75 101.74 46.45 102.96 48.22C104.17 50.00 105.32 51.83 106.30 53.74C107.27 55.65 108.16 57.64 108.81 59.68C109.45 61.73 109.94 63.87 110.16 66.00Z" stroke="%23FFFFFF" stroke-width="7" opacity="0.72"/%3E%3Cpath d="M93.26 61.00C93.35 62.21 93.32 63.45 93.15 64.66C92.99 65.88 92.69 67.10 92.28 68.27C91.87 69.45 91.33 70.61 90.70 71.72C90.07 72.83 89.32 73.91 88.49 74.92C87.65 75.93 86.72 76.90 85.70 77.78C84.68 78.66 83.56 79.49 82.37 80.20C81.19 80.91 79.90 81.54 78.58 82.04C77.27 82.54 75.86 82.93 74.47 83.20C73.07 83.47 71.62 83.61 70.21 83.66C68.80 83.71 67.38 83.63 66.00 83.49C64.62 83.35 63.27 83.10 61.94 82.83C60.62 82.55 59.33 82.20 58.06 81.82C56.79 81.44 55.54 81.01 54.32 80.53C53.10 80.05 51.88 79.52 50.72 78.92C49.55 78.32 48.40 77.65 47.33 76.91C46.26 76.16 45.23 75.33 44.31 74.43C43.39 73.52 42.54 72.53 41.83 71.49C41.11 70.45 40.49 69.34 40.00 68.20C39.51 67.06 39.13 65.86 38.87 64.66C38.60 63.46 38.46 62.22 38.42 61.00C38.39 59.78 38.46 58.53 38.66 57.31C38.85 56.09 39.16 54.87 39.60 53.69C40.03 52.52 40.59 51.35 41.27 50.26C41.94 49.18 42.75 48.12 43.65 47.17C44.54 46.21 45.57 45.31 46.65 44.51C47.72 43.71 48.90 43.00 50.10 42.36C51.30 41.72 52.56 41.16 53.84 40.68C55.12 40.19 56.44 39.77 57.77 39.42C59.10 39.07 60.46 38.78 61.83 38.58C63.20 38.38 64.60 38.23 66.00 38.20C67.40 38.17 68.82 38.21 70.21 38.38C71.59 38.55 72.99 38.82 74.31 39.20C75.64 39.59 76.94 40.09 78.16 40.67C79.38 41.25 80.54 41.94 81.62 42.69C82.70 43.43 83.71 44.26 84.65 45.12C85.59 45.98 86.45 46.89 87.26 47.84C88.07 48.79 88.82 49.78 89.50 50.80C90.17 51.83 90.80 52.89 91.32 53.99C91.84 55.09 92.29 56.24 92.62 57.41C92.94 58.58 93.17 59.79 93.26 61.00Z" stroke="%23FFFFFF" stroke-width="7" opacity="1.0"/%3E%3C/g%3E%3Ccircle cx="70.0" cy="56.0" r="9" fill="%23FF4A1C"/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  (function () {
+    var d = document.documentElement;
+    try { var t = localStorage.getItem('isoline-theme'); if (t === 'light' || t === 'dark') d.dataset.theme = t; } catch (e) {}
+    d.classList.add('js');
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('static');
+  })();
+</script>
 <style>
-:root {
-  --bg: #F4F1EA;
-  --bg-2: #EDE8DD;
-  --surface: #FBF9F4;
-  --ink: #13213D;
-  --ink-2: #4B5468;
-  --ink-3: #7A8091;
-  --rule: #DCD5C6;
-  --rule-2: #C9C0AD;
-  --accent: #B4690E;
-  --accent-soft: rgba(180, 105, 14, .1);
-  --pos: #2E7A4E;
-  --neg: #B03A2E;
-  --term-bg: #0F1828;
-  --term-ink: #D9DEE7;
-  --term-dim: #6F7B90;
-  --term-rule: #2A3650;
-  --contour: rgba(19, 33, 61, .085);
-  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
-  --max: 1160px;
-  --radius: 10px;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0E1626; --bg-2: #121C2F; --surface: #142036;
-    --ink: #ECE7DC; --ink-2: #A9B1C1; --ink-3: #7C8699;
-    --rule: #233049; --rule-2: #31405E;
-    --accent: #E59A3C; --accent-soft: rgba(229, 154, 60, .12);
-    --pos: #6CC08F; --neg: #E77B6E;
-    --term-bg: #0A111D; --term-rule: #22304A;
-    --contour: rgba(236, 231, 220, .06);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0E1626; --bg-2: #121C2F; --surface: #142036;
-  --ink: #ECE7DC; --ink-2: #A9B1C1; --ink-3: #7C8699;
-  --rule: #233049; --rule-2: #31405E;
-  --accent: #E59A3C; --accent-soft: rgba(229, 154, 60, .12);
-  --pos: #6CC08F; --neg: #E77B6E;
-  --term-bg: #0A111D; --term-rule: #22304A;
-  --contour: rgba(236, 231, 220, .06);
+:root, [data-theme="dark"] {
+  --bg: #0A0A0A;
+  --bg-2: #111111;
+  --bg-3: #1A1A1A;
+  --line: #222222;
+  --line-2: #333333;
+  --ink: #F4F4F2;
+  --ink-2: #A3A3A0;
+  --ink-3: #6E6E6B;
+  --signal: #FF4A1C;
+  --signal-ink: #FF5A2E;
+  --cell: 244, 244, 242;
+  --shadow: 0 40px 100px -30px rgba(0, 0, 0, .8);
   color-scheme: dark;
 }
-
+[data-theme="light"] {
+  --bg: #FFFFFF;
+  --bg-2: #F5F5F3;
+  --bg-3: #EAEAE7;
+  --line: #E6E6E3;
+  --line-2: #D4D4D0;
+  --ink: #0A0A0A;
+  --ink-2: #525250;
+  --ink-3: #7A7A76;
+  --signal: #FF4A1C;
+  --signal-ink: #D13A10;
+  --cell: 10, 10, 10;
+  --shadow: 0 40px 100px -40px rgba(0, 0, 0, .35);
+  color-scheme: light;
+}
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font: 400 16px/1.65 var(--sans);
-  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  font: 400 16px/1.6 "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  transition: background .3s, color .3s;
 }
 a { color: inherit; }
-img { max-width: 100%; display: block; }
-code, pre, kbd { font-family: var(--mono); }
-::selection { background: var(--accent); color: #fff; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-
-.wrap { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
-.eyebrow {
-  font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
-  color: var(--accent); display: inline-flex; align-items: center; gap: 10px;
-}
-.eyebrow::before { content: ""; width: 18px; height: 1px; background: currentColor; }
-h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -.015em; margin: 0; color: var(--ink); }
-h2 { font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1.08; }
-h3 { font-size: 1.45rem; line-height: 1.2; }
-em { font-style: italic; }
-.lede { color: var(--ink-2); font-size: 1.08rem; max-width: 36rem; }
+img { display: block; max-width: 100%; }
+code, kbd { font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace; font-size: .92em; }
+::selection { background: var(--signal); color: #fff; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+.label { font: 500 11.5px/1.3 "IBM Plex Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.label b { color: var(--signal-ink); font-weight: 500; }
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.045em; line-height: .95; }
+h2 { font-size: clamp(2.6rem, 6.4vw, 5.6rem); }
+h3 { font-size: 1.5rem; letter-spacing: -.03em; line-height: 1.1; }
+.muted { color: var(--ink-2); }
+.sig { color: var(--signal-ink); }
 
 /* NAV */
-.nav {
-  position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px);
-  border-bottom: 1px solid transparent; transition: border-color .2s;
-}
-.nav.scrolled { border-bottom-color: var(--rule); }
-.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 24px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 600 18px/1 var(--sans); letter-spacing: -.02em; }
-.brand svg { width: 28px; height: 28px; border-radius: 7px; box-shadow: 0 0 0 1px var(--rule-2); }
-.brand .tittle { color: var(--accent); }
-.ver { font: 500 11px/1 var(--mono); color: var(--ink-3); border: 1px solid var(--rule); border-radius: 999px; padding: 4px 8px; margin-left: 4px; }
-.nav-links { display: flex; align-items: center; gap: 28px; font-size: 14px; }
-.nav-links a { text-decoration: none; color: var(--ink-2); transition: color .15s; }
+.nav { position: fixed; inset: 0 0 auto 0; z-index: 60; transition: background .3s, border-color .3s; border-bottom: 1px solid transparent; }
+.nav.solid { background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom-color: var(--line); }
+.nav .wrap { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; letter-spacing: -.035em; text-decoration: none; }
+.brand svg { width: 26px; height: 26px; border-radius: 6px; box-shadow: 0 0 0 1px var(--line-2); }
+.brand i { font-style: normal; color: var(--signal-ink); }
+.nav-links { display: flex; align-items: center; gap: 26px; font-size: 14px; }
+.nav-links a { text-decoration: none; color: var(--ink-2); transition: color .2s; }
 .nav-links a:hover { color: var(--ink); }
 .btn {
-  display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px;
-  border-radius: 8px; font: 500 14px/1 var(--sans); text-decoration: none; cursor: pointer;
-  border: 1px solid var(--rule-2); background: transparent; color: var(--ink);
-  transition: background .15s, border-color .15s, transform .1s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2);
+  background: transparent; color: var(--ink); font: 500 14px/1 "Inter Tight", sans-serif; text-decoration: none; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
 }
-.btn:hover { border-color: var(--ink-3); background: var(--surface); }
-.btn:active { transform: translateY(1px); }
-.btn-solid { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.btn-solid:hover { background: var(--ink); opacity: .9; border-color: var(--ink); }
-.btn svg { width: 16px; height: 16px; }
-.theme-toggle { width: 40px; padding: 0; justify-content: center; }
-.menu-btn { display: none; }
+.btn:hover { border-color: var(--ink-2); }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn-ink { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn-ink:hover { background: var(--signal); border-color: var(--signal); color: #fff; }
+.icon-btn { width: 40px; padding: 0; }
 
 /* HERO */
-.hero { position: relative; padding: 72px 0 96px; overflow: hidden; }
-#contours { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.hero::after {
-  content: ""; position: absolute; inset: auto 0 0 0; height: 160px; pointer-events: none;
-  background: linear-gradient(to bottom, transparent, var(--bg));
-}
-.hero .wrap { position: relative; z-index: 1; }
-.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: 56px; align-items: center; }
-.hero h1 { font-size: clamp(2.8rem, 6.2vw, 5rem); line-height: .98; letter-spacing: -.03em; margin: 22px 0 24px; }
-.hero h1 em { color: var(--accent); }
-.hero .lede { font-size: 1.15rem; margin-bottom: 32px; }
-.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+#ridges { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--bg) 88%, transparent) 0%, color-mix(in srgb, var(--bg) 55%, transparent) 38%, transparent 62%),
+              linear-gradient(0deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 70%, transparent) 22%, transparent 42%); }
+.hero-copy { position: relative; z-index: 2; padding-top: 110px; padding-bottom: 48px; pointer-events: none; }
+.hero-copy > * { pointer-events: auto; }
+.hero h1 { font-size: clamp(3.3rem, 10.5vw, 10rem); line-height: .86; letter-spacing: -.06em; margin: 22px 0 30px; }
+.hero h1 .ln { display: block; overflow: hidden; padding-bottom: .07em; }
+.hero h1 .w { display: inline-block; }
+.js:not(.static) .hero h1 .w { transform: translateY(108%); transition: transform 1.1s cubic-bezier(.16, 1, .3, 1); }
+.js:not(.static) .hero h1 .ln:nth-child(2) .w { transition-delay: .08s; }
+.js:not(.static) .hero h1 .ln:nth-child(3) .w { transition-delay: .16s; }
+.js.ready .hero h1 .w { transform: none; }
+.hero-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
+.hero-row p { max-width: 30rem; margin: 0; font-size: 1.15rem; color: var(--ink-2); }
+.js:not(.static) .fade { opacity: 0; transform: translateY(16px); transition: opacity .9s ease .45s, transform .9s cubic-bezier(.16, 1, .3, 1) .45s; }
+.js.ready .fade { opacity: 1; transform: none; }
+.cta { display: flex; gap: 10px; flex-wrap: wrap; }
 .install {
-  display: inline-flex; align-items: center; gap: 14px; height: 48px; padding: 0 8px 0 18px;
-  background: var(--surface); border: 1px solid var(--rule-2); border-radius: 10px;
-  font: 500 15px/1 var(--mono); color: var(--ink); cursor: pointer;
-  box-shadow: 0 1px 0 rgba(19, 33, 61, .04), 0 8px 24px -12px rgba(19, 33, 61, .18);
-  transition: border-color .15s;
+  display: inline-flex; align-items: center; gap: 14px; height: 52px; padding: 0 7px 0 22px; border-radius: 999px;
+  background: var(--bg-2); border: 1px solid var(--line-2); color: var(--ink); cursor: pointer;
+  font: 500 15px/1 "IBM Plex Mono", monospace; transition: border-color .2s;
 }
-.install:hover { border-color: var(--ink-3); }
-.install .dollar { color: var(--ink-3); user-select: none; }
-.install .copy { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; color: var(--ink-3); transition: background .15s, color .15s; }
-.install:hover .copy { background: var(--bg-2); color: var(--ink); }
-.install svg { width: 16px; height: 16px; }
-.btn-lg { height: 48px; padding: 0 20px; font-size: 15px; border-radius: 10px; }
-.facts { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 28px; font-size: 13px; color: var(--ink-3); }
-.facts span { display: inline-flex; align-items: center; gap: 8px; }
-.facts span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--rule-2); }
+.install:hover { border-color: var(--ink-2); }
+.install .d { color: var(--ink-3); }
+.install .c { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); transition: background .2s, color .2s; }
+.install:hover .c { background: var(--signal); color: #fff; }
+.install svg { width: 15px; height: 15px; }
+.btn-lg { height: 52px; padding: 0 22px; font-size: 15px; }
 
-/* TERMINAL */
-.term {
-  background: var(--term-bg); color: var(--term-ink); border-radius: 12px;
-  box-shadow: 0 0 0 1px rgba(19, 33, 61, .12), 0 30px 60px -20px rgba(15, 24, 40, .45), 0 12px 24px -12px rgba(15, 24, 40, .3);
-  overflow: hidden; font: 400 12.5px/1.62 var(--mono);
+.tape { position: relative; z-index: 2; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg); overflow: hidden; white-space: nowrap; }
+.tape-track { display: inline-flex; animation: tape 52s linear infinite; }
+.tape:hover .tape-track { animation-play-state: paused; }
+.tape span { display: inline-flex; gap: 10px; align-items: baseline; padding: 15px 28px; border-right: 1px solid var(--line); font: 500 13px/1 "IBM Plex Mono", monospace; color: var(--ink-3); }
+.tape span b { color: var(--ink); font-weight: 500; }
+.tape span em { font-style: normal; color: var(--signal-ink); }
+@keyframes tape { to { transform: translateX(-50%); } }
+
+/* SCROLL SCENES */
+.scene { position: relative; }
+.stage { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; align-items: center; }
+.scene-grid { width: 100%; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 64px; align-items: center; }
+.step-count { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.bar { flex: 1; max-width: 180px; height: 2px; background: var(--line-2); position: relative; overflow: hidden; }
+.bar i { position: absolute; inset: 0; background: var(--signal); transform-origin: left; transform: scaleX(var(--p, 1)); }
+.step-txt { display: grid; }
+.step-txt > div { grid-area: 1 / 1; transition: opacity .5s, transform .6s cubic-bezier(.16, 1, .3, 1); }
+.js .step-txt > div { opacity: 0; transform: translateY(18px); pointer-events: none; }
+.js .step-txt > div.on { opacity: 1; transform: none; pointer-events: auto; }
+.step-txt h2 { font-size: clamp(2.4rem, 5vw, 4.4rem); margin: 0 0 20px; }
+.step-txt p { color: var(--ink-2); font-size: 1.08rem; max-width: 28rem; margin: 0; }
+.step-txt code { color: var(--ink); }
+
+.panel-stack { position: relative; height: min(620px, 74svh); }
+.panel {
+  position: absolute; inset: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--bg-2);
+  padding: 28px; overflow: hidden; display: flex; flex-direction: column;
+  transition: opacity .55s ease, transform .7s cubic-bezier(.16, 1, .3, 1), filter .55s;
 }
-.term-bar { display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-bottom: 1px solid var(--term-rule); }
-.term-bar i { width: 11px; height: 11px; border-radius: 50%; background: #2C3851; }
-.term-bar span { margin-left: auto; margin-right: auto; transform: translateX(-24px); font: 500 12px/1 var(--sans); color: var(--term-dim); }
-.term pre { margin: 0; padding: 18px 20px 20px; white-space: pre; overflow-x: auto; scrollbar-width: thin; }
-.t-dim { color: var(--term-dim); }
-.t-p { color: #7FA7D9; }
-.t-acc { color: #E8A04A; }
-.t-ok { color: #74C69A; }
-.t-hd { color: #9AA6BA; }
-.t-b { color: #F3F1EC; font-weight: 500; }
-.t-bar { color: #5B86C4; }
-.term .line { opacity: 1; }
-.js .term .line { opacity: 0; transform: translateY(3px); transition: opacity .35s ease, transform .35s ease; }
-.js .term .line.on { opacity: 1; transform: none; }
-.caret { display: inline-block; width: 7px; height: 14px; background: var(--term-ink); vertical-align: -2px; animation: blink 1.05s steps(1) infinite; }
-@keyframes blink { 50% { opacity: 0; } }
-.term-note { margin-top: 12px; font-size: 12.5px; color: var(--ink-3); text-align: right; }
+.js .panel { opacity: 0; transform: translateY(40px) scale(.97); filter: blur(6px); pointer-events: none; }
+.js .panel.on { opacity: 1; transform: none; filter: none; pointer-events: auto; }
+.js .panel.past { transform: translateY(-40px) scale(.97); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; }
 
-/* SCORE STRIP */
-.strip { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--surface); }
-.strip .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
-.stat { padding: 30px 24px; border-left: 1px solid var(--rule); }
-.stat:first-child { border-left: 0; padding-left: 0; }
-.stat b { display: block; font: 400 2.4rem/1 var(--serif); letter-spacing: -.02em; color: var(--ink); }
-.stat b sup { font-size: .5em; color: var(--accent); margin-left: 2px; }
-.stat span { display: block; margin-top: 10px; font-size: 13.5px; color: var(--ink-2); }
+/* no JS or reduced motion: scenes become ordinary stacked sections showing final states */
+html:not(.js) .scene, .static .scene { height: auto !important; }
+html:not(.js) .stage, .static .stage { position: relative; height: auto; padding: 110px 0; overflow: visible; }
+html:not(.js) .panel-stack, .static .panel-stack { height: auto; display: grid; gap: 16px; }
+html:not(.js) .panel, .static .panel { position: relative; inset: auto; min-height: 580px; opacity: 1; transform: none; filter: none; pointer-events: auto; }
+.static .step-txt { gap: 36px; }
+.static .step-txt > div { grid-area: auto; opacity: 1; transform: none; }
+html:not(.js) .step-txt { gap: 36px; }
+html:not(.js) .step-txt > div { grid-area: auto; }
+.static .step-count, html:not(.js) .step-count { display: none; }
+.static .paper, html:not(.js) .paper { height: 640px; transform: none; }
 
-/* SECTIONS */
-section.block { padding: 120px 0; }
-.sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: end; margin-bottom: 56px; }
-.sec-head h2 { margin-top: 18px; }
-.sec-head p { color: var(--ink-2); margin: 0; max-width: 32rem; }
+/* ledger */
+.ledger { width: 100%; border-collapse: collapse; font: 400 13.5px/1 "IBM Plex Mono", monospace; }
+.ledger th { text-align: right; font-weight: 500; color: var(--ink-3); padding: 0 0 12px; font-size: 11.5px; letter-spacing: .06em; }
+.ledger th:first-child, .ledger td:first-child { text-align: left; font-family: "Inter Tight", sans-serif; font-size: 14px; color: var(--ink-2); }
+.ledger td { padding: 11px 0; border-top: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.ledger tr { transition: opacity .4s, transform .5s cubic-bezier(.16, 1, .3, 1); }
+.js:not(.static) .ledger tbody tr { opacity: 0; transform: translateX(24px); }
+.js:not(.static) .ledger tbody tr.in { opacity: 1; transform: none; }
+.ledger td.hl { color: var(--ink); }
 
-/* ENGINES */
-.engines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
-.engine { padding: 36px 40px 40px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 0; }
-.engine:nth-child(even) { padding: 36px 0 40px 40px; border-left: 1px solid var(--rule); }
-.engine .n { font: 500 12px/1.9 var(--mono); color: var(--ink-3); }
-.engine h3 { margin-bottom: 10px; }
-.engine p { margin: 0 0 18px; color: var(--ink-2); font-size: 15px; }
-.formula {
-  font: 400 12.5px/1.6 var(--mono); color: var(--ink); background: var(--bg-2);
-  border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: nowrap;
-}
-.formula .k { color: var(--accent); }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag { font: 500 12px/1 var(--mono); color: var(--ink-2); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 10px; background: var(--surface); }
+/* piotroski */
+.fscore { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: center; flex: 1; }
+.fbig { font: 600 clamp(7rem, 14vw, 12rem)/.8 "Inter Tight", sans-serif; letter-spacing: -.07em; font-variant-numeric: tabular-nums; }
+.fbig small { font-size: .28em; color: var(--ink-3); letter-spacing: -.02em; margin-left: 6px; }
+.signals { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.signals li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 14px; color: var(--ink-3); padding: 8px 0; border-bottom: 1px dashed var(--line); transition: color .3s; }
+.signals li .box { width: 16px; height: 16px; border: 1.5px solid var(--line-2); border-radius: 4px; display: grid; place-items: center; transition: background .25s, border-color .25s, transform .35s cubic-bezier(.3, 1.8, .4, 1); }
+.signals li .box svg { width: 11px; height: 11px; color: #fff; opacity: 0; transition: opacity .2s; }
+.signals li .grp { font: 500 10.5px/1 "IBM Plex Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.signals li.on, html:not(.js) .signals li, .static .signals li { color: var(--ink); }
+.signals li.on .box, html:not(.js) .signals li .box, .static .signals li .box { background: var(--signal); border-color: var(--signal); }
+.signals li.on .box { transform: scale(1.1); }
+.signals li.on .box svg, html:not(.js) .signals li .box svg, .static .signals li .box svg { opacity: 1; }
+
+/* altman gauge */
+.gauge-wrap { flex: 1; display: grid; place-items: center; position: relative; min-height: 0; }
+.gauge { width: 100%; max-width: 520px; max-height: 100%; overflow: visible; }
+.gauge .zone { fill: none; stroke-width: 26; }
+.gauge text { font: 500 11px "IBM Plex Mono", monospace; fill: var(--ink-3); letter-spacing: .06em; }
+.zread { position: absolute; left: 0; right: 0; bottom: 2%; text-align: center; }
+.zread b { display: block; font: 600 clamp(3.6rem, 7vw, 5.6rem)/.9 "Inter Tight", sans-serif; letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+.zread span { font: 500 12px/1 "IBM Plex Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--signal-ink); }
+
+/* withheld */
+.withheld { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 30px; }
+.na-row { display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap; }
+.na-row .metric { font-size: 1.1rem; color: var(--ink-2); min-width: 9.5rem; }
+.na-val { position: relative; display: inline-block; font: 600 clamp(3.2rem, 7vw, 5.2rem)/.9 "Inter Tight", sans-serif; letter-spacing: -.05em; }
+.na-val .zero { position: relative; color: var(--ink-3); opacity: calc(1 - var(--na, 1)); }
+.na-val .zero::after { content: ""; position: absolute; left: -4%; top: 50%; height: 6px; width: 108%; background: var(--signal); transform-origin: left; transform: scaleX(var(--strike, 1)); }
+.na-val .na { position: absolute; left: 0; top: 0; color: var(--ink); opacity: var(--na, 1); transform: translateY(calc((1 - var(--na, 1)) * 30px)); }
+.note { font: 400 13px/1.65 "IBM Plex Mono", monospace; color: var(--ink-3); border-left: 2px solid var(--signal); padding-left: 14px; }
+
+/* DCF */
+.dcf-chart { flex: 1; position: relative; min-height: 0; }
+.dcf-chart svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.dcf-chart text { font: 500 11px "IBM Plex Mono", monospace; fill: var(--ink-3); }
+.dcf-chart .val { fill: var(--ink); font-size: 12px; }
+.dcf-sum { display: flex; gap: 32px; align-items: baseline; flex-wrap: wrap; margin-top: 16px; padding-top: 18px; border-top: 1px solid var(--line); }
+.dcf-sum .big { font: 600 clamp(2.4rem, 5vw, 3.6rem)/.95 "Inter Tight", sans-serif; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+.dcf-sum .lbl { font: 500 11px/1.4 "IBM Plex Mono", monospace; color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+.grid-sens { display: grid; grid-template-columns: 64px repeat(5, minmax(0, 1fr)); gap: 6px; font: 500 13px/1 "IBM Plex Mono", monospace; flex: 1; align-content: center; perspective: 800px; }
+.grid-sens .hd { color: var(--ink-3); font-size: 11px; display: grid; place-items: center; min-height: 30px; }
+.grid-sens .rh { place-items: center start; }
+.cell { min-height: 62px; border-radius: 10px; display: grid; place-items: center; color: var(--ink); background: rgba(var(--cell), var(--a)); transition: transform .6s cubic-bezier(.16, 1, .3, 1), opacity .4s; font-variant-numeric: tabular-nums; }
+.cell.dark { color: var(--bg); }
+.cell.base { background: var(--signal); color: #fff; box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 30%, transparent); }
+.js:not(.static) .cell { transform: rotateX(90deg); opacity: 0; }
+.js:not(.static) .cell.in { transform: none; opacity: 1; }
+.scen { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.scen span { flex: 1; min-width: 120px; border: 1px solid var(--line-2); border-radius: 12px; padding: 12px 14px; font: 500 11px/1.5 "IBM Plex Mono", monospace; color: var(--ink-3); letter-spacing: .04em; }
+.scen span b { display: block; font: 600 1.6rem/1.1 "Inter Tight", sans-serif; color: var(--ink); letter-spacing: -.04em; }
+.scen span.base { border-color: var(--signal); }
+.scen span.base b { color: var(--signal-ink); }
 
 /* REPORT */
-.report-sec { background: var(--bg-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-.report-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; }
-.checks { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }
-.checks li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--ink-2); font-size: 15px; }
-.checks li::before { content: ""; width: 14px; height: 14px; margin-top: 5px; border-radius: 50%; border: 1.5px solid var(--accent); box-shadow: inset 0 0 0 3px var(--bg-2), inset 0 0 0 10px var(--accent); }
-.checks b { color: var(--ink); font-weight: 500; }
-.browser {
-  border-radius: 12px; overflow: hidden; background: #fff;
-  box-shadow: 0 0 0 1px rgba(19, 33, 61, .1), 0 40px 80px -30px rgba(19, 33, 61, .45);
-  transform: perspective(1600px) rotateY(-6deg) rotateX(2deg); transform-origin: left center;
-  transition: transform .6s cubic-bezier(.2, .7, .2, 1);
+.report-grid { padding-top: 64px; width: 100%; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; }
+.paper {
+  position: relative; width: 100%; height: min(76svh, 760px); border-radius: 14px; overflow: hidden; background: #fff; box-shadow: var(--shadow), 0 0 0 1px var(--line);
+  transform: perspective(1800px) rotateX(calc(var(--tilt, 0) * 1deg)) rotateY(calc(var(--tilt, 0) * -1.2deg));
 }
-.browser:hover { transform: none; }
-.browser-bar { display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px; background: #EEEBE4; border-bottom: 1px solid #DED8CB; }
-.browser-bar i { width: 10px; height: 10px; border-radius: 50%; background: #D3CCBD; }
-.browser-bar span { margin-left: 12px; flex: 1; max-width: 340px; height: 22px; border-radius: 6px; background: #fff; font: 400 11.5px/22px var(--sans); color: #6A6F7A; padding: 0 10px; }
-.browser-view { height: 460px; overflow: hidden; }
-.browser-view img { width: 100%; }
+.paper-bar { height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 12px; background: #F2F2F0; border-bottom: 1px solid #E2E2DF; }
+.paper-bar i { width: 10px; height: 10px; border-radius: 50%; background: #D6D6D2; }
+.paper-bar span { margin-left: 10px; font: 400 11.5px/1 "IBM Plex Mono", monospace; color: #6F6F68; }
+.paper-view { position: absolute; inset: 34px 0 0 0; overflow: hidden; background: #F3F4F6; }
+.paper-view img { width: 100%; height: auto; transform: translateY(calc(var(--scroll, 0) * -1px)); will-change: transform; }
+.feats { list-style: none; padding: 0; margin: 34px 0 0; display: grid; border-top: 1px solid var(--line); }
+.feats li { padding: 16px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 46px minmax(0, 1fr); color: var(--ink-2); font-size: 15px; transition: color .3s; }
+.feats li span:first-child { font: 500 12px/1.8 "IBM Plex Mono", monospace; color: var(--ink-3); transition: color .3s; }
+.feats li b { color: var(--ink); font-weight: 600; }
+.feats li.on span:first-child { color: var(--signal-ink); }
 
-/* HONEST DATA */
-.honest { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
-.quote { font: 400 clamp(1.7rem, 3.2vw, 2.4rem)/1.2 var(--serif); letter-spacing: -.015em; margin: 18px 0 20px; }
-.quote em { color: var(--accent); }
-.ledger { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; font-size: 14px; }
-.ledger-row { display: grid; grid-template-columns: 1fr auto auto; gap: 18px; padding: 13px 18px; border-top: 1px solid var(--rule); align-items: center; }
-.ledger-row:first-child { border-top: 0; background: var(--bg-2); font: 500 11.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-.ledger-row .v { font: 500 13.5px/1 var(--mono); text-align: right; min-width: 64px; }
-.pill { font: 500 11px/1 var(--mono); padding: 5px 8px; border-radius: 999px; }
-.pill.ok { color: var(--pos); background: color-mix(in srgb, var(--pos) 12%, transparent); }
-.pill.na { color: var(--accent); background: var(--accent-soft); }
-.ledger-note { padding: 14px 18px; border-top: 1px dashed var(--rule-2); font: 400 12.5px/1.55 var(--mono); color: var(--ink-3); }
+/* SECTIONS */
+.block { padding: 140px 0; position: relative; }
+.head { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 56px; align-items: end; margin-bottom: 64px; }
+.head h2 { margin-top: 20px; }
+.head p { margin: 0; color: var(--ink-2); font-size: 1.08rem; }
+.js:not(.static) .rv { opacity: 0; transform: translateY(30px); transition: opacity 1s ease, transform 1s cubic-bezier(.16, 1, .3, 1); }
+.js:not(.static) .rv.in { opacity: 1; transform: none; }
 
-/* COMMANDS */
-.cmd-wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; background: var(--surface); }
-.cmd-list { border-right: 1px solid var(--rule); padding: 10px; display: flex; flex-direction: column; gap: 2px; background: var(--bg-2); }
-.cmd-tab {
-  text-align: left; border: 0; background: transparent; cursor: pointer; border-radius: 8px;
-  padding: 11px 14px; font: 500 14px/1.2 var(--mono); color: var(--ink-2); display: flex; justify-content: space-between; align-items: center;
-}
-.cmd-tab small { font: 400 11.5px/1 var(--sans); color: var(--ink-3); }
-.cmd-tab:hover { color: var(--ink); }
-.cmd-tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--rule); }
-.cmd-panel { padding: 36px 40px; min-height: 360px; }
-.cmd-panel[hidden] { display: none; }
-.cmd-panel h3 { margin-bottom: 8px; }
-.cmd-panel > p { color: var(--ink-2); margin: 0 0 24px; max-width: 38rem; }
-.code {
-  position: relative; background: var(--term-bg); color: var(--term-ink); border-radius: 10px;
-  font: 400 13.5px/1.75 var(--mono); padding: 18px 56px 18px 20px; overflow-x: auto; white-space: pre; margin: 0 0 20px;
-}
-.code .c { color: #8FB4E6; }
-.code .a { color: #E8A04A; }
-.code .f { color: var(--term-dim); }
-.code .s { color: #9BD3AE; }
-.copy-btn {
-  position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 7px;
-  display: grid; place-items: center; border: 1px solid var(--term-rule); background: transparent; color: var(--term-dim); cursor: pointer;
-  transition: color .15s, border-color .15s;
-}
-.copy-btn:hover { color: var(--term-ink); border-color: #3A4865; }
-.copy-btn svg { width: 14px; height: 14px; }
-.outputs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-3); }
+/* commands */
+.term { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--bg-2); }
+.term-tabs { display: flex; gap: 2px; padding: 8px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.term-tab { border: 0; background: transparent; color: var(--ink-3); font: 500 13.5px/1 "IBM Plex Mono", monospace; padding: 11px 16px; border-radius: 10px; cursor: pointer; white-space: nowrap; transition: color .2s, background .2s; }
+.term-tab:hover { color: var(--ink); }
+.term-tab[aria-selected="true"] { background: var(--bg-3); color: var(--ink); }
+.term-body { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); min-height: 390px; }
+.term-out { margin: 0; padding: 26px 64px 26px 28px; font: 400 13.5px/1.75 "IBM Plex Mono", monospace; color: var(--ink-2); white-space: pre; overflow-x: auto; border-right: 1px solid var(--line); position: relative; }
+.term-out .p { color: var(--ink-3); }
+.term-out .c { color: var(--ink); }
+.term-out .f { color: var(--signal-ink); }
+.caret { display: inline-block; width: 8px; height: 16px; background: var(--signal); vertical-align: -3px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.term-side { padding: 26px 28px; display: flex; flex-direction: column; gap: 14px; }
+.term-side h3 { font-size: 1.35rem; }
+.term-side p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.chip { font: 500 11.5px/1 "IBM Plex Mono", monospace; border: 1px solid var(--line-2); color: var(--ink-2); padding: 7px 10px; border-radius: 999px; }
+.copy-mini { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--ink-3); display: grid; place-items: center; cursor: pointer; }
+.copy-mini:hover { color: var(--ink); border-color: var(--ink-3); }
+.copy-mini svg { width: 14px; height: 14px; }
 
-/* MCP */
-.mcp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+/* mcp */
+.mcp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: start; }
+.code { position: relative; margin: 26px 0 0; padding: 22px 60px 22px 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-2); font: 400 13.5px/1.75 "IBM Plex Mono", monospace; color: var(--ink-2); white-space: pre; overflow-x: auto; }
+.code .s { color: var(--ink); }
+.code .a { color: var(--signal-ink); }
+.code .cm { color: var(--ink-3); }
 .chat { display: grid; gap: 12px; }
-.bubble { max-width: 88%; padding: 14px 18px; border-radius: 14px; font-size: 15px; }
-.bubble.you { justify-self: end; background: var(--ink); color: var(--bg); border-bottom-right-radius: 4px; }
-.bubble.ai { background: var(--surface); border: 1px solid var(--rule); border-bottom-left-radius: 4px; color: var(--ink-2); }
-.bubble.ai code { font-size: 12.5px; color: var(--accent); }
-.bubble .tool { display: flex; align-items: center; gap: 8px; font: 500 11.5px/1 var(--mono); color: var(--ink-3); margin-bottom: 8px; }
-.bubble .tool::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--pos); }
-.clients { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.msg { max-width: 90%; padding: 15px 18px; border-radius: 18px; font-size: 15px; transition: opacity .5s, transform .6s cubic-bezier(.16, 1, .3, 1); }
+.js:not(.static) .msg { opacity: 0; transform: translateY(14px) scale(.98); }
+.js:not(.static) .msg.in { opacity: 1; transform: none; }
+.msg.you { justify-self: end; background: var(--ink); color: var(--bg); border-bottom-right-radius: 6px; }
+.msg.ai { border: 1px solid var(--line); background: var(--bg-2); color: var(--ink-2); border-bottom-left-radius: 6px; }
+.msg .tool { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font: 500 11.5px/1.3 "IBM Plex Mono", monospace; color: var(--ink-3); }
+.msg .tool::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 22%, transparent); }
 
-/* FINAL CTA */
-.final { padding: 130px 0 120px; text-align: center; position: relative; overflow: hidden; border-top: 1px solid var(--rule); }
-.final h2 { font-size: clamp(2.4rem, 5vw, 3.8rem); max-width: 16ch; margin: 18px auto 18px; }
-.final p { color: var(--ink-2); margin: 0 auto 36px; max-width: 32rem; }
+/* final */
+.final { position: relative; padding: 180px 0 160px; overflow: hidden; border-top: 1px solid var(--line); text-align: center; }
+#ridges2 { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .6; }
+.final .wrap { position: relative; }
+.final h2 { font-size: clamp(3rem, 9vw, 8rem); line-height: .88; letter-spacing: -.06em; margin: 22px auto 26px; max-width: 11ch; }
+.final p { color: var(--ink-2); max-width: 30rem; margin: 0 auto 38px; font-size: 1.08rem; }
 .final .cta { justify-content: center; }
+.magnet { transition: transform .35s cubic-bezier(.16, 1, .3, 1), border-color .2s, background .2s, color .2s; }
 
-/* FOOTER */
-footer { border-top: 1px solid var(--rule); padding: 48px 0 40px; font-size: 14px; color: var(--ink-3); }
-.foot { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
-.foot h4 { margin: 0 0 14px; font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
-.foot ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
-.foot a { text-decoration: none; color: var(--ink-3); }
+footer { border-top: 1px solid var(--line); padding: 56px 0 40px; font-size: 14px; color: var(--ink-3); }
+.foot { display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 32px; }
+.foot h4 { margin: 0 0 14px; font: 500 11.5px/1 "IBM Plex Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.foot ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.foot a { text-decoration: none; }
 .foot a:hover { color: var(--ink); }
-.foot-legal { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13px; }
+.legal { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-size: 13px; }
 
-/* REVEAL (content is visible without JS) */
-.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1); }
-.js .reveal.in { opacity: 1; transform: none; }
-
-.toast {
-  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
-  background: var(--ink); color: var(--bg); font: 500 13px/1 var(--sans); padding: 12px 16px; border-radius: 8px;
-  transition: opacity .2s, transform .2s; z-index: 100;
-}
+.toast { position: fixed; left: 50%; bottom: 26px; z-index: 90; transform: translate(-50%, 24px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 999px; font: 500 13px/1 "Inter Tight", sans-serif; transition: opacity .25s, transform .35s cubic-bezier(.16, 1, .3, 1); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+.progress { position: fixed; left: 0; top: 0; height: 2px; width: 100%; background: var(--signal); transform-origin: left; transform: scaleX(0); z-index: 70; }
 
-@media (max-width: 960px) {
-  .hero-grid, .sec-head, .report-grid, .honest, .mcp-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-  .hero { padding: 40px 0 72px; }
-  .strip .wrap { grid-template-columns: repeat(2, 1fr); }
-  .stat { padding: 24px 0 24px 20px; }
-  .stat:nth-child(3) { border-left: 0; padding-left: 0; }
-  .stat:nth-child(n+3) { border-top: 1px solid var(--rule); }
-  .engines { grid-template-columns: minmax(0, 1fr); }
-  .engine, .engine:nth-child(even) { padding: 32px 0; border-left: 0; }
-  .browser { transform: none; }
-  .cmd-wrap { grid-template-columns: minmax(0, 1fr); }
-  .cmd-list { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--rule); }
-  .cmd-tab { flex: none; }
-  .cmd-tab small { display: none; }
-  .cmd-panel { padding: 28px 24px; }
+@media (max-width: 980px) {
+  .scene-grid, .report-grid, .head, .mcp { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .js:not(.static) .stage { align-items: flex-start; padding-top: 84px; }
+  .step-txt h2 { font-size: clamp(2rem, 8vw, 3rem); margin-bottom: 10px; }
+  .step-txt p { font-size: .98rem; }
+  .step-count { margin-bottom: 14px; }
+  .panel-stack { height: calc(100svh - 340px); min-height: 380px; }
+  .panel { padding: 20px; }
+  .fscore { grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: start; }
+  .fbig { font-size: 4.6rem; }
+  .signals li { padding: 3px 0; font-size: 13px; }
+  .grid-sens { grid-template-columns: 46px repeat(5, minmax(0, 1fr)); gap: 4px; font-size: 11px; }
+  .cell { min-height: 44px; border-radius: 7px; }
+  .report-grid .feats { display: none; }
+  .report-grid h2 { font-size: clamp(2rem, 8vw, 3rem); }
+  .report-grid p { font-size: .98rem !important; margin-top: 12px !important; }
+  .paper { height: calc(100svh - 330px); min-height: 340px; }
+  .term-body { grid-template-columns: minmax(0, 1fr); }
+  .term-out { border-right: 0; border-bottom: 1px solid var(--line); min-height: 300px; }
   .foot { grid-template-columns: 1fr 1fr; }
-  section.block { padding: 88px 0; }
+  .block { padding: 100px 0; }
 }
 @media (max-width: 720px) {
   .wrap { padding: 0 16px; }
   .nav-links a:not(.btn) { display: none; }
   .nav-links { gap: 8px; }
-  .browser-view { height: 300px; }
-  .term { font-size: 11px; }
+  .hero h1 { margin: 16px 0 22px; }
+  .ledger { font-size: 12px; }
+  .ledger td { padding: 8px 0; }
+  .ledger th:nth-child(4), .ledger td:nth-child(4), .ledger th:nth-child(5), .ledger td:nth-child(5) { display: none; }
+  .scen span { min-width: 88px; padding: 10px; }
+  .scen span b { font-size: 1.2rem; }
   .install { font-size: 14px; }
+  .tape span { padding: 12px 18px; }
+  .na-row .metric { min-width: 0; width: 100%; }
+  .dcf-sum { gap: 20px; }
+  .term-out { font-size: 12px; padding: 20px 56px 20px 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .js .reveal, .js .term .line { opacity: 1; transform: none; transition: none; }
-  .caret { animation: none; }
-  .browser { transform: none; transition: none; }
+  .tape-track, .caret { animation: none; }
 }
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="mark" viewBox="0 0 128 128"><defs><clipPath id="mc"><rect width="128" height="128" rx="28"/></clipPath></defs><g clip-path="url(#mc)"><rect width="128" height="128" rx="28" fill="#13213D"/><g fill="none" stroke-linejoin="round"><path d="M127.22 71.00C127.63 74.07 127.71 77.25 127.41 80.36C127.12 83.48 126.43 86.63 125.45 89.67C124.48 92.71 123.13 95.72 121.55 98.58C119.97 101.45 118.08 104.25 115.97 106.88C113.85 109.50 111.47 112.04 108.85 114.32C106.24 116.60 103.35 118.76 100.27 120.56C97.19 122.36 93.82 123.95 90.37 125.12C86.93 126.30 83.23 127.14 79.60 127.62C75.97 128.10 72.20 128.16 68.60 127.99C65.00 127.83 61.41 127.26 58.00 126.63C54.59 126.00 51.31 125.09 48.11 124.21C44.91 123.32 41.86 122.33 38.80 121.34C35.74 120.35 32.75 119.36 29.73 118.27C26.71 117.17 23.66 116.09 20.67 114.77C17.68 113.45 14.63 112.05 11.80 110.36C8.96 108.67 6.14 106.78 3.64 104.64C1.15 102.51 -1.19 100.10 -3.16 97.54C-5.13 94.99 -6.82 92.18 -8.18 89.32C-9.54 86.45 -10.57 83.40 -11.31 80.35C-12.06 77.30 -12.50 74.14 -12.66 71.00C-12.82 67.86 -12.71 64.66 -12.26 61.52C-11.82 58.38 -11.10 55.21 -10.00 52.18C-8.91 49.15 -7.47 46.13 -5.70 43.35C-3.92 40.57 -1.75 37.90 0.65 35.50C3.05 33.11 5.83 30.93 8.70 29.00C11.57 27.08 14.72 25.42 17.87 23.94C21.01 22.46 24.30 21.24 27.57 20.12C30.84 19.00 34.15 18.06 37.49 17.22C40.83 16.38 44.19 15.64 47.61 15.10C51.03 14.55 54.51 14.10 58.00 13.95C61.49 13.80 65.08 13.82 68.56 14.20C72.04 14.58 75.57 15.25 78.89 16.23C82.20 17.21 85.45 18.56 88.45 20.09C91.44 21.63 94.25 23.50 96.86 25.44C99.46 27.38 101.83 29.55 104.09 31.74C106.35 33.93 108.41 36.22 110.41 38.56C112.41 40.91 114.30 43.30 116.08 45.79C117.85 48.29 119.58 50.85 121.06 53.55C122.54 56.24 123.94 59.06 124.97 61.96C125.99 64.87 126.82 67.93 127.22 71.00Z" stroke="#F4F1EA" stroke-width="5.5" opacity="0.44"/><path d="M110.16 66.00C110.38 68.13 110.38 70.34 110.13 72.49C109.89 74.65 109.39 76.83 108.68 78.92C107.98 81.02 107.04 83.09 105.93 85.07C104.82 87.04 103.50 88.97 102.03 90.78C100.56 92.58 98.90 94.32 97.09 95.89C95.28 97.46 93.29 98.94 91.17 100.20C89.05 101.45 86.74 102.56 84.38 103.42C82.02 104.27 79.49 104.91 76.99 105.31C74.50 105.72 71.91 105.86 69.41 105.84C66.91 105.83 64.41 105.56 62.00 105.21C59.59 104.87 57.26 104.34 54.97 103.79C52.69 103.23 50.49 102.58 48.31 101.90C46.12 101.22 43.98 100.50 41.85 99.69C39.72 98.88 37.58 98.04 35.52 97.05C33.45 96.06 31.37 94.99 29.43 93.74C27.50 92.49 25.61 91.10 23.93 89.56C22.25 88.02 20.69 86.31 19.37 84.50C18.05 82.70 16.92 80.73 16.01 78.73C15.10 76.73 14.41 74.61 13.92 72.49C13.43 70.37 13.14 68.17 13.06 66.00C12.97 63.83 13.08 61.61 13.40 59.44C13.73 57.28 14.25 55.09 15.02 53.00C15.78 50.91 16.78 48.83 17.99 46.90C19.20 44.97 20.68 43.11 22.30 41.43C23.93 39.75 25.80 38.20 27.75 36.83C29.70 35.45 31.84 34.24 33.99 33.16C36.15 32.08 38.41 31.17 40.67 30.35C42.94 29.52 45.26 28.83 47.59 28.23C49.93 27.63 52.30 27.12 54.70 26.75C57.10 26.38 59.55 26.10 62.00 26.01C64.45 25.93 66.95 25.98 69.39 26.26C71.82 26.54 74.29 27.02 76.61 27.69C78.94 28.37 81.22 29.29 83.33 30.33C85.45 31.38 87.45 32.64 89.31 33.97C91.18 35.30 92.89 36.79 94.50 38.31C96.12 39.83 97.60 41.44 99.01 43.09C100.42 44.75 101.74 46.45 102.96 48.22C104.17 50.00 105.32 51.83 106.30 53.74C107.27 55.65 108.16 57.64 108.81 59.68C109.45 61.73 109.94 63.87 110.16 66.00Z" stroke="#F4F1EA" stroke-width="5.5" opacity="0.72"/><path d="M93.26 61.00C93.35 62.21 93.32 63.45 93.15 64.66C92.99 65.88 92.69 67.10 92.28 68.27C91.87 69.45 91.33 70.61 90.70 71.72C90.07 72.83 89.32 73.91 88.49 74.92C87.65 75.93 86.72 76.90 85.70 77.78C84.68 78.66 83.56 79.49 82.37 80.20C81.19 80.91 79.90 81.54 78.58 82.04C77.27 82.54 75.86 82.93 74.47 83.20C73.07 83.47 71.62 83.61 70.21 83.66C68.80 83.71 67.38 83.63 66.00 83.49C64.62 83.35 63.27 83.10 61.94 82.83C60.62 82.55 59.33 82.20 58.06 81.82C56.79 81.44 55.54 81.01 54.32 80.53C53.10 80.05 51.88 79.52 50.72 78.92C49.55 78.32 48.40 77.65 47.33 76.91C46.26 76.16 45.23 75.33 44.31 74.43C43.39 73.52 42.54 72.53 41.83 71.49C41.11 70.45 40.49 69.34 40.00 68.20C39.51 67.06 39.13 65.86 38.87 64.66C38.60 63.46 38.46 62.22 38.42 61.00C38.39 59.78 38.46 58.53 38.66 57.31C38.85 56.09 39.16 54.87 39.60 53.69C40.03 52.52 40.59 51.35 41.27 50.26C41.94 49.18 42.75 48.12 43.65 47.17C44.54 46.21 45.57 45.31 46.65 44.51C47.72 43.71 48.90 43.00 50.10 42.36C51.30 41.72 52.56 41.16 53.84 40.68C55.12 40.19 56.44 39.77 57.77 39.42C59.10 39.07 60.46 38.78 61.83 38.58C63.20 38.38 64.60 38.23 66.00 38.20C67.40 38.17 68.82 38.21 70.21 38.38C71.59 38.55 72.99 38.82 74.31 39.20C75.64 39.59 76.94 40.09 78.16 40.67C79.38 41.25 80.54 41.94 81.62 42.69C82.70 43.43 83.71 44.26 84.65 45.12C85.59 45.98 86.45 46.89 87.26 47.84C88.07 48.79 88.82 49.78 89.50 50.80C90.17 51.83 90.80 52.89 91.32 53.99C91.84 55.09 92.29 56.24 92.62 57.41C92.94 58.58 93.17 59.79 93.26 61.00Z" stroke="#F4F1EA" stroke-width="5.5" opacity="1.0"/></g><circle cx="70.0" cy="56.0" r="9" fill="#C8781A"/></g></symbol>
-  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V5a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="mark" viewBox="0 0 128 128"><defs><clipPath id="mc"><rect width="128" height="128" rx="28"/></clipPath></defs><g clip-path="url(#mc)"><rect width="128" height="128" rx="28" fill="#0A0A0A"/><g fill="none" stroke-linejoin="round"><path d="M127.22 71.00C127.63 74.07 127.71 77.25 127.41 80.36C127.12 83.48 126.43 86.63 125.45 89.67C124.48 92.71 123.13 95.72 121.55 98.58C119.97 101.45 118.08 104.25 115.97 106.88C113.85 109.50 111.47 112.04 108.85 114.32C106.24 116.60 103.35 118.76 100.27 120.56C97.19 122.36 93.82 123.95 90.37 125.12C86.93 126.30 83.23 127.14 79.60 127.62C75.97 128.10 72.20 128.16 68.60 127.99C65.00 127.83 61.41 127.26 58.00 126.63C54.59 126.00 51.31 125.09 48.11 124.21C44.91 123.32 41.86 122.33 38.80 121.34C35.74 120.35 32.75 119.36 29.73 118.27C26.71 117.17 23.66 116.09 20.67 114.77C17.68 113.45 14.63 112.05 11.80 110.36C8.96 108.67 6.14 106.78 3.64 104.64C1.15 102.51 -1.19 100.10 -3.16 97.54C-5.13 94.99 -6.82 92.18 -8.18 89.32C-9.54 86.45 -10.57 83.40 -11.31 80.35C-12.06 77.30 -12.50 74.14 -12.66 71.00C-12.82 67.86 -12.71 64.66 -12.26 61.52C-11.82 58.38 -11.10 55.21 -10.00 52.18C-8.91 49.15 -7.47 46.13 -5.70 43.35C-3.92 40.57 -1.75 37.90 0.65 35.50C3.05 33.11 5.83 30.93 8.70 29.00C11.57 27.08 14.72 25.42 17.87 23.94C21.01 22.46 24.30 21.24 27.57 20.12C30.84 19.00 34.15 18.06 37.49 17.22C40.83 16.38 44.19 15.64 47.61 15.10C51.03 14.55 54.51 14.10 58.00 13.95C61.49 13.80 65.08 13.82 68.56 14.20C72.04 14.58 75.57 15.25 78.89 16.23C82.20 17.21 85.45 18.56 88.45 20.09C91.44 21.63 94.25 23.50 96.86 25.44C99.46 27.38 101.83 29.55 104.09 31.74C106.35 33.93 108.41 36.22 110.41 38.56C112.41 40.91 114.30 43.30 116.08 45.79C117.85 48.29 119.58 50.85 121.06 53.55C122.54 56.24 123.94 59.06 124.97 61.96C125.99 64.87 126.82 67.93 127.22 71.00Z" stroke="#FFFFFF" stroke-width="5.5" opacity="0.44"/><path d="M110.16 66.00C110.38 68.13 110.38 70.34 110.13 72.49C109.89 74.65 109.39 76.83 108.68 78.92C107.98 81.02 107.04 83.09 105.93 85.07C104.82 87.04 103.50 88.97 102.03 90.78C100.56 92.58 98.90 94.32 97.09 95.89C95.28 97.46 93.29 98.94 91.17 100.20C89.05 101.45 86.74 102.56 84.38 103.42C82.02 104.27 79.49 104.91 76.99 105.31C74.50 105.72 71.91 105.86 69.41 105.84C66.91 105.83 64.41 105.56 62.00 105.21C59.59 104.87 57.26 104.34 54.97 103.79C52.69 103.23 50.49 102.58 48.31 101.90C46.12 101.22 43.98 100.50 41.85 99.69C39.72 98.88 37.58 98.04 35.52 97.05C33.45 96.06 31.37 94.99 29.43 93.74C27.50 92.49 25.61 91.10 23.93 89.56C22.25 88.02 20.69 86.31 19.37 84.50C18.05 82.70 16.92 80.73 16.01 78.73C15.10 76.73 14.41 74.61 13.92 72.49C13.43 70.37 13.14 68.17 13.06 66.00C12.97 63.83 13.08 61.61 13.40 59.44C13.73 57.28 14.25 55.09 15.02 53.00C15.78 50.91 16.78 48.83 17.99 46.90C19.20 44.97 20.68 43.11 22.30 41.43C23.93 39.75 25.80 38.20 27.75 36.83C29.70 35.45 31.84 34.24 33.99 33.16C36.15 32.08 38.41 31.17 40.67 30.35C42.94 29.52 45.26 28.83 47.59 28.23C49.93 27.63 52.30 27.12 54.70 26.75C57.10 26.38 59.55 26.10 62.00 26.01C64.45 25.93 66.95 25.98 69.39 26.26C71.82 26.54 74.29 27.02 76.61 27.69C78.94 28.37 81.22 29.29 83.33 30.33C85.45 31.38 87.45 32.64 89.31 33.97C91.18 35.30 92.89 36.79 94.50 38.31C96.12 39.83 97.60 41.44 99.01 43.09C100.42 44.75 101.74 46.45 102.96 48.22C104.17 50.00 105.32 51.83 106.30 53.74C107.27 55.65 108.16 57.64 108.81 59.68C109.45 61.73 109.94 63.87 110.16 66.00Z" stroke="#FFFFFF" stroke-width="5.5" opacity="0.72"/><path d="M93.26 61.00C93.35 62.21 93.32 63.45 93.15 64.66C92.99 65.88 92.69 67.10 92.28 68.27C91.87 69.45 91.33 70.61 90.70 71.72C90.07 72.83 89.32 73.91 88.49 74.92C87.65 75.93 86.72 76.90 85.70 77.78C84.68 78.66 83.56 79.49 82.37 80.20C81.19 80.91 79.90 81.54 78.58 82.04C77.27 82.54 75.86 82.93 74.47 83.20C73.07 83.47 71.62 83.61 70.21 83.66C68.80 83.71 67.38 83.63 66.00 83.49C64.62 83.35 63.27 83.10 61.94 82.83C60.62 82.55 59.33 82.20 58.06 81.82C56.79 81.44 55.54 81.01 54.32 80.53C53.10 80.05 51.88 79.52 50.72 78.92C49.55 78.32 48.40 77.65 47.33 76.91C46.26 76.16 45.23 75.33 44.31 74.43C43.39 73.52 42.54 72.53 41.83 71.49C41.11 70.45 40.49 69.34 40.00 68.20C39.51 67.06 39.13 65.86 38.87 64.66C38.60 63.46 38.46 62.22 38.42 61.00C38.39 59.78 38.46 58.53 38.66 57.31C38.85 56.09 39.16 54.87 39.60 53.69C40.03 52.52 40.59 51.35 41.27 50.26C41.94 49.18 42.75 48.12 43.65 47.17C44.54 46.21 45.57 45.31 46.65 44.51C47.72 43.71 48.90 43.00 50.10 42.36C51.30 41.72 52.56 41.16 53.84 40.68C55.12 40.19 56.44 39.77 57.77 39.42C59.10 39.07 60.46 38.78 61.83 38.58C63.20 38.38 64.60 38.23 66.00 38.20C67.40 38.17 68.82 38.21 70.21 38.38C71.59 38.55 72.99 38.82 74.31 39.20C75.64 39.59 76.94 40.09 78.16 40.67C79.38 41.25 80.54 41.94 81.62 42.69C82.70 43.43 83.71 44.26 84.65 45.12C85.59 45.98 86.45 46.89 87.26 47.84C88.07 48.79 88.82 49.78 89.50 50.80C90.17 51.83 90.80 52.89 91.32 53.99C91.84 55.09 92.29 56.24 92.62 57.41C92.94 58.58 93.17 59.79 93.26 61.00Z" stroke="#FFFFFF" stroke-width="5.5" opacity="1.0"/></g><circle cx="70.0" cy="56.0" r="9" fill="#FF4A1C"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-gh" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
+<div class="progress" id="progress"></div>
 
 <header class="nav" id="nav">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="Isoline home">
-      <svg aria-hidden="true"><use href="#mark"/></svg>
-      <span><span class="tittle">i</span>soline</span>
-      <span class="ver">v0.8.0</span>
-    </a>
+    <a class="brand" href="#top" aria-label="Isoline home"><svg aria-hidden="true"><use href="#mark"/></svg><span><i>i</i>soline</span></a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#engines">Engines</a>
+      <a href="#scan">Engines</a>
+      <a href="#dcf">Valuation</a>
       <a href="#report">Reports</a>
       <a href="#commands">Commands</a>
-      <a href="#mcp">AI tools</a>
       <a href="https://shubhwade.github.io/isoline/">Docs</a>
-      <button class="btn theme-toggle" id="theme" aria-label="Toggle colour theme"><svg><use href="#i-moon"/></svg></button>
+      <button class="btn icon-btn" id="theme" aria-label="Switch colour theme"><svg><use href="#i-sun"/></svg></button>
       <a class="btn" href="https://github.com/shubhwade/isoline"><svg><use href="#i-gh"/></svg>GitHub</a>
     </nav>
   </div>
 </header>
 
 <main id="top">
-  <section class="hero">
-    <canvas id="contours" aria-hidden="true"></canvas>
-    <div class="wrap hero-grid">
-      <div>
-        <span class="eyebrow">Open-source financial analysis</span>
-        <h1>Financial statements, <em>measured precisely.</em></h1>
-        <p class="lede">Piotroski, Altman and Beneish scores, quality metrics, a DCF and a print-ready report for any listed company. One command, no API key, every formula shown.</p>
+  <section class="hero" aria-label="Introduction">
+    <canvas id="ridges" aria-hidden="true"></canvas>
+    <div class="wrap hero-copy">
+      <span class="label fade"><b>●</b>&nbsp; v0.8.0 · open source · MIT</span>
+      <h1 aria-label="Financial statements, measured precisely.">
+        <span class="ln" aria-hidden="true"><span class="w">Financial</span></span>
+        <span class="ln" aria-hidden="true"><span class="w">statements,</span></span>
+        <span class="ln" aria-hidden="true"><span class="w sig">measured precisely.</span></span>
+      </h1>
+      <div class="hero-row fade">
+        <p>Piotroski, Altman and Beneish scores, quality metrics, a DCF and a print-ready report for any listed company. One command. No API key. Every formula shown.</p>
         <div class="cta">
-          <button class="install" data-copy="pip install isoline" aria-label="Copy install command">
-            <span><span class="dollar">$ </span>pip install isoline</span>
-            <span class="copy"><svg><use href="#i-copy"/></svg></span>
-          </button>
+          <button class="install" data-copy="pip install isoline" aria-label="Copy install command"><span><span class="d">$ </span>pip install isoline</span><span class="c"><svg><use href="#i-copy"/></svg></span></button>
           <a class="btn btn-lg" href="https://shubhwade.github.io/isoline/quickstart/">Quick start <svg><use href="#i-arrow"/></svg></a>
         </div>
-        <div class="facts">
-          <span>Python 3.10+</span><span>Windows, macOS, Linux</span><span>MIT licensed</span>
-        </div>
       </div>
-      <div>
-        <div class="term" role="img" aria-label="Terminal output of isoline scan ACME">
-          <div class="term-bar"><i></i><i></i><i></i><span>isoline scan ACME</span></div>
-<pre id="term"><span class="line"><span class="t-p">~</span> <span class="t-dim">$</span> <span class="t-b">isoline scan ACME</span></span>
-<span class="line"><span class="t-dim">────────</span> <span class="t-b">Acme Industrial</span> <span class="t-dim">(synthetic sample) ─ ACME ─────</span></span>
-<span class="line"><span class="t-dim">Scan duration: 25 ms</span></span>
-<span class="line"> </span>
-<span class="line"><span class="t-hd"> HEALTH              VALUE</span></span>
-<span class="line"> Piotroski F-score       <span class="t-b">9</span>  <span class="t-bar">████████████</span>  <span class="t-ok">ok</span></span>
-<span class="line"> Altman Z″-score      <span class="t-b">3.94</span>  <span class="t-bar">█████</span>         <span class="t-ok">ok</span></span>
-<span class="line"> Debt / Equity        <span class="t-b">1.07</span>  <span class="t-bar">█</span>             <span class="t-ok">ok</span></span>
-<span class="line"> Interest coverage   <span class="t-b">13.89</span>  <span class="t-bar">████████████</span>  <span class="t-ok">ok</span></span>
-<span class="line"> </span>
-<span class="line"><span class="t-hd"> GROWTH AND QUALITY</span></span>
-<span class="line"> Revenue CAGR 3y     <span class="t-b">12.5%</span>   ROE (DuPont)  <span class="t-b">20.9%</span></span>
-<span class="line"> PAT CAGR 3y         <span class="t-b">29.4%</span>   FCF margin    <span class="t-b">10.1%</span></span>
-<span class="line"> Margin trend    <span class="t-ok">improving</span>   Accruals      <span class="t-b">-3.3%</span></span>
-<span class="line"> </span>
-<span class="line"><span class="t-dim">╭─ Summary (rule-based) ─────────────────────────╮</span></span>
-<span class="line"><span class="t-dim">│</span> Strong fundamentals (Piotroski F-score of 9).  <span class="t-dim">│</span></span>
-<span class="line"><span class="t-dim">│</span> Financially safe. No red flags triggered.      <span class="t-dim">│</span></span>
-<span class="line"><span class="t-dim">╰────────────────────────────────────────────────╯</span></span>
-<span class="line"><span class="t-acc">Note:</span> <span class="t-dim">Beneish M-score not reported: inputs missing.</span></span>
-<span class="line"><span class="t-ok">✓</span> Wrote ACME_analysis.xlsx, ACME_dashboard.html</span>
-<span class="line"><span class="t-p">~</span> <span class="t-dim">$</span> <span class="caret"></span></span></pre>
-        </div>
-        <p class="term-note">Excerpt of real output on a synthetic sample company.</p>
+    </div>
+    <div class="tape" aria-label="Sample output for Acme Industrial, a synthetic company">
+      <div class="tape-track" id="tape">
+        <span>ACME<em>synthetic sample</em></span><span>Piotroski F<b>9 / 9</b></span><span>Altman Z″<b>3.94</b><em>safe</em></span><span>Debt / equity<b>1.07</b></span><span>Current ratio<b>1.89</b></span><span>Interest cover<b>13.89×</b></span><span>Revenue CAGR 3y<b>12.5%</b></span><span>PAT CAGR 3y<b>29.4%</b></span><span>ROE (DuPont)<b>20.9%</b></span><span>FCF margin<b>10.1%</b></span><span>Accruals<b>−3.3%</b></span><span>P/E<b>18.40</b></span><span>EV / EBITDA<b>10.20</b></span><span>DCF base<b>$19.02</b><em>per share</em></span><span>Beneish M<b>n/a</b><em>withheld</em></span>
       </div>
     </div>
   </section>
 
-  <div class="strip">
+  <!-- SCAN STORY -->
+  <section class="scene" id="scan" style="height:520svh">
+    <div class="stage">
+      <div class="wrap scene-grid">
+        <div>
+          <div class="step-count"><span class="label" id="scan-n">01 / 04</span><span class="bar"><i id="scan-bar"></i></span><span class="label">isoline scan ACME</span></div>
+          <div class="step-txt" id="scan-txt">
+            <div class="on"><h2>Four years of statements, in seconds.</h2><p>Income statement, balance sheet and cash flow come from Yahoo Finance, with SEC EDGAR as the fallback for US tickers.</p></div>
+            <div><h2>Nine signals. <span class="sig">Nine passes.</span></h2><p>The Piotroski F-score tests profitability, leverage and liquidity, and operating efficiency, one binary signal at a time.</p></div>
+            <div><h2>Distress risk, on Altman's scale.</h2><p>The Z″ model for non-manufacturers: <code>6.56·X1 + 3.26·X2 + 6.72·X3 + 1.05·X4</code>. Above 2.6 is the safe zone.</p></div>
+            <div><h2>When data is missing, it says so.</h2><p>No zeros standing in for gaps. A metric that can't be computed is withheld, with the reason printed next to it.</p></div>
+          </div>
+        </div>
+        <div class="panel-stack" id="scan-panels">
+          <div class="panel on">
+            <div class="panel-head"><span class="label">Acme Industrial · USD millions</span><span class="label"><b>synthetic sample</b></span></div>
+            <table class="ledger">
+              <thead><tr><th></th><th>FY2024</th><th>FY2023</th><th>FY2022</th><th>FY2021</th></tr></thead>
+              <tbody>
+                <tr><td>Revenue</td><td class="hl">1,480</td><td>1,320</td><td>1,190</td><td>1,040</td></tr>
+                <tr><td>Gross profit</td><td class="hl">600</td><td>520</td><td>455</td><td>390</td></tr>
+                <tr><td>EBIT</td><td class="hl">250</td><td>205</td><td>165</td><td>130</td></tr>
+                <tr><td>Net income</td><td class="hl">180</td><td>143</td><td>111</td><td>83</td></tr>
+                <tr><td>Total assets</td><td class="hl">1,900</td><td>1,760</td><td>1,650</td><td>1,540</td></tr>
+                <tr><td>Equity</td><td class="hl">920</td><td>800</td><td>700</td><td>600</td></tr>
+                <tr><td>Long-term debt</td><td class="hl">400</td><td>430</td><td>460</td><td>490</td></tr>
+                <tr><td>Operating cash flow</td><td class="hl">240</td><td>190</td><td>150</td><td>118</td></tr>
+                <tr><td>Capital expenditure</td><td class="hl">−90</td><td>−80</td><td>−75</td><td>−70</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span class="label">Piotroski F-score</span><span class="label">Piotroski (2000)</span></div>
+            <div class="fscore">
+              <div class="fbig"><span id="fnum">9</span><small>/9</small></div>
+              <ul class="signals" id="signals">
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Return on assets positive<span class="grp">profit</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Operating cash flow positive<span class="grp">profit</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Return on assets improving<span class="grp">profit</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Cash flow exceeds net income<span class="grp">profit</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Leverage falling<span class="grp">balance</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Current ratio rising<span class="grp">balance</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>No new shares issued<span class="grp">balance</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Gross margin rising<span class="grp">efficiency</span></li>
+                <li><span class="box"><svg><use href="#i-check"/></svg></span>Asset turnover rising<span class="grp">efficiency</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span class="label">Altman Z″-score</span><span class="label">Altman (1983/1995)</span></div>
+            <div class="gauge-wrap">
+              <svg class="gauge" viewBox="0 0 520 310" aria-label="Altman Z″ gauge reading 3.94, in the safe zone">
+                <path class="zone" id="z-dis" d="M60.0 270.0A200 200 0 0 1 105.9 142.5" stroke="#333333"></path>
+                <path class="zone" id="z-grey" d="M105.9 142.5A200 200 0 0 1 272.6 70.4" stroke="#6E6E6B"></path>
+                <path class="zone" id="z-safe" d="M272.6 70.4A200 200 0 0 1 460.0 270.0" stroke="#F4F4F2"></path>
+                <g id="ticks"><text x="26.0" y="274.0" text-anchor="middle">0</text><text x="79.7" y="124.8" text-anchor="middle">1.1</text><text x="274.7" y="40.5" text-anchor="middle">2.6</text><text x="494.0" y="274.0" text-anchor="middle">5</text><text x="60" y="300" text-anchor="middle">DISTRESS</text><text x="198.0" y="130.8" text-anchor="middle">GREY</text><text x="460" y="300" text-anchor="middle">SAFE</text></g>
+                <g id="needle" transform="rotate(51.70 260 270)"><line x1="260" y1="270" x2="260" y2="86" style="stroke:var(--signal)" stroke-width="4" stroke-linecap="round"/><circle cx="260" cy="270" r="12" style="fill:var(--signal)"/></g>
+              </svg>
+              <div class="zread"><b id="znum">3.94</b><span>safe zone · above 2.6</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span class="label">Withheld, with reasons</span><span class="label"><b>honest data</b></span></div>
+            <div class="withheld" id="withheld">
+              <div class="na-row"><span class="metric">Beneish M-score</span><span class="na-val"><span class="zero">0.00</span><span class="na">n/a</span></span></div>
+              <div class="na-row"><span class="metric">ROIC</span><span class="na-val"><span class="zero">0.0%</span><span class="na">n/a</span></span></div>
+              <div class="note">Note: Beneish M-score not reported: required inputs are missing.<br>Note: ROIC not reported: EBIT or invested capital unavailable or not positive.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DCF STORY -->
+  <section class="scene" id="dcf" style="height:420svh">
+    <div class="stage">
+      <div class="wrap scene-grid">
+        <div>
+          <div class="step-count"><span class="label" id="dcf-n">01 / 03</span><span class="bar"><i id="dcf-bar"></i></span><span class="label">isoline value ACME</span></div>
+          <div class="step-txt" id="dcf-txt">
+            <div class="on"><h2>Project the cash.</h2><p>Free cash flow starts from the three-year average ($111.7M) and grows at the 12.5% revenue CAGR, fading to 2.5% by year five.</p></div>
+            <div><h2>Discount it back.</h2><p>Each year is discounted at 10% (a stated default, never hidden) and the terminal value is added. Here the terminal value is 71.3% of the total.</p></div>
+            <div><h2>Then stress-test it.</h2><p>Bear, base and bull cases, and a grid of discount rate against terminal growth. Illustrative, not a price target.</p></div>
+          </div>
+        </div>
+        <div class="panel-stack" id="dcf-panels">
+          <div class="panel on">
+            <div class="panel-head"><span class="label">Free cash flow · USD millions</span><span class="label" id="dcf-mode">present value + terminal</span></div>
+            <div class="dcf-chart" title="Terminal value bar is not drawn to scale"><svg id="dcf-svg" viewBox="0 0 560 360" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Five years of projected free cash flow, discounted at 10%, plus a terminal value of 1,356.1 million"><line x1="0" y1="316" x2="560" y2="316" style="stroke:var(--line-2)"></line><rect x="6" y="173.3" width="50" height="142.8" rx="4" style="fill:var(--ink)" opacity="1.00"></rect><text class="val" x="31" y="164.3" text-anchor="middle">114.2</text><text x="31" y="338" text-anchor="middle">Y1</text><rect x="72" y="173.3" width="50" height="142.8" rx="4" style="fill:var(--ink)" opacity="0.90"></rect><text class="val" x="97" y="164.3" text-anchor="middle">114.2</text><text x="97" y="338" text-anchor="middle">Y2</text><rect x="138" y="176.5" width="50" height="139.5" rx="4" style="fill:var(--ink)" opacity="0.80"></rect><text class="val" x="163" y="167.5" text-anchor="middle">111.6</text><text x="163" y="338" text-anchor="middle">Y3</text><rect x="204" y="182.9" width="50" height="133.1" rx="4" style="fill:var(--ink)" opacity="0.70"></rect><text class="val" x="229" y="173.9" text-anchor="middle">106.5</text><text x="229" y="338" text-anchor="middle">Y4</text><rect x="270" y="192.0" width="50" height="124.0" rx="4" style="fill:var(--ink)" opacity="0.60"></rect><text class="val" x="295" y="183.0" text-anchor="middle">99.2</text><text x="295" y="338" text-anchor="middle">Y5</text><rect x="358" y="18.0" width="202" height="298.0" rx="6" style="fill:var(--signal)" opacity="1.00"></rect><text x="459" y="46.0" text-anchor="middle" style="fill:#fff">TERMINAL VALUE</text><text x="459" y="72.0" text-anchor="middle" style="fill:#fff;font-size:18px">1356.1</text><text x="459" y="94.0" text-anchor="middle" style="fill:#fff;opacity:.85">71.3% of value</text><text x="459" y="338" text-anchor="middle">TV · not to scale</text></svg></div>
+            <div class="dcf-sum">
+              <div><div class="lbl">Equity value</div><div class="big" id="dcf-eq">$1.90B</div></div>
+              <div><div class="lbl">Per share</div><div class="big sig" id="dcf-ps">$19.02</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span class="label">Value per share · USD</span><span class="label">rows: terminal growth · columns: discount rate</span></div>
+            <div class="grid-sens" id="sens"></div>
+            <div class="scen">
+              <span>Bear · 11% / 6.2% growth<b>$14.64</b></span>
+              <span class="base">Base · 10% / 12.5% growth<b>$19.02</b></span>
+              <span>Bull · 9% / 15.6% growth<b>$23.49</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="scene" id="report" style="height:300svh">
+    <div class="stage">
+      <div class="wrap report-grid">
+        <div>
+          <span class="label"><b>●</b>&nbsp; Reports</span>
+          <h2 style="margin-top:22px">A report you can hand to someone.</h2>
+          <p class="muted" style="font-size:1.08rem;max-width:28rem;margin:22px 0 0">Every scan writes a formal HTML report and an Excel workbook next to you, then opens the report.</p>
+          <ul class="feats" id="feats">
+            <li><span>01</span><span><b>Summary and score cards.</b> The verdict first, then the evidence.</span></li>
+            <li><span>02</span><span><b>Explained tables.</b> What every metric measures, beside its value.</span></li>
+            <li><span>03</span><span><b>Two charts.</b> Revenue, profit and margin trend over four years.</span></li>
+            <li><span>04</span><span><b>Prints to A4.</b> Self-contained and offline. Excel, JSON and CSV too.</span></li>
+          </ul>
+        </div>
+        <div class="paper" id="paper">
+          <div class="paper-bar"><i></i><i></i><i></i><span>ACME_dashboard.html</span></div>
+          <div class="paper-view"><img id="paper-img" src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png" alt="The HTML report Isoline writes for a synthetic sample company: summary, score cards, explained tables and charts" width="1100" height="2300"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMANDS -->
+  <section class="block" id="commands">
     <div class="wrap">
-      <div class="stat"><b>9</b><span>Piotroski signals across profitability, leverage and efficiency</span></div>
-      <div class="stat"><b>Z<sup>″</sup></b><span>Altman distress model for non-manufacturers and emerging markets</span></div>
-      <div class="stat"><b>8</b><span>Beneish variables screening for earnings manipulation</span></div>
-      <div class="stat"><b>3</b><span>DCF scenarios with a sensitivity grid and every assumption shown</span></div>
-    </div>
-  </div>
-
-  <section class="block" id="engines">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <div><span class="eyebrow">The engines</span><h2>Published models, implemented faithfully.</h2></div>
-        <p>Each score follows its source paper, cites its inputs and states its limits. The methodology page lists every formula and data field, so you can check the work.</p>
+      <div class="head rv">
+        <div><span class="label"><b>●</b>&nbsp; Commands</span><h2>Small surface. Deep output.</h2></div>
+        <p>Yahoo Finance symbols: <code>AAPL</code> for US listings, <code>INFY.NS</code> for NSE, <code>.BO</code> for BSE. Every command takes <code>--help</code>.</p>
       </div>
-      <div class="engines">
-        <article class="engine reveal">
-          <span class="n">01</span>
-          <div>
-            <h3>Financial health</h3>
-            <p>Piotroski F-score from nine binary signals, plus the Altman Z″ distress model with safe, grey and distress zones.</p>
-            <div class="formula">Z″ = <span class="k">6.56</span>·X1 + <span class="k">3.26</span>·X2 + <span class="k">6.72</span>·X3 + <span class="k">1.05</span>·X4</div>
-          </div>
-        </article>
-        <article class="engine reveal">
-          <span class="n">02</span>
-          <div>
-            <h3>Earnings quality</h3>
-            <p>Beneish M-score across eight variables, accruals ratio and cash conversion to show when reported profit isn't turning into cash.</p>
-            <div class="formula">M = <span class="k">−4.84</span> + <span class="k">0.920</span>·DSRI + <span class="k">0.528</span>·GMI + <span class="k">0.404</span>·AQI + <span class="k">0.892</span>·SGI + …</div>
-          </div>
-        </article>
-        <article class="engine reveal">
-          <span class="n">03</span>
-          <div>
-            <h3>Returns and growth</h3>
-            <p>DuPont ROE split into margin, turnover and leverage. ROIC, FCF margin and yield, three-year revenue and profit CAGR, margin trend.</p>
-            <div class="tags"><span class="tag">ROE = NM × AT × EM</span><span class="tag">ROIC</span><span class="tag">FCF yield</span><span class="tag">CAGR 3y</span></div>
-          </div>
-        </article>
-        <article class="engine reveal">
-          <span class="n">04</span>
-          <div>
-            <h3>Valuation</h3>
-            <p>P/E, P/B and EV/EBITDA, plus a discounted cash flow with bear, base and bull cases and a discount-rate by terminal-growth grid.</p>
-            <div class="tags"><span class="tag">isoline value AAPL</span><span class="tag">--discount 0.09</span><span class="tag">--growth 0.07</span></div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="block report-sec" id="report">
-    <div class="wrap report-grid">
-      <div class="reveal">
-        <span class="eyebrow">Reports</span>
-        <h2 style="margin-top:18px">A report you can hand to someone.</h2>
-        <p class="lede" style="margin-top:18px">Every scan writes a formal HTML report and an Excel workbook next to you, then opens the report in your browser.</p>
-        <ul class="checks">
-          <li><span><b>Self-contained HTML.</b> Summary, score cards, explained tables and two charts. Works offline, prints cleanly to A4.</span></li>
-          <li><span><b>Multi-sheet Excel.</b> A dashboard sheet plus the raw figures behind every metric.</span></li>
-          <li><span><b>JSON and CSV.</b> <code>--json</code> or <code>--export</code> for pipelines, notebooks and Power BI.</span></li>
-        </ul>
-      </div>
-      <div class="reveal">
-        <div class="browser">
-          <div class="browser-bar"><i></i><i></i><i></i><span>ACME_dashboard.html</span></div>
-          <div class="browser-view"><img src="https://raw.githubusercontent.com/shubhwade/isoline/main/docs/assets/sample-report.png" alt="The HTML report Isoline writes: summary, score cards and valuation table for a synthetic sample company" loading="lazy" width="1280" height="1600"></div>
+      <div class="term rv">
+        <div class="term-tabs" role="tablist" aria-label="Commands" id="tabs"></div>
+        <div class="term-body">
+          <pre class="term-out" id="term-out"><span class="p">~ $</span> <span class="c">isoline scan AAPL</span></pre>
+          <div class="term-side"><h3 id="term-h">Scan a company</h3><p id="term-p">Runs every engine, prints tables and a rule-based summary, writes the Excel and HTML reports and opens the report.</p><div class="chips" id="term-chips"></div></div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="block" id="honest">
-    <div class="wrap honest">
-      <div class="reveal">
-        <span class="eyebrow">Honest data</span>
-        <p class="quote">Missing inputs show <em>n/a</em> with a reason. Never a zero, never a guess.</p>
-        <p class="lede">Free financial data has gaps. When a figure can't be computed, Isoline withholds it and says why, instead of quietly scoring a company on numbers that aren't there. US tickers fall back to SEC EDGAR when Yahoo Finance is incomplete.</p>
-      </div>
-      <div class="ledger reveal" role="table" aria-label="Example of withheld metrics">
-        <div class="ledger-row" role="row"><span>Metric</span><span>Value</span><span>Status</span></div>
-        <div class="ledger-row" role="row"><span>Piotroski F-score</span><span class="v">9</span><span class="pill ok">ok</span></div>
-        <div class="ledger-row" role="row"><span>Altman Z″-score</span><span class="v">3.94</span><span class="pill ok">ok</span></div>
-        <div class="ledger-row" role="row"><span>Beneish M-score</span><span class="v">n/a</span><span class="pill na">withheld</span></div>
-        <div class="ledger-row" role="row"><span>ROIC</span><span class="v">n/a</span><span class="pill na">withheld</span></div>
-        <div class="ledger-note">Note: Beneish M-score not reported: required inputs are missing.<br>Note: ROIC not reported: EBIT or invested capital unavailable or not positive.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="commands" style="padding-top:40px">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <div><span class="eyebrow">Commands</span><h2>Small surface, deep output.</h2></div>
-        <p>Use Yahoo Finance symbols: <code>AAPL</code> for US listings, <code>INFY.NS</code> for NSE, <code>.BO</code> for BSE. Every command takes <code>--help</code>.</p>
-      </div>
-      <div class="cmd-wrap reveal">
-        <div class="cmd-list" role="tablist" aria-label="Commands">
-          <button class="cmd-tab" role="tab" aria-selected="true" aria-controls="p-scan" id="t-scan">scan <small>full analysis</small></button>
-          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-compare" id="t-compare">compare <small>side by side</small></button>
-          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-value" id="t-value">value <small>DCF</small></button>
-          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-screen" id="t-screen">screen <small>sector filter</small></button>
-          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-tui" id="t-tui">tui <small>full screen</small></button>
-          <button class="cmd-tab" role="tab" aria-selected="false" aria-controls="p-powerbi" id="t-powerbi">powerbi <small>export</small></button>
-        </div>
-        <div class="cmd-panel" role="tabpanel" id="p-scan" aria-labelledby="t-scan">
-          <h3>Scan a company</h3>
-          <p>Runs every engine, prints the tables and summary, writes the Excel and HTML reports and opens the report.</p>
-<pre class="code"><span class="c">isoline</span> scan <span class="a">AAPL</span>
-<span class="c">isoline</span> scan <span class="a">INFY.NS</span> <span class="f">--no-open</span>
-<span class="c">isoline</span> scan <span class="a">MSFT</span> <span class="f">--json</span> <span class="f">--no-report</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
-          <div class="outputs">Writes <span class="tag">AAPL_analysis.xlsx</span><span class="tag">AAPL_dashboard.html</span></div>
-        </div>
-        <div class="cmd-panel" role="tabpanel" id="p-compare" aria-labelledby="t-compare" hidden>
-          <h3>Compare two companies</h3>
-          <p>Every metric side by side, with a combined report.</p>
-<pre class="code"><span class="c">isoline</span> compare <span class="a">TCS.NS</span> <span class="a">INFY.NS</span>
-<span class="c">isoline</span> compare <span class="a">AAPL</span> <span class="a">MSFT</span> <span class="f">--export</span> <span class="s">compare.xlsx</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
-        </div>
-        <div class="cmd-panel" role="tabpanel" id="p-value" aria-labelledby="t-value" hidden>
-          <h3>Estimate intrinsic value</h3>
-          <p>A discounted cash flow with bear, base and bull scenarios, a sensitivity grid and margin of safety. Defaults are printed as assumptions; override any of them. Illustrative, not a price target.</p>
-<pre class="code"><span class="c">isoline</span> value <span class="a">AAPL</span>
-<span class="c">isoline</span> value <span class="a">AAPL</span> <span class="f">--discount</span> <span class="s">0.09</span> <span class="f">--growth</span> <span class="s">0.07</span> <span class="f">--years</span> <span class="s">10</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
-        </div>
-        <div class="cmd-panel" role="tabpanel" id="p-screen" aria-labelledby="t-screen" hidden>
-          <h3>Screen a sector</h3>
-          <p>Filter an example sector universe by Piotroski score and leverage. Skipped tickers come with a reason.</p>
-<pre class="code"><span class="c">isoline</span> screen <span class="a">IT</span>
-<span class="c">isoline</span> screen <span class="a">Banking</span> <span class="f">--min-piotroski</span> <span class="s">7</span> <span class="f">--max-de</span> <span class="s">1.5</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
-        </div>
-        <div class="cmd-panel" role="tabpanel" id="p-tui" aria-labelledby="t-tui" hidden>
-          <h3>Work in the terminal interface</h3>
-          <p>A full-screen app with modes, a command palette on <kbd>Ctrl</kbd>+<kbd>K</kbd> and session history.</p>
-<pre class="code"><span class="c">pip</span> install <span class="s">"isoline[tui]"</span>
-<span class="c">isoline</span> tui<button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
-        </div>
-        <div class="cmd-panel" role="tabpanel" id="p-powerbi" aria-labelledby="t-powerbi" hidden>
-          <h3>Export to Power BI</h3>
-          <p>Portfolio metrics or red-flag details as a tidy CSV, ready to load.</p>
-<pre class="code"><span class="c">isoline</span> powerbi <span class="f">--tickers</span> <span class="a">INFY.NS TCS.NS WIPRO.NS</span> <span class="f">--export</span> <span class="s">portfolio.csv</span>
-<span class="c">isoline</span> powerbi <span class="a">AAPL MSFT</span> <span class="f">--flags</span> <span class="f">--export</span> <span class="s">flags.csv</span><button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  <!-- MCP -->
   <section class="block" id="mcp" style="padding-top:40px">
-    <div class="wrap mcp-grid">
-      <div class="reveal">
-        <span class="eyebrow">For AI tools</span>
-        <h2 style="margin-top:18px">Give your assistant real numbers.</h2>
-        <p class="lede" style="margin:18px 0 28px">Run Isoline as an MCP server and Claude Desktop, Cursor or Windsurf can call the same engines, so answers rest on computed figures rather than recall.</p>
-        <div class="clients"><span class="tag">Claude Desktop</span><span class="tag">Cursor</span><span class="tag">Windsurf</span></div>
-<pre class="code"><span class="f"># pip install "isoline[mcp]"</span>
+    <div class="wrap mcp">
+      <div class="rv">
+        <span class="label"><b>●</b>&nbsp; For AI tools</span>
+        <h2 style="margin-top:20px">Give your assistant real numbers.</h2>
+        <p class="muted" style="font-size:1.08rem;margin:22px 0 0;max-width:30rem">Run Isoline as an MCP server and Claude Desktop, Cursor or Windsurf call the same engines, so answers rest on computed figures, not recall.</p>
+<pre class="code"><span class="cm"># pip install "isoline[mcp]"</span>
 {
   <span class="s">"mcpServers"</span>: {
     <span class="s">"isoline"</span>: { <span class="s">"command"</span>: <span class="a">"isoline"</span>, <span class="s">"args"</span>: [<span class="a">"serve"</span>] }
   }
-}<button class="copy-btn" aria-label="Copy"><svg><use href="#i-copy"/></svg></button></pre>
+}<button class="copy-mini" data-copy-json aria-label="Copy configuration"><svg><use href="#i-copy"/></svg></button></pre>
       </div>
-      <div class="chat reveal" aria-label="Example conversation">
-        <div class="bubble you">Compare TCS and Infosys on balance-sheet strength.</div>
-        <div class="bubble ai"><div class="tool">compare · TCS.NS, INFY.NS</div>Here are Piotroski signals, Altman Z″, debt/equity and interest coverage side by side. One metric couldn't be computed from the filings, so it's marked n/a rather than guessed.</div>
-        <div class="bubble you">Which IT names pass Piotroski 7 or better with low debt?</div>
-        <div class="bubble ai"><div class="tool">screen · sector=IT, min_piotroski=7, max_de=1.0</div>Three tickers pass. Two were skipped, each with the reason it couldn't be scored.</div>
+      <div class="chat" id="chat" aria-label="Example conversation">
+        <div class="msg you">Compare TCS and Infosys on balance-sheet strength.</div>
+        <div class="msg ai"><div class="tool">compare · TCS.NS, INFY.NS</div>Here are Piotroski signals, Altman Z″, debt/equity and interest coverage side by side. One metric couldn't be computed from the filings, so it's marked n/a rather than guessed.</div>
+        <div class="msg you">Which IT names pass Piotroski 7 or better with low debt?</div>
+        <div class="msg ai"><div class="tool">screen · sector=IT, min_piotroski=7, max_de=1.0</div>Here are the tickers that pass. Any that couldn't be scored are listed with the reason.</div>
       </div>
     </div>
   </section>
 
   <section class="final">
-    <div class="wrap reveal">
-      <span class="eyebrow">Get started</span>
-      <h2>Your first report is one command away.</h2>
-      <p>Free and open source. No account, no API key. If it saves you time, a star on GitHub helps others find it.</p>
+    <canvas id="ridges2" aria-hidden="true"></canvas>
+    <div class="wrap rv">
+      <span class="label"><b>●</b>&nbsp; Get started</span>
+      <h2>One command away.</h2>
+      <p>Free and open source. No account, no API key. If it saves you time, a star helps others find it.</p>
       <div class="cta">
-        <button class="install" data-copy="pip install isoline" aria-label="Copy install command">
-          <span><span class="dollar">$ </span>pip install isoline</span>
-          <span class="copy"><svg><use href="#i-copy"/></svg></span>
-        </button>
-        <a class="btn btn-lg btn-solid" href="https://github.com/shubhwade/isoline"><svg><use href="#i-gh"/></svg>Star on GitHub</a>
+        <button class="install magnet" data-copy="pip install isoline" aria-label="Copy install command"><span><span class="d">$ </span>pip install isoline</span><span class="c"><svg><use href="#i-copy"/></svg></span></button>
+        <a class="btn btn-lg btn-ink magnet" href="https://github.com/shubhwade/isoline"><svg><use href="#i-gh"/></svg>Star on GitHub</a>
       </div>
     </div>
   </section>
@@ -608,142 +610,283 @@ footer { border-top: 1px solid var(--rule); padding: 48px 0 40px; font-size: 14p
 <footer>
   <div class="wrap">
     <div class="foot">
-      <div>
-        <a class="brand" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg><span><span class="tittle">i</span>soline</span></a>
-        <p style="margin:14px 0 0;max-width:26ch">Financial statements, measured precisely. Built by Shubh Wade.</p>
-      </div>
+      <div><a class="brand" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg><span><i>i</i>soline</span></a><p style="margin:14px 0 0;max-width:26ch">Financial statements, measured precisely. Built by Shubh Wade.</p></div>
       <div><h4>Product</h4><ul><li><a href="https://shubhwade.github.io/isoline/quickstart/">Quick start</a></li><li><a href="https://shubhwade.github.io/isoline/cli/">CLI reference</a></li><li><a href="https://shubhwade.github.io/isoline/sdk/">Python SDK</a></li><li><a href="https://shubhwade.github.io/isoline/mcp/">MCP server</a></li></ul></div>
       <div><h4>Method</h4><ul><li><a href="https://shubhwade.github.io/isoline/methodology/">Formulas and sources</a></li><li><a href="https://shubhwade.github.io/isoline/valuation/">Valuation</a></li><li><a href="https://shubhwade.github.io/isoline/changelog/">Changelog</a></li></ul></div>
       <div><h4>Project</h4><ul><li><a href="https://github.com/shubhwade/isoline">GitHub</a></li><li><a href="https://pypi.org/project/isoline/">PyPI</a></li><li><a href="https://github.com/shubhwade/isoline/blob/main/SECURITY.md">Security</a></li></ul></div>
     </div>
-    <div class="foot-legal">
-      <span>© 2026 Isoline · MIT License · Formerly Telmus</span>
-      <span>Not investment advice. Data from Yahoo Finance and SEC EDGAR.</span>
-    </div>
+    <div class="legal"><span>© 2026 Isoline · MIT License · Formerly Telmus</span><span>Not investment advice. Figures on this page come from a synthetic sample company.</span></div>
   </div>
 </footer>
-
 <div class="toast" id="toast" role="status" aria-live="polite">Copied to clipboard</div>
 
 <script>
 (() => {
   const root = document.documentElement;
-  root.classList.add('js');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const still = root.classList.contains('static');
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  const css = n => getComputedStyle(root).getPropertyValue(n).trim();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
 
-  /* theme toggle (remembered per browser) */
-  const themeBtn = document.getElementById('theme');
-  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-  const syncIcon = () => themeBtn.innerHTML = `<svg><use href="#i-${isDark() ? 'sun' : 'moon'}"/></svg>`;
-  try { const t = localStorage.getItem('isoline-theme'); if (t) root.dataset.theme = t; } catch (e) {}
-  syncIcon();
-  themeBtn.addEventListener('click', () => {
-    root.dataset.theme = isDark() ? 'light' : 'dark';
-    try { localStorage.setItem('isoline-theme', root.dataset.theme); } catch (e) {}
-    syncIcon(); drawContours(performance.now());
-  });
+  /* ---------- copy ---------- */
+  const toast = $('#toast'); let toastTimer;
+  function copy(text, btn) {
+    const done = () => {
+      toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+      const u = btn.querySelector('use'); if (u) { u.setAttribute('href', '#i-check'); setTimeout(() => u.setAttribute('href', '#i-copy'), 1500); }
+    };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, () => {});
+  }
+  $$('[data-copy]').forEach(b => b.addEventListener('click', () => copy(b.dataset.copy, b)));
+  $$('[data-copy-json]').forEach(b => b.addEventListener('click', () =>
+    copy('{\n  "mcpServers": {\n    "isoline": { "command": "isoline", "args": ["serve"] }\n  }\n}', b)));
 
-  /* nav border on scroll */
-  const nav = document.getElementById('nav');
-  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8);
-  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  /* ---------- duplicate the ticker tape for a seamless loop ---------- */
+  const tape = $('#tape'); tape.innerHTML += tape.innerHTML;
+  $$('span', tape).slice(tape.children.length / 2).forEach(s => s.setAttribute('aria-hidden', 'true'));
 
-  /* copy */
-  const toast = document.getElementById('toast');
-  let toastTimer;
-  const copied = (el) => {
-    toast.classList.add('show'); clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
-    const use = el.querySelector('use'); if (!use) return;
-    use.setAttribute('href', '#i-check'); setTimeout(() => use.setAttribute('href', '#i-copy'), 1600);
-  };
-  const copy = (text, el) => navigator.clipboard?.writeText(text).then(() => copied(el)).catch(() => {});
-  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => copy(b.dataset.copy, b)));
-  document.querySelectorAll('.copy-btn').forEach(b => b.addEventListener('click', () => {
-    const pre = b.closest('pre').cloneNode(true); pre.querySelector('.copy-btn').remove();
-    copy(pre.textContent.split('\n').filter(l => !l.trim().startsWith('#')).join('\n').trim(), b);
-  }));
+  /* ---------- ridgeline terrain ---------- */
+  function ridges(canvas, opts) {
+    const ctx = canvas.getContext('2d');
+    let W = 0, H = 0, dpr = 1, visible = true;
+    const m = { x: .7, y: .45, tx: .7, ty: .45 };
+    const size = () => { dpr = Math.min(window.devicePixelRatio || 1, 2); W = canvas.clientWidth; H = canvas.clientHeight; canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); };
+    const height = (u, v, t) => {
+      let h = 0;
+      for (const [px, py, s, a] of opts.peaks) {
+        const ox = px + .03 * Math.sin(t * .00025 + px * 9), oy = py + .02 * Math.cos(t * .0002 + py * 7);
+        const dx = u - ox, dy = (v - oy) * 1.4; h += a * Math.exp(-(dx * dx + dy * dy) / (2 * s * s));
+      }
+      if (opts.mouse) { const dx = u - m.x, dy = (v - m.y) * 1.4; h += opts.mouse * Math.exp(-(dx * dx + dy * dy) / .0098); }
+      return h + .05 * Math.sin(u * 22 + t * .0011 + v * 6) * Math.sin(v * 15 - t * .0007);
+    };
+    function draw(t) {
+      if (!W || !H) return;
+      m.x += (m.tx - m.x) * .06; m.y += (m.ty - m.y) * .06;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      const ink = css('--ink'), bg = css('--bg'), sig = css('--signal');
+      const n = opts.rows, top = H * opts.top, bottom = H * opts.bottom, amp = H * opts.amp, step = Math.max(4, W / 220);
+      const hot = Math.round(clamp(m.y) * (n - 1));
+      for (let r = 0; r < n; r++) {
+        const v = r / (n - 1), base = top + (bottom - top) * v, k = .35 + v * .65;
+        ctx.beginPath(); ctx.moveTo(0, base);
+        for (let x = 0; x <= W + step; x += step) ctx.lineTo(x, base - amp * height(x / W, v, t) * k);
+        ctx.lineTo(W, H + 2); ctx.lineTo(0, H + 2); ctx.closePath();
+        ctx.fillStyle = bg; ctx.fill();
+        const isHot = opts.mouse && r === hot;
+        ctx.strokeStyle = isHot ? sig : ink; ctx.globalAlpha = isHot ? 1 : opts.alpha * (.25 + v * .75);
+        ctx.lineWidth = isHot ? 1.75 : 1; ctx.stroke(); ctx.globalAlpha = 1;
+      }
+    }
+    size(); draw(0);
+    addEventListener('resize', () => { size(); draw(performance.now()); });
+    if (opts.mouse) addEventListener('pointermove', e => {
+      const r = canvas.getBoundingClientRect(); if (e.clientY > r.bottom || e.clientY < r.top) return;
+      m.tx = clamp((e.clientX - r.left) / r.width); m.ty = clamp((e.clientY - r.top) / r.height, .2, .95);
+    }, { passive: true });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
+    if (!still) { let last = 0; const loop = t => { if (visible && t - last > 30) { draw(t); last = t; } requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+    return () => draw(performance.now());
+  }
+  const redrawHero = ridges($('#ridges'), { rows: 46, top: .12, bottom: 1.02, amp: .34, alpha: .55, mouse: .55,
+    peaks: [[.7, .45, .13, 1], [.86, .62, .09, .7], [.5, .7, .16, .55], [.22, .55, .12, .4], [.95, .3, .1, .5]] });
+  const redrawFinal = ridges($('#ridges2'), { rows: 30, top: .25, bottom: 1.05, amp: .3, alpha: .35, mouse: 0,
+    peaks: [[.2, .5, .14, .9], [.8, .55, .14, .9], [.5, .8, .2, .5]] });
 
-  /* command tabs with arrow-key support */
-  const tabs = [...document.querySelectorAll('.cmd-tab')];
-  const select = (t) => {
-    tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1;
-      document.getElementById(x.getAttribute('aria-controls')).hidden = !on; });
-  };
-  tabs.forEach((t, i) => {
-    t.tabIndex = i ? -1 : 0;
-    t.addEventListener('click', () => select(t));
+  /* ---------- Altman gauge ---------- */
+  const Z = 3.936, ZMAX = 5, CX = 260, CY = 270, R = 200;
+  const ang = z => -90 + 180 * clamp(z / ZMAX);
+  const pt = (z, r) => { const a = (ang(z) - 90) * Math.PI / 180; return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; };
+  const arc = (z0, z1) => { const [x0, y0] = pt(z0, R), [x1, y1] = pt(z1, R); return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`; };
+  function buildGauge() {
+    const zones = [['#z-dis', 0, 1.1, css('--line-2')], ['#z-grey', 1.1, 2.6, css('--ink-3')], ['#z-safe', 2.6, ZMAX, css('--ink')]];
+    for (const [id, a, b, c] of zones) { const p = $(id); p.setAttribute('d', arc(a, b)); p.setAttribute('stroke', c); }
+    let g = '';
+    for (const [z, l] of [[0, '0'], [1.1, '1.1'], [2.6, '2.6'], [5, '5']]) { const [x, y] = pt(z, R + 34); g += `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle">${l}</text>`; }
+    g += `<text x="${CX - R}" y="300" text-anchor="middle">DISTRESS</text><text x="${pt(1.85, R - 44)[0].toFixed(1)}" y="${(pt(1.85, R - 44)[1] + 4).toFixed(1)}" text-anchor="middle">GREY</text><text x="${CX + R}" y="300" text-anchor="middle">SAFE</text>`;
+    $('#ticks').innerHTML = g;
+  }
+  const needle = $('#needle'), znum = $('#znum');
+  const setZ = z => { needle.setAttribute('transform', `rotate(${ang(z).toFixed(2)} ${CX} ${CY})`); znum.textContent = z.toFixed(2); };
+  buildGauge(); setZ(Z);
+
+  /* ---------- DCF chart ---------- */
+  const FCF = [125.6, 138.1, 148.5, 155.9, 159.8], PV = [114.2, 114.2, 111.6, 106.5, 99.2];
+  const PV_TV = 1356.1, EQUITY = 1901.7, SHARES = 100;
+  const dcf = { grow: 1, disc: 1, tv: 1 };
+  function drawDcf() {
+    const s = dcf, W = 560, base = 316, scale = 1.25, bw = 50, gap = 16, x0 = 6;
+    let o = `<line x1="0" y1="${base}" x2="${W}" y2="${base}" style="stroke:var(--line-2)"/>`;
+    FCF.forEach((f, k) => {
+      const g = clamp(s.grow * 5 - k), v = f + (PV[k] - f) * s.disc, h = v * scale * g, x = x0 + k * (bw + gap);
+      o += `<rect x="${x}" y="${(base - h).toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="4" style="fill:var(--ink)" opacity="${(1 - s.disc * k * .1).toFixed(2)}"/>`;
+      if (g > .7 && (s.disc === 0 || s.disc === 1)) o += `<text class="val" x="${x + bw / 2}" y="${(base - h - 9).toFixed(1)}" text-anchor="middle">${v.toFixed(1)}</text>`;
+      o += `<text x="${x + bw / 2}" y="${base + 22}" text-anchor="middle">Y${k + 1}</text>`;
+    });
+    const tx = x0 + 5 * (bw + gap) + 22, tw = W - tx, th = (base - 18) * s.tv;
+    if (s.tv > 0) {
+      o += `<rect x="${tx}" y="${(base - th).toFixed(1)}" width="${tw}" height="${th.toFixed(1)}" rx="6" style="fill:var(--signal)" opacity="${(.2 + .8 * s.tv).toFixed(2)}"/>`;
+      if (s.tv > .5) o += `<text x="${tx + tw / 2}" y="${(base - th + 28).toFixed(1)}" text-anchor="middle" style="fill:#fff">TERMINAL VALUE</text><text x="${tx + tw / 2}" y="${(base - th + 54).toFixed(1)}" text-anchor="middle" style="fill:#fff;font-size:18px">${PV_TV.toFixed(1)}</text><text x="${tx + tw / 2}" y="${(base - th + 76).toFixed(1)}" text-anchor="middle" style="fill:#fff;opacity:.85">71.3% of value</text>`;
+    }
+    o += `<text x="${tx + tw / 2}" y="${base + 22}" text-anchor="middle">TV · not to scale</text>`;
+    $('#dcf-svg').innerHTML = o;
+    $('#dcf-mode').textContent = s.disc < .5 ? 'projected' : s.tv < .5 ? 'discounted at 10%' : 'present value + terminal';
+    const done = s.disc >= 1 && s.tv >= 1;
+    $('#dcf-eq').textContent = done ? `$${(EQUITY / 1000).toFixed(2)}B` : '—';
+    $('#dcf-ps').textContent = done ? `$${(EQUITY / SHARES).toFixed(2)}` : '—';
+  }
+  drawDcf();
+
+  /* sensitivity grid: real run_dcf output for the synthetic company */
+  const SENS = { d: [8, 9, 10, 11, 12], g: [1.5, 2.5, 3.5],
+    v: [[22.29, 19.28, 16.98, 15.16, 13.69], [26.03, 21.98, 19.02, 16.75, 14.96], [31.43, 25.67, 21.69, 18.76, 16.53]] };
+  (() => {
+    let h = '<div class="hd rh">g / r</div>' + SENS.d.map(d => `<div class="hd">${d}%</div>`).join('');
+    SENS.g.forEach((g, gi) => {
+      h += `<div class="hd rh">${g}%</div>`;
+      SENS.v[gi].forEach((v, di) => {
+        const a = .06 + .62 * (v - 13.69) / (31.43 - 13.69), isBase = gi === 1 && di === 2;
+        h += `<div class="cell${isBase ? ' base' : ''}${a > .42 && !isBase ? ' dark' : ''}" style="--a:${a.toFixed(3)}">${v.toFixed(2)}</div>`;
+      });
+    });
+    $('#sens').innerHTML = h;
+  })();
+
+  themeBtnInit();
+  function themeBtnInit() {
+    const btn = $('#theme');
+    const sync = () => { btn.innerHTML = `<svg><use href="#i-${root.dataset.theme === 'dark' ? 'sun' : 'moon'}"/></svg>`;
+      btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+      $('meta[name="theme-color"]').content = root.dataset.theme === 'dark' ? '#0A0A0A' : '#FFFFFF'; };
+    btn.addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem('isoline-theme', root.dataset.theme); } catch (e) {}
+      sync(); buildGauge(); redrawHero(); redrawFinal();
+    });
+    sync();
+  }
+
+  /* ---------- scroll-driven scenes ---------- */
+  const scenes = [];
+  const prog = $('#progress'), nav = $('#nav');
+  const phases = (p, n) => { const f = p * n, i = Math.min(n - 1, Math.floor(f)); return [i, clamp(f - i)]; };
+  function setStep(id, i, n, local, panelOf = x => x) {
+    const pi = panelOf(i);
+    $$(`#${id}-txt > div`).forEach((d, k) => d.classList.toggle('on', k === i));
+    $$(`#${id}-panels > .panel`).forEach((d, k) => { d.classList.toggle('on', k === pi); d.classList.toggle('past', k < pi); });
+    $(`#${id}-n`).textContent = `0${i + 1} / 0${n}`;
+    $(`#${id}-bar`).style.setProperty('--p', ((i + local) / n).toFixed(3));
+  }
+  if (!still) {
+    const rows = $$('#scan-panels .ledger tbody tr'), sigs = $$('#signals li'), fnum = $('#fnum'), withheld = $$('#withheld .na-val');
+    scenes.push([$('#scan'), p => {
+      const [i, l] = phases(p, 4);
+      setStep('scan', i, 4, l);
+      rows.forEach((r, k) => r.classList.toggle('in', i > 0 || clamp(l * 1.5) * rows.length > k));
+      const on = i > 1 ? 9 : i === 1 ? Math.min(9, Math.floor(clamp(l * 1.3) * 10)) : 0;
+      sigs.forEach((s, k) => s.classList.toggle('on', k < on)); fnum.textContent = on;
+      setZ(i > 2 ? Z : i === 2 ? Z * ease(clamp(l * 1.4)) : 0);
+      withheld.forEach((w, k) => { const t = i === 3 ? clamp(l * 1.8 - k * .3) : 0;
+        w.style.setProperty('--strike', clamp(t * 2).toFixed(3)); w.style.setProperty('--na', clamp(t * 2 - 1).toFixed(3)); });
+    }]);
+    const cells = $$('#sens .cell');
+    scenes.push([$('#dcf'), p => {
+      const [i, l] = phases(p, 3);
+      setStep('dcf', i, 3, l, x => (x < 2 ? 0 : 1));
+      if (i === 0) Object.assign(dcf, { grow: ease(clamp(l * 1.5)), disc: 0, tv: 0 });
+      else if (i === 1) Object.assign(dcf, { grow: 1, disc: ease(clamp(l * 2.2)), tv: ease(clamp(l * 2.2 - 1.1)) });
+      else Object.assign(dcf, { grow: 1, disc: 1, tv: 1 });
+      drawDcf();
+      cells.forEach((c, k) => c.classList.toggle('in', i === 2 && l * 1.7 > ((k % 5) + Math.floor(k / 5)) / 7));
+    }]);
+    const paper = $('#paper'), pimg = $('#paper-img'), feats = $$('#feats li');
+    scenes.push([$('#report'), p => {
+      const view = paper.clientHeight - 34, max = Math.max(0, pimg.clientHeight - view);
+      pimg.style.setProperty('--scroll', (ease(clamp(p * 1.1)) * max).toFixed(1));
+      paper.style.setProperty('--tilt', ((1 - clamp(p * 4)) * 8).toFixed(2));
+      feats.forEach((f, k) => f.classList.toggle('on', Math.floor(p * 4.4) >= k));
+    }]);
+  }
+  let queued = false;
+  function tick() {
+    queued = false;
+    const vh = innerHeight, max = document.documentElement.scrollHeight - vh;
+    prog.style.transform = `scaleX(${(max > 0 ? scrollY / max : 0).toFixed(4)})`;
+    nav.classList.toggle('solid', scrollY > 40);
+    for (const [el, fn] of scenes) {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -vh || r.top > vh * 2) continue;
+      fn(clamp(-r.top / Math.max(1, r.height - vh)));
+    }
+  }
+  const request = () => { if (!queued) { queued = true; requestAnimationFrame(tick); } };
+  addEventListener('scroll', request, { passive: true });
+  addEventListener('resize', request);
+  $('#paper-img').addEventListener('load', request);
+  tick();
+
+  /* ---------- reveal on scroll ---------- */
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in'); io.unobserve(e.target);
+    if (e.target.id === 'chat') $$('.msg', e.target).forEach((m, k) => setTimeout(() => m.classList.add('in'), k * 650));
+  }), { rootMargin: '0px 0px -10% 0px' });
+  $$('.rv, #chat').forEach(el => io.observe(el));
+
+  /* ---------- command terminal ---------- */
+  const CMDS = [
+    { k: 'scan', cmd: 'isoline scan AAPL', h: 'Scan a company', p: 'Runs every engine, prints tables and a rule-based summary, writes the Excel and HTML reports and opens the report.', chips: ['--json', '--export FILE', '--no-report', '--no-open'],
+      out: ['', '<span class="p"># example: real output for the synthetic sample company</span>', '<span class="p">──</span> <span class="c">Acme Industrial (synthetic sample)</span> <span class="p">── ACME ──</span>', ' Piotroski F-score        <span class="c">9</span>', ' Altman Z-score        <span class="c">3.94</span>', ' Revenue CAGR 3y      <span class="c">12.5%</span>', ' ROE (DuPont)         <span class="c">20.9%</span>', ' ROIC                   <span class="f">n/a</span>', '', ' Strong fundamentals (Piotroski F-score of 9).', ' Financially safe (Altman Z-score of 3.94).'] },
+    { k: 'compare', cmd: 'isoline compare TCS.NS INFY.NS', h: 'Compare two companies', p: 'Every metric side by side, with a combined Excel and HTML report.', chips: ['--export FILE', '--no-report', '--no-open'] },
+    { k: 'value', cmd: 'isoline value AAPL --discount 0.09', h: 'Estimate intrinsic value', p: 'A DCF with bear, base and bull cases, a sensitivity grid and margin of safety. Defaults are printed as assumptions. Illustrative, not a price target.', chips: ['--discount', '--growth', '--terminal', '--years', '--json'] },
+    { k: 'screen', cmd: 'isoline screen IT --min-piotroski 7', h: 'Screen a sector', p: 'Filter an example sector universe (IT, Banking) by Piotroski score and debt/equity. Skipped tickers come with a reason.', chips: ['--min-piotroski', '--max-de', '--export FILE'] },
+    { k: 'check', cmd: 'isoline check INFY.NS', h: 'Quick health check', p: 'Just Piotroski F and Altman Z: the fastest way to decide whether a company deserves a full scan.', chips: ['ticker'] },
+    { k: 'tui', cmd: 'isoline tui', h: 'Terminal interface', p: 'A full-screen app with four modes, a command palette on Ctrl+K and session history. Needs pip install "isoline[tui]".', chips: ['Ctrl+K', 'four modes', 'history'] },
+    { k: 'powerbi', cmd: 'isoline powerbi --tickers INFY.NS TCS.NS --export portfolio.csv', h: 'Export to Power BI', p: 'Portfolio metrics, or red-flag details with --flags, as a tidy CSV ready to load.', chips: ['--tickers', '--export FILE', '--flags'] },
+  ];
+  const tabs = $('#tabs'), out = $('#term-out');
+  tabs.innerHTML = CMDS.map((c, i) => `<button class="term-tab" role="tab" id="tab-${c.k}" aria-controls="term-out" aria-selected="${i === 0}" tabindex="${i ? -1 : 0}">${c.k}</button>`).join('');
+  out.setAttribute('role', 'tabpanel');
+  let run = 0;
+  function show(i, animate) {
+    const c = CMDS[i], me = ++run;
+    $$('.term-tab', tabs).forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    out.setAttribute('aria-labelledby', `tab-${c.k}`);
+    $('#term-h').textContent = c.h; $('#term-p').textContent = c.p;
+    $('#term-chips').innerHTML = c.chips.map(x => `<span class="chip">${x}</span>`).join('');
+    const prompt = '<span class="p">~ $</span> ';
+    const finish = () => {
+      out.innerHTML = prompt + `<span class="c">${c.cmd}</span>` + (c.out ? '\n' + c.out.join('\n') : '') + '\n' + prompt + '<span class="caret"></span>' +
+        '<button class="copy-mini" aria-label="Copy command"><svg><use href="#i-copy"/></svg></button>';
+      $('.copy-mini', out).addEventListener('click', e => copy(c.cmd, e.currentTarget));
+    };
+    if (!animate || still) return finish();
+    let n = 0;
+    (function type() {
+      if (me !== run) return;
+      n++; out.innerHTML = prompt + `<span class="c">${c.cmd.slice(0, n)}</span><span class="caret"></span>`;
+      if (n < c.cmd.length) setTimeout(type, 20 + Math.random() * 28); else setTimeout(() => { if (me === run) finish(); }, 240);
+    })();
+  }
+  $$('.term-tab', tabs).forEach((t, i) => {
+    t.addEventListener('click', () => show(i, true));
     t.addEventListener('keydown', e => {
-      const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
-      if (!d) return; e.preventDefault();
-      const n = tabs[(i + d + tabs.length) % tabs.length]; n.focus(); select(n);
+      const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key]; if (!d) return; e.preventDefault();
+      const n = (i + d + CMDS.length) % CMDS.length; $$('.term-tab', tabs)[n].focus(); show(n, true);
     });
   });
+  show(0, false);
+  new IntersectionObserver(([e], o) => { if (e.isIntersecting) { show(0, true); o.disconnect(); } }, { threshold: .4 }).observe(out);
 
-  /* reveal on scroll */
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }),
-    { rootMargin: '0px 0px -8% 0px' });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-  /* terminal: lines print in sequence */
-  const lines = [...document.querySelectorAll('#term .line')];
-  if (reduce) lines.forEach(l => l.classList.add('on'));
-  else lines.forEach((l, i) => setTimeout(() => l.classList.add('on'), 350 + i * (i < 3 ? 160 : 70)));
-
-  /* topographic background: marching squares over a slowly drifting height field */
-  const cv = document.getElementById('contours');
-  const ctx = cv.getContext('2d');
-  const peaks = [[.78, .30, .30], [.58, .78, .22], [.18, .62, .26], [.95, .85, .18], [.35, .12, .2]];
-  let W = 0, H = 0, dpr = 1;
-  const resize = () => {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    W = cv.clientWidth; H = cv.clientHeight;
-    cv.width = W * dpr; cv.height = H * dpr;
-  };
-  const field = (x, y, t) => {
-    let v = 0;
-    for (let k = 0; k < peaks.length; k++) {
-      const [px, py, s] = peaks[k];
-      const ox = px + .025 * Math.sin(t * .00011 + k * 1.7), oy = py + .025 * Math.cos(t * .00009 + k);
-      const dx = (x - ox) * (W / H > 1 ? W / H : 1), dy = y - oy;
-      v += Math.exp(-(dx * dx + dy * dy) / (2 * s * s)) * (1 - k * .12);
-    }
-    return v + .06 * Math.sin(x * 9 + t * .0002) * Math.cos(y * 7);
-  };
-  function drawContours(t) {
-    if (!W) return;
-    const color = getComputedStyle(root).getPropertyValue('--contour').trim();
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    const step = 14, cols = Math.ceil(W / step) + 1, rows = Math.ceil(H / step) + 1;
-    const g = new Float32Array(cols * rows);
-    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) g[j * cols + i] = field(i * step / W, j * step / H, t);
-    ctx.lineWidth = 1; ctx.strokeStyle = color;
-    for (let L = .12; L < 1.3; L += .085) {
-      ctx.beginPath();
-      for (let j = 0; j < rows - 1; j++) for (let i = 0; i < cols - 1; i++) {
-        const a = g[j * cols + i], b = g[j * cols + i + 1], c = g[(j + 1) * cols + i + 1], d = g[(j + 1) * cols + i];
-        const idx = (a > L) | (b > L) << 1 | (c > L) << 2 | (d > L) << 3;
-        if (idx === 0 || idx === 15) continue;
-        const x = i * step, y = j * step;
-        const e = [
-          [x + step * (L - a) / (b - a), y], [x + step, y + step * (L - b) / (c - b)],
-          [x + step * (L - d) / (c - d), y + step], [x, y + step * (L - a) / (d - a)]];
-        const segs = { 1: [[3, 0]], 2: [[0, 1]], 3: [[3, 1]], 4: [[1, 2]], 5: [[3, 0], [1, 2]], 6: [[0, 2]], 7: [[3, 2]],
-          8: [[2, 3]], 9: [[0, 2]], 10: [[0, 1], [2, 3]], 11: [[1, 2]], 12: [[1, 3]], 13: [[0, 1]], 14: [[0, 3]] }[idx];
-        for (const [p, q] of segs) { ctx.moveTo(e[p][0], e[p][1]); ctx.lineTo(e[q][0], e[q][1]); }
-      }
-      ctx.stroke();
-    }
-  }
-  window.drawContours = drawContours;
-  resize(); drawContours(0);
-  addEventListener('resize', () => { resize(); drawContours(performance.now()); });
-  if (!reduce) {
-    let last = 0, visible = true;
-    new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(cv);
-    const loop = (t) => { if (visible && t - last > 66) { drawContours(t); last = t; } requestAnimationFrame(loop); };
-    requestAnimationFrame(loop);
-  }
+  /* ---------- magnetic buttons ---------- */
+  if (!still && matchMedia('(pointer: fine)').matches) $$('.magnet').forEach(b => {
+    b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect();
+      b.style.transform = `translate(${((e.clientX - r.left - r.width / 2) * .25).toFixed(1)}px, ${((e.clientY - r.top - r.height / 2) * .35).toFixed(1)}px)`; });
+    b.addEventListener('pointerleave', () => { b.style.transform = ''; });
+  });
 })();
 </script>
 </body>

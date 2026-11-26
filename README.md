@@ -9,12 +9,13 @@
 Piotroski, Altman and Beneish scores, quality metrics and print-ready reports for any listed company, from your terminal.</p>
 
 <p align="center">
-  <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/v/isoline?color=1B2A4A" alt="PyPI version"></a>
-  <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/pyversions/isoline?color=1B2A4A" alt="Python versions"></a>
+  <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/v/isoline?color=111111" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/isoline/"><img src="https://img.shields.io/pypi/pyversions/isoline?color=111111" alt="Python versions"></a>
   <a href="https://pepy.tech/projects/isoline"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fshubhwade%2Fisoline%2Fbadges%2Fdownloads.json" alt="Downloads (isoline + legacy telmus)"></a>
   <a href="https://github.com/shubhwade/isoline/actions/workflows/ci.yml"><img src="https://github.com/shubhwade/isoline/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/shubhwade/isoline/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-1B2A4A" alt="MIT license"></a>
-  <a href="https://shubhwade.github.io/isoline/"><img src="https://img.shields.io/badge/docs-isoline-B4690E" alt="Documentation"></a>
+  <a href="https://github.com/shubhwade/isoline/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-111111" alt="MIT license"></a>
+  <a href="https://isolinee.vercel.app"><img src="https://img.shields.io/badge/website-isolinee.vercel.app-111111" alt="Website"></a>
+  <a href="https://shubhwade.github.io/isoline/"><img src="https://img.shields.io/badge/docs-isoline-111111" alt="Documentation"></a>
 </p>
 
 ```bash

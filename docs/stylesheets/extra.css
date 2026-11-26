@@ -1,18 +1,16 @@
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400&display=swap");
-
 :root {
-  --md-text-font: "Inter", sans-serif;
-  --md-code-font: "JetBrains Mono", monospace;
+  --md-text-font: "Inter Tight", sans-serif;
+  --md-code-font: "IBM Plex Mono", monospace;
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Inter Tight", sans-serif;
 }
 
 code,
 pre,
 tt {
-  font-family: "JetBrains Mono", monospace;
+  font-family: "IBM Plex Mono", monospace;
 }
 
 .md-header {
@@ -60,28 +58,33 @@ tt {
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
-/* Brand palette: navy ink, warm paper, amber accent (matches the website and logo). */
+/* Brand palette: black, white and one vermilion signal colour (matches the website and logo). */
 [data-md-color-scheme="default"] {
-  --md-primary-fg-color: #13213D;
-  --md-primary-fg-color--light: #2A3A5C;
-  --md-primary-fg-color--dark: #0B1528;
-  --md-accent-fg-color: #B4690E;
-  --md-default-bg-color: #FBF9F4;
-  --md-typeset-a-color: #9A5A0C;
-  --md-code-bg-color: #F1EDE4;
+  --md-primary-fg-color: #0A0A0A;
+  --md-primary-fg-color--light: #262626;
+  --md-primary-fg-color--dark: #000000;
+  --md-accent-fg-color: #D13A10;
+  --md-default-bg-color: #FFFFFF;
+  --md-typeset-a-color: #D13A10;
+  --md-code-bg-color: #F5F5F3;
 }
 [data-md-color-scheme="slate"] {
-  --md-hue: 220;
-  --md-primary-fg-color: #0E1626;
-  --md-primary-fg-color--light: #1A2740;
-  --md-primary-fg-color--dark: #0A111D;
-  --md-accent-fg-color: #E59A3C;
-  --md-default-bg-color: #0E1626;
-  --md-typeset-a-color: #E59A3C;
+  --md-hue: 0;
+  --md-primary-fg-color: #0A0A0A;
+  --md-primary-fg-color--light: #1A1A1A;
+  --md-primary-fg-color--dark: #000000;
+  --md-accent-fg-color: #FF5A2E;
+  --md-default-bg-color: #0A0A0A;
+  --md-default-bg-color--light: #111111;
+  --md-code-bg-color: #141414;
+  --md-typeset-a-color: #FF5A2E;
 }
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs { border-bottom: 1px solid #222222; }
 .md-header__button.md-logo img { height: 1.6rem; border-radius: 6px; }
 .md-typeset h1, .md-typeset h2 {
-  font-family: "Newsreader", Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.015em;
+  font-family: "Inter Tight", "Inter", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.035em;
 }
+.md-typeset h1 { color: var(--md-default-fg-color); }

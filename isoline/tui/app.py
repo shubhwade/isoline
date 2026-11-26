@@ -125,17 +125,17 @@ class IsolineApp(App[None]):
     COMMAND_PALETTE_BINDING = "ctrl+k"
     COMMANDS = {IsolineCommands}
     CSS = """
-    Screen { background: #12161D; }
-    #side { width: 28; border-right: solid #2A3342; padding: 0 1; }
-    #side Static.title { color: #B4690E; text-style: bold; margin-top: 1; }
-    ListView { background: #12161D; height: auto; }
-    ListItem.-highlight, ListView:focus > ListItem.-highlight { background: #1B2A4A; }
+    Screen { background: #0A0A0A; }
+    #side { width: 28; border-right: solid #262626; padding: 0 1; }
+    #side Static.title { color: #FF5A2E; text-style: bold; margin-top: 1; }
+    ListView { background: #0A0A0A; height: auto; }
+    ListItem.-highlight, ListView:focus > ListItem.-highlight { background: #262626; }
     #main { padding: 0 1; }
-    #hint { color: #9AA4B2; height: 1; margin-bottom: 1; }
-    #status { color: #B4690E; height: 1; }
-    Input { border: tall #2A3342; }
-    Input:focus { border: tall #B4690E; }
-    RichLog { border: round #2A3342; height: 1fr; padding: 0 1; }
+    #hint { color: #A3A3A0; height: 1; margin-bottom: 1; }
+    #status { color: #FF5A2E; height: 1; }
+    Input { border: tall #333333; }
+    Input:focus { border: tall #FF5A2E; }
+    RichLog { border: round #333333; height: 1fr; padding: 0 1; }
     """
     BINDINGS = [
         Binding("ctrl+n", "new", "New"),

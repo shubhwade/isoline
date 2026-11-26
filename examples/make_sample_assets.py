@@ -3,12 +3,15 @@
 Everything is computed by the real engines from a SYNTHETIC company ("Acme Industrial"),
 so the screenshots show true formatting without implying any real company's numbers.
 
-    python examples/make_sample_assets.py docs/assets
+    python examples/make_sample_assets.py docs/assets [--chrome PATH]
+
+Writes sample-report.html and sample-terminal.svg, plus sample-report.png (the top
+2300 px of the report at 1100 px wide) when Playwright's Chromium is installed.
 """
 
 from __future__ import annotations
 
-import sys
+import io
 from pathlib import Path
 from unittest.mock import patch
 
@@ -64,17 +67,42 @@ def synthetic() -> dict:
             "cashflow": cash, "fast_info": {}, "source": "synthetic sample"}
 
 
-def main(out: Path) -> None:
+def main(out: Path, chrome: str | None = None) -> None:
     out.mkdir(parents=True, exist_ok=True)
     with patch("isoline.core.scanner.load_financials", return_value=synthetic()):
         result = IsolineScanner().scan("ACME")
     (out / "sample-report.html").write_text(scan_report(result), encoding="utf-8")
-    rec = Console(record=True, width=100, force_terminal=True)
+    rec = Console(record=True, width=100, force_terminal=True, file=io.StringIO())
     cli.console = rec
     cli._print_scan(result)
     rec.save_svg(str(out / "sample-terminal.svg"), title="isoline scan ACME  (synthetic sample)")
+    render_png(out / "sample-report.html", out / "sample-report.png", chrome=chrome)
     print("wrote", out)
 
 
+def render_png(html_file: Path, png: Path, width: int = 1100, height: int = 2300,
+               chrome: str | None = None) -> None:
+    """Screenshot the report; skipped with a message if Playwright is unavailable."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("playwright not installed: skipped", png.name)
+        return
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(executable_path=chrome) if chrome else pw.chromium.launch()
+        page = browser.new_page(viewport={"width": width, "height": 900}, device_scale_factor=1)
+        page.goto(html_file.resolve().as_uri())
+        full = page.evaluate("document.documentElement.scrollHeight")
+        page.screenshot(path=str(png), full_page=True,
+                        clip={"x": 0, "y": 0, "width": width, "height": min(full, height)})
+        browser.close()
+
+
 if __name__ == "__main__":
-    main(Path(sys.argv[1] if len(sys.argv) > 1 else "docs/assets"))
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("out", nargs="?", default="docs/assets")
+    ap.add_argument("--chrome", default=None, help="Path to a Chrome/Chromium binary (optional).")
+    args = ap.parse_args()
+    main(Path(args.out), args.chrome)
