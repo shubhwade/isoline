@@ -126,7 +126,7 @@ def test_reports_escape_provider_text_everywhere() -> None:
     fin["info"] = {**fin["info"], "symbol": "EV", "longName": "<img src=x onerror=alert(1)>"}
     r = escape_obj(_scan(fin, "EV"))
     for html in (scan_report(r), compare_report(CompareResult("EV", "EV", r, r)), portfolio_report([r])):
-        assert "<img" not in html and "&lt;img" in html
+        assert "<img src=x onerror" not in html and "&lt;img src=x onerror=alert(1)&gt;" in html
 
 
 def test_reports_never_touch_the_network(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

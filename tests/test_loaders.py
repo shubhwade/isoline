@@ -97,24 +97,29 @@ def test_statements_are_fetched_concurrently() -> None:
 
 
 def test_compare_runs_both_scans_concurrently() -> None:
-    import time
+    """Both loads must be in flight at the same time.
+
+    A barrier proves the overlap without timing: each mocked load waits until the other
+    has started. Run one after the other, the first load would wait alone and the barrier
+    would break. (An earlier version measured wall-clock time and failed on slow CI runners.)
+    """
+    import threading
     from unittest.mock import patch
 
     from isoline.core.scanner import IsolineScanner
     from tests.test_scores import company
 
-    def slow(ticker: str) -> dict:
-        time.sleep(0.4)
+    both_started = threading.Barrier(2, timeout=10)
+
+    def load(ticker: str) -> dict:
+        both_started.wait()  # raises BrokenBarrierError if the other scan never starts
         fin = company()
         fin["info"] = {"symbol": ticker, "longName": ticker, "exchange": "X"}
         return fin
 
-    with patch("isoline.core.scanner.load_financials", side_effect=slow):
-        start = time.perf_counter()
+    with patch("isoline.core.scanner.load_financials", side_effect=load):
         result = IsolineScanner().compare("AAA", "BBB")
-        elapsed = time.perf_counter() - start
     assert (result.result_a.ticker, result.result_b.ticker) == ("AAA", "BBB")
-    assert elapsed < 0.7
 
 
 def test_concurrent_scans_leave_stdout_intact() -> None:

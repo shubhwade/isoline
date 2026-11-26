@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.9.0
 ### Added
 - **Financial statements** in every scan: income statement, balance sheet and cash flow for up to four fiscal years, newest first, as reported (`isoline statements TICKER`, with `--json` and `--export .csv/.json`; SDK `isoline.sdk.statements()`; MCP tool `statements`). Values are matched to fiscal periods by date and never estimated; free cash flow and total liabilities and equity are marked when computed; a balance check warns when the source data does not balance. Capex, dividends and buybacks are always shown as outflows whatever sign the provider uses.
 - **HTML report redesigned after real documents.** The statements follow published annual reports (for example a US 10-K): one plain typeface, black type, a unit line such as "(In millions of USD, except per-share amounts)", group labels with indented items, a currency sign on the first row and totals, single rules above subtotals and double rules under totals, negatives in parentheses, plus change-vs-prior-year and common-size columns. The rest follows equity research reports: a key-data block (revenue, profit, free cash flow, scores, DCF fair value), Strengths and Concerns, then the detail. Written for beginners too: a "How to read this report" box, a "What it shows" line for each statement, a plain-English "What it means" sentence for every measure using the company's own numbers, and a glossary. Includes a discounted-cash-flow section (assumptions explained, three cases, sensitivity grid, or why it could not be calculated); prints to A4 with page numbers.
@@ -20,6 +20,9 @@
 - Unit tests can no longer reach SEC EDGAR by accident (they now make zero network connections).
 
 ### Fixed
+- Website browser-tab icon showed a blank globe: the inline icon contained unescaped quotes that cut the attribute short. The site now ships real `favicon.ico`, `favicon.svg`, `icon-192.png` and an Apple touch icon, generated from the logo.
+- The website's report preview looked doubled (a page inside a page): the sample image included the report's grey screen background, and the frame drew a second sheet. The image is now the report sheet alone, edge to edge, in a single square-cornered frame.
+- Reports show the Isoline mark in their header and as their browser-tab icon (base64-embedded, kept identical to the brand files by a test).
 - A ticker that fails in `isoline powerbi` is skipped and reported instead of aborting the whole export.
 - Reports open in the browser by absolute file URI, and a missing browser never fails the command.
 - Red flags read in plain English in summaries and reports ("negative free cash flow in 2+ years").

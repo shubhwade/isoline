@@ -6,7 +6,7 @@ so the screenshots show true formatting without implying any real company's numb
     python examples/make_sample_assets.py docs/assets [--chrome PATH]
 
 Writes sample-report.html and sample-terminal.svg, plus sample-report.png (the top
-2300 px of the report at 1100 px wide) when Playwright's Chromium is installed.
+2300 px of the report sheet, edge to edge) when Playwright's Chromium is installed.
 """
 
 from __future__ import annotations
@@ -102,9 +102,14 @@ def render_png(html_file: Path, png: Path, width: int = 1100, height: int = 2300
         browser = pw.chromium.launch(executable_path=chrome) if chrome else pw.chromium.launch()
         page = browser.new_page(viewport={"width": width, "height": 900}, device_scale_factor=1)
         page.goto(html_file.resolve().as_uri())
-        full = page.evaluate("document.documentElement.scrollHeight")
+        # Only the report sheet itself, edge to edge: no grey screen background or page shadow,
+        # so the image does not look like a page inside a page wherever it is shown.
+        box = page.evaluate(
+            "(() => { const r = document.querySelector('.page').getBoundingClientRect();"
+            " return {x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height}; })()"
+        )
         page.screenshot(path=str(png), full_page=True,
-                        clip={"x": 0, "y": 0, "width": width, "height": min(full, height)})
+                        clip={"x": box["x"], "y": box["y"], "width": box["w"], "height": min(box["h"], height)})
         browser.close()
 
 

@@ -193,7 +193,10 @@ def main() -> None:
 
     # 3. the report, scrolling with ease-in-out
     frames.append((page(report(img, 0), fonts, .16, hot=-1), 1.2))
-    max_off = int(2300 * 900 / 1100) - 534
+    from PIL import Image as _Image
+
+    iw, ih = _Image.open(img).size
+    max_off = int(ih * 900 / iw) - 534
     steps = 34
     for k in range(1, steps + 1):
         t = k / steps

@@ -22,6 +22,7 @@ Safety and honesty rules:
 
 from __future__ import annotations
 
+import base64
 import datetime
 import math
 from collections.abc import Sequence
@@ -31,6 +32,11 @@ from isoline import __version__
 from isoline.branding import BRAND
 from isoline.core.comparison import SECTIONS, format_value, stronger
 from isoline.core.result import CompareResult, ScanResult, StatementLine, StatementsResult
+from isoline.exporters.brand_mark import MARK_SVG
+
+# base64 so no character in the SVG can break out of the attribute
+FAVICON = "data:image/svg+xml;base64," + base64.b64encode(MARK_SVG.encode("utf-8")).decode("ascii")
+LOGO = f'<img class="logo" src="{FAVICON}" alt="" width="20" height="20">'
 
 DISCLAIMER = (
     "Isoline produces screening statistics from public financial statements obtained from "
@@ -49,8 +55,10 @@ body{margin:0;background:#e9e9e9;color:#1a1a1a;font:13px/1.5 Arial,"Helvetica Ne
 font-variant-numeric:tabular-nums lining-nums}
 .page{max-width:940px;margin:24px auto;background:#fff;padding:36px 48px 32px;box-shadow:0 1px 2px rgba(0,0,0,.15)}
 a{color:inherit}
-.top{display:flex;justify-content:space-between;align-items:baseline;border-top:4px solid #1a1a1a;padding-top:8px;font-size:11px;color:#555}
+.top{display:flex;justify-content:space-between;align-items:center;border-top:4px solid #1a1a1a;padding-top:8px;font-size:11px;color:#555}
 .top b{color:#1a1a1a}
+.top .brand{display:inline-flex;align-items:center;gap:7px}
+.top img.logo{width:20px;height:20px;display:block}
 h1{font-size:26px;line-height:1.2;margin:14px 0 4px;font-weight:700}
 .ident{color:#444;font-size:12.5px;margin:0 0 16px}
 table.kd{width:100%;border-collapse:collapse;border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;margin:0 0 18px}
@@ -420,9 +428,10 @@ def _page(title: str, kind: str, ident: str, body: str, source: str) -> str:
 <meta http-equiv="Content-Security-Policy" content="{CSP}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="{BRAND.name} {__version__}">
+<link rel="icon" type="image/svg+xml" href="{FAVICON}">
 <title>{title} · {kind}</title><style>{CSS.replace("__FOOT__", foot)}</style></head>
 <body><div class="page">
-<div class="top"><span><b>{BRAND.name}</b> &nbsp;|&nbsp; {kind}</span><span>Report date {stamp}</span></div>
+<div class="top"><span class="brand">{LOGO}<b>{BRAND.name}</b> &nbsp;|&nbsp; {kind}</span><span>Report date {stamp}</span></div>
 <h1>{title}</h1>
 <p class="ident">{ident}</p>
 {body}
