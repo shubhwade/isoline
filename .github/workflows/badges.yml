@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "17 3 * * *"
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/scripts/downloads_badge.py
+      - .github/workflows/badges.yml
 
 permissions:
   contents: write
