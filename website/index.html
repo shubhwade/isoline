@@ -4,17 +4,30 @@
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MBxMtXYHJaeZhXWHLwaOfIA+uKL6MyBTc6xDHZ/G+L4=' 'sha256-jEhwpmcmgQJOVx5RvjI0N4X0LgTqF4FKqSezNF2xItE='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Isoline: financial statements, measured precisely</title>
-<meta name="description" content="Open-source Python CLI for financial statement analysis. Piotroski F, Altman Z″ and Beneish M scores, quality metrics, DCF valuation and print-ready reports for any listed company.">
+<title>Isoline – financial statement analysis for any stock</title>
+<meta name="description" content="Isoline is a free, open-source Python CLI for financial statement analysis: Piotroski F, Altman Z and Beneish M scores, DCF valuation and print-ready reports.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="application-name" content="Isoline">
+<meta name="author" content="shubhwade">
 <link rel="canonical" href="https://isolinee.vercel.app/">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#0A0A0A">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Isoline">
+<meta property="og:locale" content="en_US">
 <meta property="og:url" content="https://isolinee.vercel.app/">
-<meta property="og:title" content="Isoline: financial statements, measured precisely">
+<meta property="og:title" content="Isoline – financial statement analysis for any stock">
 <meta property="og:description" content="Piotroski, Altman and Beneish scores, quality metrics, a DCF and print-ready reports from one command. Open source, no API key.">
 <meta property="og:image" content="https://isolinee.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Isoline: financial statements, measured precisely.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Isoline – financial statement analysis for any stock">
+<meta name="twitter:description" content="Piotroski, Altman and Beneish scores, a DCF and print-ready reports from one command. Free and open source.">
+<meta name="twitter:image" content="https://isolinee.vercel.app/og.png">
+<meta name="twitter:image:alt" content="Isoline: financial statements, measured precisely.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebSite","name":"Isoline","alternateName":["isoline","Isoline CLI"],"url":"https://isolinee.vercel.app/"},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Isoline","alternateName":["isoline","Telmus"],"description":"Free, open-source Python command-line tool for financial statement analysis: Piotroski F, Altman Z and Beneish M scores, quality metrics, DCF valuation and print-ready reports for any listed company.","url":"https://isolinee.vercel.app/","image":"https://isolinee.vercel.app/og.png","applicationCategory":"FinanceApplication","applicationSubCategory":"Financial statement analysis","operatingSystem":"Windows, macOS, Linux","softwareVersion":"0.9.0","downloadUrl":"https://pypi.org/project/isoline/","installUrl":"https://pypi.org/project/isoline/","softwareRequirements":"Python 3.10 or newer","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"shubhwade","url":"https://github.com/shubhwade"},"sameAs":["https://github.com/shubhwade/isoline","https://pypi.org/project/isoline/","https://shubhwade.github.io/isoline/"]}]</script>
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
@@ -410,14 +423,14 @@ footer { border-top: 1px solid var(--line); padding: 56px 0 40px; font-size: 14p
   <section class="hero" aria-label="Introduction">
     <canvas id="ridges" aria-hidden="true"></canvas>
     <div class="wrap hero-copy">
-      <span class="label fade"><b>●</b>&nbsp; v0.9.0 · open source · MIT</span>
+      <span class="label fade"><b>●</b>&nbsp; Isoline v0.9.0 · open source · MIT</span>
       <h1 aria-label="Financial statements, measured precisely.">
         <span class="ln" aria-hidden="true"><span class="w">Financial</span></span>
         <span class="ln" aria-hidden="true"><span class="w">statements,</span></span>
         <span class="ln" aria-hidden="true"><span class="w sig">measured precisely.</span></span>
       </h1>
       <div class="hero-row fade">
-        <p>Piotroski, Altman and Beneish scores, quality metrics, a DCF and a print-ready report for any listed company. One command. No API key. Every formula shown.</p>
+        <p>Isoline gives you Piotroski, Altman and Beneish scores, quality metrics, a DCF and a print-ready report for any listed company. One command. No API key. Every formula shown.</p>
         <div class="cta">
           <button class="install" data-copy="pip install isoline" aria-label="Copy install command"><span><span class="d">$ </span>pip install isoline</span><span class="c"><svg><use href="#i-copy"/></svg></span></button>
           <a class="btn btn-lg" href="https://shubhwade.github.io/isoline/quickstart/">Quick start <svg><use href="#i-arrow"/></svg></a>

@@ -1,5 +1,5 @@
-site_name: isoline
-site_description: Financial statement analysis for AI IDEs and coding agents
+site_name: Isoline
+site_description: Isoline is a free, open-source Python CLI for financial statement analysis of any stock - Piotroski, Altman and Beneish scores, DCF valuation and print-ready reports.
 docs_dir: docs
 exclude_docs: |
   internal/

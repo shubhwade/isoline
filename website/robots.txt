@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://isolinee.vercel.app/sitemap.xml

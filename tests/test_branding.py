@@ -102,3 +102,25 @@ def test_website_report_image_size_attributes_match_file() -> None:
     header = (root / "sample-report.png").read_bytes()[:24]
     assert header[:8] == b"\x89PNG\r\n\x1a\n"
     assert m and tuple(map(int, m.groups())) == struct.unpack(">II", header[16:24])
+
+
+def test_website_structured_data_and_crawl_files() -> None:
+    """Search engines read these: keep the version in the JSON-LD and the crawl files in sync."""
+    import json
+    import re
+    from pathlib import Path
+
+    site = Path(__file__).parents[1] / "website"
+    page = (site / "index.html").read_text(encoding="utf-8")
+    blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, flags=re.S)
+    assert len(blocks) == 1
+    data = {item["@type"]: item for item in json.loads(blocks[0])}
+    app = data["SoftwareApplication"]
+    assert app["name"] == data["WebSite"]["name"] == "Isoline"
+    assert app["softwareVersion"] == __version__
+    assert app["offers"]["price"] == "0"
+    assert "Isoline" in re.search(r"<title>(.*?)</title>", page).group(1)
+    robots = (site / "robots.txt").read_text(encoding="utf-8")
+    assert "Allow: /" in robots and "Sitemap: https://isolinee.vercel.app/sitemap.xml" in robots
+    assert "<loc>https://isolinee.vercel.app/</loc>" in (site / "sitemap.xml").read_text(encoding="utf-8")
+    assert f"Current version: {__version__}." in (site / "llms.txt").read_text(encoding="utf-8")

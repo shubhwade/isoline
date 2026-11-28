@@ -1,0 +1,22 @@
+# Isoline
+
+> Isoline is a free, open-source (MIT) Python command-line tool for financial statement analysis of any listed company. One command (`isoline scan TICKER`) computes the Piotroski F-score, Altman Z''-score and Beneish M-score, quality metrics, four years of income statement, balance sheet and cash flow, a DCF valuation, and writes a print-ready report laid out like a published annual report, with every number explained in plain English. Missing data shows as n/a, never a zero. Data comes from Yahoo Finance, with SEC EDGAR as a fallback for US tickers. Not investment advice.
+
+Install: `pip install isoline` (Python 3.10+, Windows, macOS, Linux). Current version: 0.9.0. Formerly named Telmus.
+
+## Links
+
+- [Website](https://isolinee.vercel.app/)
+- [Documentation](https://shubhwade.github.io/isoline/)
+- [Quick start](https://shubhwade.github.io/isoline/quickstart/)
+- [Source code on GitHub](https://github.com/shubhwade/isoline)
+- [Package on PyPI](https://pypi.org/project/isoline/)
+
+## Commands
+
+- `isoline scan TICKER`: scores, metrics, terminal tables, HTML and Excel reports
+- `isoline statements TICKER`: four years of financial statements, as reported
+- `isoline compare A B`: two companies side by side
+- `isoline screen SECTOR`: screen a sector with criteria
+- `isoline value TICKER`: DCF valuation with scenarios and sensitivity
+- `isoline serve`: MCP server so AI assistants can call Isoline
